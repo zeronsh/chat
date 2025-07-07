@@ -1,4 +1,4 @@
-# bun-react-template
+# @zeronsh/routes
 
 To install dependencies:
 
@@ -6,16 +6,10 @@ To install dependencies:
 bun install
 ```
 
-To start a development server:
+To run:
 
 ```bash
-bun dev
-```
-
-To run for production:
-
-```bash
-bun start
+bun run index.ts
 ```
 
 This project was created using `bun init` in bun v1.2.18. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
