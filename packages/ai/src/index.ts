@@ -156,9 +156,13 @@ export function createUIMessageStreamResponse<Message extends UIMessage>() {
 
                             const result = streamText({
                                 ...options,
-                                onError: error => {
+                                onError: async error => {
                                     if (onStreamError) {
-                                        onStreamError({ body, writer, context, error });
+                                        await onStreamError({ body, writer, context, error }).catch(
+                                            e => {
+                                                console.log(e);
+                                            }
+                                        );
                                     }
                                 },
                             });
