@@ -8,5 +8,7 @@ export type Metadata = {
 
 export type DataParts = {};
 
-export type ThreadMessage = UIMessage<Metadata, DataParts, any>;
-export type MessagePart = UIMessagePart<DataParts, any>;
+export type Tools = {};
+
+export type ThreadMessage = UIMessage<Metadata, DataParts, Tools>;
+export type MessagePart = UIMessagePart<DataParts, Tools>;
