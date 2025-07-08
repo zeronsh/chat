@@ -9,7 +9,8 @@ export const env = createEnv({
     clientPrefix: 'VITE_PUBLIC_',
     client: {
         VITE_PUBLIC_API_URL: z.string().url(),
+        VITE_PUBLIC_ZERO_URL: z.string().url(),
     },
-    runtimeEnv: process.env,
+    runtimeEnv: Object.assign({}, import.meta.env, process.env),
     emptyStringAsUndefined: true,
 });

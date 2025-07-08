@@ -1,6 +1,8 @@
-import { HeadContent, Outlet, Scripts, createRootRoute } from '@tanstack/react-router';
 // @ts-ignore
 import appCss from '@/global.css?url';
+
+import { HeadContent, Outlet, Scripts, createRootRoute } from '@tanstack/react-router';
+import { DatabaseProvider } from '@/context/database';
 
 export const Route = createRootRoute({
     head: () => ({
@@ -53,7 +55,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                 <HeadContent />
                 <Scripts />
             </head>
-            {children}
+            <DatabaseProvider>{children}</DatabaseProvider>
         </html>
     );
 }
