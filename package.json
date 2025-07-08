@@ -10,10 +10,12 @@
   },
   "devDependencies": {
     "@tanstack/react-router": "^1.125.6",
+    "@tanstack/react-start": "^1.125.6",
     "@tanstack/router-cli": "^1.125.4",
     "prettier": "^3.6.2",
     "turbo": "^2.5.4",
-    "typescript": "5.8.3"
+    "typescript": "5.8.3",
+    "vite-tsconfig-paths": "^5.1.4"
   },
   "engines": {
     "node": ">=18"

@@ -1,20 +1,34 @@
 import { serve } from 'bun';
 import index from './index.html';
+import { convertToModelMessages, createUIMessageStream, streamText, UIMessage } from 'ai';
 
-class Test {
-    static GET(req: Bun.BunRequest<'/api/hello/:name'>) {
-        const name = req.params.name;
+const chat = {
+    async POST(req: Bun.BunRequest<'/api/chat'>) {
+        const body: { messages: UIMessage[] } = await req.json();
+        const stream = createUIMessageStream({
+            execute: ({ writer }) => {
+                const result = streamText({
+                    model: 'gpt-4o-mini',
+                    messages: convertToModelMessages(body.messages),
+                });
 
-        return Response.json({
-            message: `Hello, ${name}!`,
+                result.consumeStream(writer);
+                writer.merge(
+                    result.toUIMessageStream({
+                        sendReasoning: true,
+                    })
+                );
+            },
         });
-    }
-}
+
+        return new Response(stream);
+    },
+};
 
 const server = serve({
     routes: {
         '/*': index,
-        '/api/hello/:name': Test,
+        '/api/chat': chat,
     },
     development: process.env.NODE_ENV !== 'production' && {
         hmr: true,
