@@ -15,10 +15,25 @@ export function UserMessage({
     hasNextMessage,
 }: UserMessageProps<ThreadMessage>) {
     const [_, copy] = useCopyToClipboard();
+
+    async function handleCopyClick() {
+        const text = message.parts
+            .filter(part => part.type === 'text')
+            .map(part => part.text)
+            .join('\n')
+            .trim();
+
+        if (!text) {
+            return;
+        }
+
+        await copy(text);
+    }
+
     return (
         <MessageContainer hasPreviousMessage={hasPreviousMessage} hasNextMessage={hasNextMessage}>
             <Message className="flex flex-col items-end group/user-message w-full">
-                <div className="bg-muted p-4 rounded-l-3xl rounded-tr-3xl rounded-br-lg max-w-[80%]">
+                <div className="bg-muted py-4 px-6 rounded-l-3xl rounded-tr-3xl rounded-br-lg max-w-[80%]">
                     <UIMessage message={message} />
                 </div>
                 <MessageActions className="group-hover/user-message:opacity-100 md:opacity-0 transition-opacity duration-200 gap-1">
@@ -27,19 +42,7 @@ export function UserMessage({
                             variant="ghost"
                             size="icon"
                             className="size-8"
-                            onClick={async () => {
-                                const text = message.parts
-                                    .filter(part => part.type === 'text')
-                                    .map(part => part.text)
-                                    .join('\n')
-                                    .trim();
-
-                                if (!text) {
-                                    return;
-                                }
-
-                                await copy(text);
-                            }}
+                            onClick={handleCopyClick}
                         >
                             <CopyIcon className="size-3" />
                         </Button>

@@ -37,7 +37,7 @@ export const Route = createRootRoute({
 
 function RootComponent() {
     return (
-        <body className="fixed inset-0">
+        <body className="fixed inset-0 dark">
             <div className="fixed inset-0 flex text-foreground">
                 <Outlet />
                 {/* <TanStackRouterDevtools /> */}
