@@ -27,7 +27,7 @@ export const Route = createRootRoute({
             },
         ],
     }),
-
+    notFoundComponent: () => <div>Not found</div>,
     component: () => (
         <RootDocument>
             <RootComponent />

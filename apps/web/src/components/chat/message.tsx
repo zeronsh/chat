@@ -1,28 +1,125 @@
 import type { UIMessage } from 'ai';
 import { Part } from './part';
 import type { AssistantMessageProps, UserMessageProps } from '@zeronsh/ai/react';
-import { Message } from '@/components/ui/message';
+import { Message, MessageAction, MessageActions } from '@/components/ui/message';
+import { cn } from '@/lib/utils';
+import { Loader } from '@/components/ui/loader';
+import { Button } from '@/components/ui/button';
+import { CopyIcon, EditIcon, GitBranchIcon, RefreshCcwIcon } from 'lucide-react';
 
-export function UserMessage({ message }: UserMessageProps<any>) {
+export function UserMessage({ message, hasPreviousMessage }: UserMessageProps<any>) {
     return (
-        <div className="flex justify-end max-w-2xl mx-auto w-full">
-            <Message className="bg-muted p-4 rounded-l-3xl rounded-tr-3xl rounded-br-lg max-w-[80%]">
-                <UIMessage message={message} />
+        <MessageContainer hasPreviousMessage={hasPreviousMessage} hasNextMessage={true}>
+            <Message className="flex flex-col items-end group/user-message w-full">
+                <div className="bg-muted p-4 rounded-l-3xl rounded-tr-3xl rounded-br-lg max-w-[80%]">
+                    <UIMessage message={message} />
+                </div>
+                <MessageActions className="group-hover/user-message:opacity-100 md:opacity-0 transition-opacity duration-200 gap-1">
+                    <MessageAction tooltip="Copy" side="bottom">
+                        <Button variant="ghost" size="icon" className="size-8">
+                            <CopyIcon className="size-3" />
+                        </Button>
+                    </MessageAction>
+                    <MessageAction tooltip="Edit" side="bottom">
+                        <Button variant="ghost" size="icon" className="size-8">
+                            <EditIcon className="size-3" />
+                        </Button>
+                    </MessageAction>
+                </MessageActions>
             </Message>
-        </div>
+        </MessageContainer>
     );
 }
 
-export function AssistantMessage({ message }: AssistantMessageProps<any>) {
+export function AssistantMessage({
+    status,
+    message,
+    hasNextMessage,
+    hasPreviousMessage,
+}: AssistantMessageProps<any>) {
     return (
-        <div className="flex justify-start max-w-2xl mx-auto w-full">
-            <Message className="bg-muted p-4 rounded-l-3xl rounded-tr-3xl rounded-br-lg max-w-[80%]">
+        <MessageContainer
+            className="justify-start"
+            hasPreviousMessage={hasPreviousMessage}
+            hasNextMessage={hasNextMessage}
+        >
+            <Message className="flex flex-col items-start w-full">
                 <UIMessage message={message} />
+                <MessageActions
+                    className={cn(
+                        'gap-1 transition-opacity duration-200 opacity-100',
+                        (status === 'streaming' || status === 'submitted') &&
+                            !hasNextMessage &&
+                            'opacity-0 pointer-events-none'
+                    )}
+                >
+                    <MessageAction tooltip="Copy" side="bottom">
+                        <Button variant="ghost" size="icon" className="size-8">
+                            <CopyIcon className="size-3" />
+                        </Button>
+                    </MessageAction>
+                    <MessageAction tooltip="Regenerate" side="bottom">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-8"
+                            disabled={status === 'streaming' || status === 'submitted'}
+                        >
+                            <RefreshCcwIcon className="size-3" />
+                        </Button>
+                    </MessageAction>
+                    <MessageAction tooltip="Branch" side="bottom">
+                        <Button variant="ghost" size="icon" className="size-8">
+                            <GitBranchIcon className="size-3" />
+                        </Button>
+                    </MessageAction>
+                </MessageActions>
             </Message>
-        </div>
+        </MessageContainer>
+    );
+}
+
+export function PendingMessage({
+    hasPreviousMessage,
+    hasNextMessage,
+}: {
+    hasPreviousMessage: boolean;
+    hasNextMessage: boolean;
+}) {
+    return (
+        <MessageContainer hasPreviousMessage={hasPreviousMessage} hasNextMessage={hasNextMessage}>
+            <Message>
+                <Loader variant="typing" />
+            </Message>
+        </MessageContainer>
     );
 }
 
 function UIMessage({ message }: { message: UIMessage<any, any> }) {
     return message.parts.map((part, i) => <Part key={i} part={part} />);
+}
+
+function MessageContainer({
+    children,
+    hasPreviousMessage,
+    hasNextMessage,
+    className,
+}: {
+    children: React.ReactNode;
+    hasPreviousMessage: boolean;
+    hasNextMessage: boolean;
+    className?: string;
+}) {
+    return (
+        <div
+            className={cn(
+                'flex w-full',
+                className,
+                !hasNextMessage && 'pb-40',
+                !hasPreviousMessage && 'pt-40'
+            )}
+        >
+            {children}
+        </div>
+    );
 }

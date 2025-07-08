@@ -14,7 +14,7 @@ const PromptSchema = z.object({
     message: z.string().min(1),
 });
 
-export function MultiModalInput({ sendMessage, status }: PromptInputProps<any>) {
+export function MultiModalInput({ sendMessage, status, stop }: PromptInputProps<any>) {
     const form = useForm({
         defaultValues: {
             message: '',
@@ -32,17 +32,21 @@ export function MultiModalInput({ sendMessage, status }: PromptInputProps<any>) 
 
     return (
         <form
-            className="absolute bottom-0 left-0 right-0 bg-background p-4"
+            className="absolute bottom-0 left-0 right-0 p-4"
             onSubmit={e => {
                 e.preventDefault();
-                form.handleSubmit();
+                if (status === 'streaming' || status === 'submitted') {
+                    stop();
+                } else {
+                    form.handleSubmit();
+                }
             }}
         >
             <form.Field
                 name="message"
                 children={field => (
                     <PromptInput
-                        className="max-w-3xl mx-auto"
+                        className="max-w-3xl mx-auto p-3 bg-muted/50 backdrop-blur-md"
                         value={field.state.value}
                         onValueChange={field.handleChange}
                         onSubmit={form.handleSubmit}
