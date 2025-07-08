@@ -184,6 +184,7 @@ export const Message = memo(function Message<UIMessageWithMetaData extends UIMes
             />
         );
     }
+
     if (message.role === 'user' && !props.hasNextMessage) {
         return (
             <Fragment>
@@ -192,12 +193,9 @@ export const Message = memo(function Message<UIMessageWithMetaData extends UIMes
                     message={message}
                     sendMessage={sendMessage}
                     hasPreviousMessage={hasPreviousMessage}
-                    hasNextMessage={hasNextMessage}
+                    hasNextMessage={true}
                 />
-                <PendingMessage
-                    hasNextMessage={hasNextMessage}
-                    hasPreviousMessage={hasPreviousMessage}
-                />
+                <PendingMessage hasNextMessage={hasNextMessage} hasPreviousMessage={true} />
             </Fragment>
         );
     }

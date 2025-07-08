@@ -6,17 +6,41 @@ import { cn } from '@/lib/utils';
 import { Loader } from '@/components/ui/loader';
 import { Button } from '@/components/ui/button';
 import { CopyIcon, EditIcon, GitBranchIcon, RefreshCcwIcon } from 'lucide-react';
+import { useCopyToClipboard } from 'usehooks-ts';
+import type { ThreadMessage } from '@/components/chat/types';
 
-export function UserMessage({ message, hasPreviousMessage }: UserMessageProps<any>) {
+export function UserMessage({
+    message,
+    hasPreviousMessage,
+    hasNextMessage,
+}: UserMessageProps<ThreadMessage>) {
+    const [_, copy] = useCopyToClipboard();
     return (
-        <MessageContainer hasPreviousMessage={hasPreviousMessage} hasNextMessage={true}>
+        <MessageContainer hasPreviousMessage={hasPreviousMessage} hasNextMessage={hasNextMessage}>
             <Message className="flex flex-col items-end group/user-message w-full">
                 <div className="bg-muted p-4 rounded-l-3xl rounded-tr-3xl rounded-br-lg max-w-[80%]">
                     <UIMessage message={message} />
                 </div>
                 <MessageActions className="group-hover/user-message:opacity-100 md:opacity-0 transition-opacity duration-200 gap-1">
                     <MessageAction tooltip="Copy" side="bottom">
-                        <Button variant="ghost" size="icon" className="size-8">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-8"
+                            onClick={async () => {
+                                const text = message.parts
+                                    .filter(part => part.type === 'text')
+                                    .map(part => part.text)
+                                    .join('\n')
+                                    .trim();
+
+                                if (!text) {
+                                    return;
+                                }
+
+                                await copy(text);
+                            }}
+                        >
                             <CopyIcon className="size-3" />
                         </Button>
                     </MessageAction>
@@ -36,7 +60,7 @@ export function AssistantMessage({
     message,
     hasNextMessage,
     hasPreviousMessage,
-}: AssistantMessageProps<any>) {
+}: AssistantMessageProps<ThreadMessage>) {
     return (
         <MessageContainer
             className="justify-start"
@@ -95,7 +119,7 @@ export function PendingMessage({
     );
 }
 
-function UIMessage({ message }: { message: UIMessage<any, any> }) {
+function UIMessage({ message }: { message: ThreadMessage }) {
     return message.parts.map((part, i) => <Part key={i} part={part} />);
 }
 

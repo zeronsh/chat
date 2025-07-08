@@ -1,3 +1,4 @@
+import type { ThreadMessage } from '@/components/chat/types';
 import { createServerFileRoute } from '@tanstack/react-start/server';
 import {
     UIMessage,
@@ -10,7 +11,7 @@ import {
 export const ServerRoute = createServerFileRoute('/api/chat').methods({
     async POST({ request }: { request: Request }) {
         const body: { messages: UIMessage[] } = await request.json();
-        const stream = createUIMessageStream({
+        const stream = createUIMessageStream<ThreadMessage>({
             execute: ({ writer }) => {
                 const result = streamText({
                     model: 'gpt-4o-mini',
