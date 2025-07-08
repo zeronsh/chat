@@ -10,6 +10,7 @@ import type {
     IdGenerator,
 } from 'ai';
 import { Fragment, memo } from 'react';
+import { StickToBottom, type StickToBottomProps } from 'use-stick-to-bottom';
 
 export type ChatProps<
     Metadata = {},
@@ -22,7 +23,7 @@ export type ChatProps<
     >,
 > = {
     className?: string;
-
+    contentClassName?: string;
     // AI SDK v5 props
     id?: string;
     generateId?: IdGenerator;
@@ -35,11 +36,13 @@ export type ChatProps<
     // Component props
     UserMessage: React.ComponentType<{
         message: UIMessageWithMetaData;
+        sendMessage: ReturnType<typeof useChat<UIMessageWithMetaData>>['sendMessage'];
         hasNextMessage: boolean;
         hasPreviousMessage: boolean;
     }>;
     AssistantMessage: React.ComponentType<{
         message: UIMessageWithMetaData;
+        sendMessage: ReturnType<typeof useChat<UIMessageWithMetaData>>['sendMessage'];
         hasNextMessage: boolean;
         hasPreviousMessage: boolean;
     }>;
@@ -48,6 +51,7 @@ export type ChatProps<
         hasPreviousMessage: boolean;
     }>;
     PromptInput: React.ComponentType<{
+        status: ReturnType<typeof useChat<UIMessageWithMetaData>>['status'];
         stop: ReturnType<typeof useChat<UIMessageWithMetaData>>['stop'];
         sendMessage: ReturnType<typeof useChat<UIMessageWithMetaData>>['sendMessage'];
     }>;
@@ -76,27 +80,37 @@ export function Chat<
     const { PromptInput } = props;
 
     return (
-        <div className={props.className}>
-            <Messages
-                messages={helpers.messages}
-                UserMessage={props.UserMessage}
-                AssistantMessage={props.AssistantMessage}
-                PendingMessage={props.PendingMessage}
+        <ChatContainerRoot className={props.className}>
+            <ChatContainerContent className={props.contentClassName}>
+                <Messages
+                    messages={helpers.messages}
+                    UserMessage={props.UserMessage}
+                    AssistantMessage={props.AssistantMessage}
+                    PendingMessage={props.PendingMessage}
+                    sendMessage={helpers.sendMessage}
+                />
+            </ChatContainerContent>
+            <PromptInput
+                status={helpers.status}
+                stop={helpers.stop}
+                sendMessage={helpers.sendMessage}
             />
-            <PromptInput stop={helpers.stop} sendMessage={helpers.sendMessage} />
-        </div>
+        </ChatContainerRoot>
     );
 }
 
 export type MessagesProps<UIMessageWithMetaData extends UIMessage = UIMessage> = {
     messages: UIMessageWithMetaData[];
+    sendMessage: ReturnType<typeof useChat<UIMessageWithMetaData>>['sendMessage'];
     UserMessage: React.ComponentType<{
         message: UIMessageWithMetaData;
+        sendMessage: ReturnType<typeof useChat<UIMessageWithMetaData>>['sendMessage'];
         hasNextMessage: boolean;
         hasPreviousMessage: boolean;
     }>;
     AssistantMessage: React.ComponentType<{
         message: UIMessageWithMetaData;
+        sendMessage: ReturnType<typeof useChat<UIMessageWithMetaData>>['sendMessage'];
         hasNextMessage: boolean;
         hasPreviousMessage: boolean;
     }>;
@@ -109,36 +123,36 @@ export type MessagesProps<UIMessageWithMetaData extends UIMessage = UIMessage> =
 export const Messages = memo(function Messages<UIMessageWithMetaData extends UIMessage = UIMessage>(
     props: MessagesProps<UIMessageWithMetaData>
 ) {
-    return (
-        <div>
-            {props.messages.map((message, i) => (
-                <Message
-                    key={message.id}
-                    message={message}
-                    UserMessage={props.UserMessage}
-                    AssistantMessage={props.AssistantMessage}
-                    hasNextMessage={props.messages[i + 1] !== undefined}
-                    hasPreviousMessage={props.messages[i - 1] !== undefined}
-                    PendingMessage={props.PendingMessage}
-                />
-            ))}
-        </div>
-    );
+    return props.messages.map((message, i) => (
+        <Message
+            key={message.id}
+            message={message}
+            sendMessage={props.sendMessage}
+            UserMessage={props.UserMessage}
+            AssistantMessage={props.AssistantMessage}
+            hasNextMessage={props.messages[i + 1] !== undefined}
+            hasPreviousMessage={props.messages[i - 1] !== undefined}
+            PendingMessage={props.PendingMessage}
+        />
+    ));
 }) as <UIMessageWithMetaData extends UIMessage = UIMessage>(
     props: MessagesProps<UIMessageWithMetaData>
 ) => React.ReactElement;
 
 export type MessageProps<UIMessageWithMetaData extends UIMessage = UIMessage> = {
     message: UIMessageWithMetaData;
+    sendMessage: ReturnType<typeof useChat<UIMessageWithMetaData>>['sendMessage'];
     hasNextMessage: boolean;
     hasPreviousMessage: boolean;
     UserMessage: React.ComponentType<{
         message: UIMessageWithMetaData;
+        sendMessage: ReturnType<typeof useChat<UIMessageWithMetaData>>['sendMessage'];
         hasNextMessage: boolean;
         hasPreviousMessage: boolean;
     }>;
     AssistantMessage: React.ComponentType<{
         message: UIMessageWithMetaData;
+        sendMessage: ReturnType<typeof useChat<UIMessageWithMetaData>>['sendMessage'];
         hasNextMessage: boolean;
         hasPreviousMessage: boolean;
     }>;
@@ -153,6 +167,7 @@ export const Message = memo(function Message<UIMessageWithMetaData extends UIMes
 ) {
     const {
         message,
+        sendMessage,
         hasNextMessage,
         hasPreviousMessage,
         UserMessage,
@@ -164,6 +179,7 @@ export const Message = memo(function Message<UIMessageWithMetaData extends UIMes
         return (
             <AssistantMessage
                 message={message}
+                sendMessage={sendMessage}
                 hasNextMessage={hasNextMessage}
                 hasPreviousMessage={hasPreviousMessage}
             />
@@ -183,6 +199,7 @@ export const Message = memo(function Message<UIMessageWithMetaData extends UIMes
             <Fragment>
                 <UserMessage
                     message={message}
+                    sendMessage={sendMessage}
                     hasPreviousMessage={hasPreviousMessage}
                     hasNextMessage={hasNextMessage}
                 />
@@ -197,6 +214,7 @@ export const Message = memo(function Message<UIMessageWithMetaData extends UIMes
     return (
         <UserMessage
             message={message}
+            sendMessage={sendMessage}
             hasPreviousMessage={hasPreviousMessage}
             hasNextMessage={hasNextMessage}
         />
@@ -204,3 +222,39 @@ export const Message = memo(function Message<UIMessageWithMetaData extends UIMes
 }) as <UIMessageWithMetaData extends UIMessage = UIMessage>(
     props: MessageProps<UIMessageWithMetaData>
 ) => React.ReactElement;
+
+export type ChatContainerRootProps = {
+    children: React.ReactNode;
+    className?: string;
+} & React.HTMLAttributes<HTMLDivElement> &
+    StickToBottomProps;
+
+export type ChatContainerContentProps = {
+    children: React.ReactNode;
+    className?: string;
+} & React.HTMLAttributes<HTMLDivElement>;
+
+export type ChatContainerScrollAnchorProps = {
+    className?: string;
+    ref?: React.RefObject<HTMLDivElement>;
+} & React.HTMLAttributes<HTMLDivElement>;
+
+export function ChatContainerRoot({ children, className, ...props }: ChatContainerRootProps) {
+    return (
+        <StickToBottom className={className} role="log" {...props}>
+            {children}
+        </StickToBottom>
+    );
+}
+
+export function ChatContainerContent({ children, className, ...props }: ChatContainerContentProps) {
+    return (
+        <StickToBottom.Content className={className} {...props}>
+            {children}
+        </StickToBottom.Content>
+    );
+}
+
+export function ChatContainerScrollAnchor({ className, ...props }: ChatContainerScrollAnchorProps) {
+    return <div className={className} aria-hidden="true" {...props} />;
+}

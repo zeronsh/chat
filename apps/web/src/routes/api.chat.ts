@@ -15,6 +15,7 @@ export const ServerRoute = createServerFileRoute('/api/chat').methods({
                 const result = streamText({
                     model: 'gpt-4o-mini',
                     messages: convertToModelMessages(body.messages),
+                    abortSignal: request.signal,
                 });
 
                 result.consumeStream();
