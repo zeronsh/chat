@@ -1,4 +1,4 @@
-import type { UIMessage } from 'ai';
+import type { UIMessage, UIMessagePart } from 'ai';
 
 export type Metadata = {
     modelId: string;
@@ -9,3 +9,4 @@ export type Metadata = {
 export type DataParts = {};
 
 export type ThreadMessage = UIMessage<Metadata, DataParts, any>;
+export type MessagePart = UIMessagePart<DataParts, any>;
