@@ -14,7 +14,7 @@ const PromptSchema = z.object({
     message: z.string().min(1),
 });
 
-export function MultiModalInput({ sendMessage }: PromptInputProps<any>) {
+export function MultiModalInput({ sendMessage, status }: PromptInputProps<any>) {
     const form = useForm({
         defaultValues: {
             message: '',
