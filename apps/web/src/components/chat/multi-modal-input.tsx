@@ -6,6 +6,7 @@ import {
     PromptInputAction,
 } from '@/components/ui/prompt-input';
 import { useForm } from '@tanstack/react-form';
+import { PromptInputProps } from '@zeronsh/ai/react';
 import { SquareIcon, ArrowUpIcon } from 'lucide-react';
 import { z } from 'zod';
 
@@ -13,7 +14,7 @@ const PromptSchema = z.object({
     message: z.string().min(1),
 });
 
-export function MultiModalInput({ sendMessage }: { sendMessage: any }) {
+export function MultiModalInput({ sendMessage }: PromptInputProps<any>) {
     const form = useForm({
         defaultValues: {
             message: '',

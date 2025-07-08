@@ -34,27 +34,35 @@ export type ChatProps<
     onError?: ChatOnErrorCallback;
 
     // Component props
-    UserMessage: React.ComponentType<{
-        message: UIMessageWithMetaData;
-        sendMessage: ReturnType<typeof useChat<UIMessageWithMetaData>>['sendMessage'];
-        hasNextMessage: boolean;
-        hasPreviousMessage: boolean;
-    }>;
-    AssistantMessage: React.ComponentType<{
-        message: UIMessageWithMetaData;
-        sendMessage: ReturnType<typeof useChat<UIMessageWithMetaData>>['sendMessage'];
-        hasNextMessage: boolean;
-        hasPreviousMessage: boolean;
-    }>;
-    PendingMessage: React.ComponentType<{
-        hasNextMessage: boolean;
-        hasPreviousMessage: boolean;
-    }>;
-    PromptInput: React.ComponentType<{
-        status: ReturnType<typeof useChat<UIMessageWithMetaData>>['status'];
-        stop: ReturnType<typeof useChat<UIMessageWithMetaData>>['stop'];
-        sendMessage: ReturnType<typeof useChat<UIMessageWithMetaData>>['sendMessage'];
-    }>;
+    UserMessage: React.ComponentType<UserMessageProps<UIMessageWithMetaData>>;
+    AssistantMessage: React.ComponentType<AssistantMessageProps<UIMessageWithMetaData>>;
+    PendingMessage: React.ComponentType<PendingMessageProps>;
+    PromptInput: React.ComponentType<PromptInputProps<UIMessageWithMetaData>>;
+};
+
+export type UserMessageProps<UIMessageWithMetaData extends UIMessage = UIMessage> = {
+    message: UIMessageWithMetaData;
+    sendMessage: ReturnType<typeof useChat<UIMessageWithMetaData>>['sendMessage'];
+    hasNextMessage: boolean;
+    hasPreviousMessage: boolean;
+};
+
+export type AssistantMessageProps<UIMessageWithMetaData extends UIMessage = UIMessage> = {
+    message: UIMessageWithMetaData;
+    sendMessage: ReturnType<typeof useChat<UIMessageWithMetaData>>['sendMessage'];
+    hasNextMessage: boolean;
+    hasPreviousMessage: boolean;
+};
+
+export type PendingMessageProps = {
+    hasNextMessage: boolean;
+    hasPreviousMessage: boolean;
+};
+
+export type PromptInputProps<UIMessageWithMetaData extends UIMessage = UIMessage> = {
+    status: ReturnType<typeof useChat<UIMessageWithMetaData>>['status'];
+    stop: ReturnType<typeof useChat<UIMessageWithMetaData>>['stop'];
+    sendMessage: ReturnType<typeof useChat<UIMessageWithMetaData>>['sendMessage'];
 };
 
 export function Chat<
@@ -102,22 +110,9 @@ export function Chat<
 export type MessagesProps<UIMessageWithMetaData extends UIMessage = UIMessage> = {
     messages: UIMessageWithMetaData[];
     sendMessage: ReturnType<typeof useChat<UIMessageWithMetaData>>['sendMessage'];
-    UserMessage: React.ComponentType<{
-        message: UIMessageWithMetaData;
-        sendMessage: ReturnType<typeof useChat<UIMessageWithMetaData>>['sendMessage'];
-        hasNextMessage: boolean;
-        hasPreviousMessage: boolean;
-    }>;
-    AssistantMessage: React.ComponentType<{
-        message: UIMessageWithMetaData;
-        sendMessage: ReturnType<typeof useChat<UIMessageWithMetaData>>['sendMessage'];
-        hasNextMessage: boolean;
-        hasPreviousMessage: boolean;
-    }>;
-    PendingMessage: React.ComponentType<{
-        hasNextMessage: boolean;
-        hasPreviousMessage: boolean;
-    }>;
+    UserMessage: React.ComponentType<UserMessageProps<UIMessageWithMetaData>>;
+    AssistantMessage: React.ComponentType<AssistantMessageProps<UIMessageWithMetaData>>;
+    PendingMessage: React.ComponentType<PendingMessageProps>;
 };
 
 export const Messages = memo(function Messages<UIMessageWithMetaData extends UIMessage = UIMessage>(
@@ -144,22 +139,9 @@ export type MessageProps<UIMessageWithMetaData extends UIMessage = UIMessage> = 
     sendMessage: ReturnType<typeof useChat<UIMessageWithMetaData>>['sendMessage'];
     hasNextMessage: boolean;
     hasPreviousMessage: boolean;
-    UserMessage: React.ComponentType<{
-        message: UIMessageWithMetaData;
-        sendMessage: ReturnType<typeof useChat<UIMessageWithMetaData>>['sendMessage'];
-        hasNextMessage: boolean;
-        hasPreviousMessage: boolean;
-    }>;
-    AssistantMessage: React.ComponentType<{
-        message: UIMessageWithMetaData;
-        sendMessage: ReturnType<typeof useChat<UIMessageWithMetaData>>['sendMessage'];
-        hasNextMessage: boolean;
-        hasPreviousMessage: boolean;
-    }>;
-    PendingMessage: React.ComponentType<{
-        hasNextMessage: boolean;
-        hasPreviousMessage: boolean;
-    }>;
+    UserMessage: React.ComponentType<UserMessageProps<UIMessageWithMetaData>>;
+    AssistantMessage: React.ComponentType<AssistantMessageProps<UIMessageWithMetaData>>;
+    PendingMessage: React.ComponentType<PendingMessageProps>;
 };
 
 export const Message = memo(function Message<UIMessageWithMetaData extends UIMessage = UIMessage>(
