@@ -1,33 +1,27 @@
 import type { ThreadMessage } from '@/components/chat/types';
 import { createServerFileRoute } from '@tanstack/react-start/server';
-import {
-    UIMessage,
-    createUIMessageStream,
-    streamText,
-    convertToModelMessages,
-    JsonToSseTransformStream,
-} from 'ai';
+import { convertToModelMessages } from 'ai';
+import { createUIMessageStreamResponse } from '@zeronsh/ai';
+import z from 'zod';
 
 export const ServerRoute = createServerFileRoute('/api/chat').methods({
     async POST({ request }: { request: Request }) {
-        const body: { messages: UIMessage[] } = await request.json();
-        const stream = createUIMessageStream<ThreadMessage>({
-            execute: ({ writer }) => {
-                const result = streamText({
-                    model: 'gpt-4o-mini',
+        return createUIMessageStreamResponse<ThreadMessage>()({
+            request,
+            schema: z.object({
+                messages: z.any(),
+            }),
+            onPrepare: async ({ body }) => {
+                return {
                     messages: convertToModelMessages(body.messages),
-                    abortSignal: request.signal,
-                });
-
-                result.consumeStream();
-                writer.merge(
-                    result.toUIMessageStream({
-                        sendReasoning: true,
-                    })
-                );
+                };
+            },
+            onStream: ({ context: { messages } }) => {
+                return {
+                    model: 'gpt-4o-mini',
+                    messages,
+                };
             },
         });
-
-        return new Response(stream.pipeThrough(new JsonToSseTransformStream()));
     },
 });
