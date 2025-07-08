@@ -23,7 +23,7 @@
         "@tanstack/react-form": "^1.14.1",
         "@tanstack/react-router": "^1.125.6",
         "@zeronsh/ai": "workspace:*",
-        "ai": "^5.0.0-beta.9",
+        "ai": "5.0.0-beta.9",
         "better-auth": "^1.2.12",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
