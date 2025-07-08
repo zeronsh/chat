@@ -1,3 +1,4 @@
+import { ThreadMessage } from '@/components/chat/types';
 import { Button } from '@/components/ui/button';
 import {
     PromptInput,
@@ -14,7 +15,7 @@ const PromptSchema = z.object({
     message: z.string().min(1),
 });
 
-export function MultiModalInput({ sendMessage, status, stop }: PromptInputProps<any>) {
+export function MultiModalInput({ sendMessage, status, stop }: PromptInputProps<ThreadMessage>) {
     const form = useForm({
         defaultValues: {
             message: '',
