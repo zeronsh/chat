@@ -1,4 +1,3 @@
-import { Message, MessageContent } from '@/components/ui/message';
 import { createFileRoute } from '@tanstack/react-router';
 import { Chat } from '@zeronsh/ai/react';
 import { MultiModalInput } from '@/components/chat/multi-modal-input';
