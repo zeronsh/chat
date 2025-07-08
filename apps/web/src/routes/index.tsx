@@ -8,16 +8,16 @@ export const Route = createFileRoute('/')({
 function Index() {
     return (
         <Chat
+            className="absolute inset-0 overflow-y-auto"
             UserMessage={({ message }) => <div>{JSON.stringify(message, null, 2)}</div>}
             AssistantMessage={({ message }) => <div>{JSON.stringify(message, null, 2)}</div>}
             PendingMessage={() => <div>Loading...</div>}
             PromptInput={({ sendMessage, status, stop }) => (
-                <div>
+                <div className="absolute bottom-0 left-0 right-0 bg-background">
                     <button onClick={() => sendMessage({ text: 'Write a 1000 word story' })}>
                         Send
                     </button>
                     <button onClick={() => stop()}>Stop</button>
-                    <div>{status}</div>
                 </div>
             )}
         />
