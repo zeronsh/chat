@@ -1,28 +1,24 @@
 {
-  "name": "chat",
-  "private": true,
-  "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev",
-    "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "check-types": "turbo run check-types"
-  },
-  "devDependencies": {
-    "@tanstack/react-router": "^1.125.6",
-    "@tanstack/react-start": "^1.125.6",
-    "@tanstack/router-cli": "^1.125.4",
-    "prettier": "^3.6.2",
-    "turbo": "^2.5.4",
-    "typescript": "5.8.3",
-    "vite-tsconfig-paths": "^5.1.4"
-  },
-  "engines": {
-    "node": ">=18"
-  },
-  "packageManager": "bun@1.2.18",
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ]
+    "name": "chat",
+    "private": true,
+    "scripts": {
+        "build": "turbo run build",
+        "dev": "turbo run dev",
+        "lint": "turbo run lint",
+        "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+        "check-types": "turbo run check-types"
+    },
+    "devDependencies": {
+        "@tanstack/react-router": "^1.125.6",
+        "@tanstack/react-start": "^1.125.6",
+        "@tanstack/router-cli": "^1.125.4",
+        "prettier": "^3.6.2",
+        "turbo": "^2.5.4",
+        "typescript": "5.8.3",
+        "vite-tsconfig-paths": "^5.1.4"
+    },
+    "engines": {
+        "node": ">=18"
+    },
+    "packageManager": "pnpm@9.5.0"
 }

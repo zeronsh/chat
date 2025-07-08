@@ -54,11 +54,7 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
     }, [session, isPending]);
 
     if (isPending || !session || !zero) {
-        return (
-            <body className="fixed inset-0 bg-background dark">
-                <div className="moon animate-pulse duration-[3000ms]" />
-            </body>
-        );
+        return <body className="fixed inset-0 bg-background dark" />;
     }
 
     return (

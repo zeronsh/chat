@@ -1,6 +1,6 @@
 import { type Schema, schema } from '@/zero/schema';
 import type { AuthData, TableName } from '@/zero/types';
-import { definePermissions, ExpressionBuilder } from '@rocicorp/zero';
+import { definePermissions, ExpressionBuilder, PermissionsConfig } from '@rocicorp/zero';
 
 export const permissions = definePermissions<AuthData, Schema>(schema, () => {
     const allowIfUser = (authData: AuthData, builder: ExpressionBuilder<Schema, TableName>) =>
@@ -41,7 +41,7 @@ export const permissions = definePermissions<AuthData, Schema>(schema, () => {
                 },
             },
         },
-        chat: {
+        thread: {
             row: {
                 select: [allowIfThreadCreator],
                 insert: [allowIfThreadCreator],
@@ -52,5 +52,5 @@ export const permissions = definePermissions<AuthData, Schema>(schema, () => {
                 },
             },
         },
-    };
+    } satisfies PermissionsConfig<AuthData, Schema>;
 });

@@ -4,14 +4,15 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "dev": "dotenvx run -- bunx --bun vite",
+        "dev": "dotenvx run -- vite",
         "build": "dotenvx run -f .env.production -- vite build",
         "serve": "dotenvx run -f .env.production -- vite preview",
         "auth:generate": "dotenvx run -- npx @better-auth/cli generate --output ./src/database/auth-schema.ts",
         "database:push": "dotenvx run -- npx drizzle-kit push",
         "database:generate": "dotenvx run -- npx drizzle-kit generate",
         "database:migrate": "dotenvx run -- npx drizzle-kit migrate",
-        "zero:generate": "dotenvx run -- drizzle-zero generate --format --output ./src/zero/schema.ts"
+        "zero:generate": "dotenvx run -- drizzle-zero generate --format --output ./src/zero/schema.ts",
+        "zero:dev": "dotenvx run -- npx zero-cache-dev -p src/zero/index.ts "
     },
     "dependencies": {
         "@radix-ui/react-avatar": "^1.1.10",
@@ -21,7 +22,7 @@
         "@t3-oss/env-core": "^0.13.8",
         "@tanstack/react-form": "^1.14.1",
         "@tanstack/react-router": "^1.125.6",
-        "@zeronsh/ai": "*",
+        "@zeronsh/ai": "workspace:*",
         "ai": "^5.0.0-beta.9",
         "better-auth": "^1.2.12",
         "class-variance-authority": "^0.7.1",
