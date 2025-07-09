@@ -11,6 +11,7 @@ import { PromptInputProps } from '@zeronsh/ai/react';
 import { SquareIcon, ArrowUpIcon } from 'lucide-react';
 import { z } from 'zod';
 import { useNavigate } from '@tanstack/react-router';
+import { useParamsThreadId } from '@/hooks/use-params-thread-id';
 
 const PromptSchema = z.object({
     message: z.string().min(1),
@@ -22,6 +23,7 @@ export function MultiModalInput({
     status,
     stop,
 }: PromptInputProps<ThreadMessage>) {
+    const threadId = useParamsThreadId();
     const navigate = useNavigate();
 
     const form = useForm({
@@ -34,8 +36,14 @@ export function MultiModalInput({
             onSubmit: PromptSchema,
         },
         onSubmit: async ({ value }) => {
-            window.history.replaceState({}, '', `/t/${id}`);
-            sendMessage({ text: value.message });
+            await navigate({
+                to: '/$threadId',
+                params: {
+                    threadId: id,
+                },
+                replace: Boolean(threadId),
+            });
+            await sendMessage({ text: value.message });
             form.reset();
         },
     });

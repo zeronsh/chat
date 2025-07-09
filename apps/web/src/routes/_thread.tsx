@@ -18,6 +18,7 @@ function RouteComponent() {
             id={threadId}
             className="absolute inset-0 overflow-y-auto"
             contentClassName="flex flex-col gap-4 px-4 mx-auto max-w-3xl w-full"
+            experimental_throttle={100}
             transport={
                 new DefaultChatTransport({
                     api: '/api/chat',

@@ -117,9 +117,12 @@ export function createChatComponent<
     const Message = memo(function Message(props: MessageProps<UIMessageWithMetaData>) {
         const { status, message, sendMessage, hasNextMessage, hasPreviousMessage } = props;
 
+        const children: React.ReactNode[] = [];
+
         if (message.role === 'assistant' && message.parts.length > 0) {
-            return (
+            children.push(
                 <AssistantMessage
+                    key={message.id}
                     status={status}
                     message={message}
                     sendMessage={sendMessage}
@@ -129,9 +132,23 @@ export function createChatComponent<
             );
         }
 
+        if (message.role === 'user') {
+            children.push(
+                <UserMessage
+                    key={message.id}
+                    status={status}
+                    message={message}
+                    sendMessage={sendMessage}
+                    hasPreviousMessage={hasPreviousMessage}
+                    hasNextMessage={true}
+                />
+            );
+        }
+
         if (message.role === 'assistant' && message.parts.length === 0) {
-            return (
+            children.push(
                 <PendingMessage
+                    key="pending"
                     hasNextMessage={hasNextMessage}
                     hasPreviousMessage={hasPreviousMessage}
                 />
@@ -139,29 +156,16 @@ export function createChatComponent<
         }
 
         if (message.role === 'user' && !props.hasNextMessage) {
-            return (
-                <Fragment>
-                    <UserMessage
-                        status={status}
-                        message={message}
-                        sendMessage={sendMessage}
-                        hasPreviousMessage={hasPreviousMessage}
-                        hasNextMessage={true}
-                    />
-                    <PendingMessage hasNextMessage={hasNextMessage} hasPreviousMessage={true} />
-                </Fragment>
+            children.push(
+                <PendingMessage
+                    key="pending"
+                    hasNextMessage={hasNextMessage}
+                    hasPreviousMessage={hasPreviousMessage}
+                />
             );
         }
 
-        return (
-            <UserMessage
-                status={status}
-                message={message}
-                sendMessage={sendMessage}
-                hasPreviousMessage={hasPreviousMessage}
-                hasNextMessage={hasNextMessage}
-            />
-        );
+        return children;
     });
 
     return memo(function Chat(props: ChatProps<Metadata, DataParts, Tools, UIMessageWithMetaData>) {
