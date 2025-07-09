@@ -43,7 +43,7 @@ export function MultiModalInput({
                 },
                 replace: Boolean(threadId),
             });
-            await sendMessage({ text: value.message });
+            sendMessage({ text: value.message });
             form.reset();
         },
     });
