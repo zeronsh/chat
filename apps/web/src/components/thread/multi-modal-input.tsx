@@ -12,6 +12,8 @@ import { SquareIcon, ArrowUpIcon } from 'lucide-react';
 import { z } from 'zod';
 import { useNavigate } from '@tanstack/react-router';
 import { useParamsThreadId } from '@/hooks/use-params-thread-id';
+import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
 
 const PromptSchema = z.object({
     message: z.string().min(1),
@@ -49,8 +51,14 @@ export function MultiModalInput({
     });
 
     return (
-        <form
-            className="absolute bottom-0 left-0 right-0 p-4"
+        <motion.form
+            layout
+            layoutId="prompt-input"
+            className={cn({
+                'absolute px-4 pt-4': true,
+                'bottom-0 left-0 right-0': threadId,
+                'top-48 left-0 right-0': !threadId,
+            })}
             onSubmit={e => {
                 e.preventDefault();
                 if (status === 'streaming' || status === 'submitted') {
@@ -60,6 +68,18 @@ export function MultiModalInput({
                 }
             }}
         >
+            <div
+                className={cn({
+                    'absolute top-0 left-0 right-0 translate-y-[-100%] transition-opacity duration-300 p-4': true,
+                    'opacity-0 pointer-events-none': threadId,
+                })}
+            >
+                <div className="flex items-center justify-center h-full">
+                    <p className="text-2xl font-semibold text-muted-foreground">
+                        What's on your mind?
+                    </p>
+                </div>
+            </div>
             <form.Field
                 name="message"
                 children={field => (
@@ -82,12 +102,12 @@ export function MultiModalInput({
                                     type="submit"
                                     variant="default"
                                     size="icon"
-                                    className="h-8 w-8 rounded-full"
+                                    className="h-6 w-6 rounded-full"
                                 >
                                     {status === 'streaming' || status === 'submitted' ? (
-                                        <SquareIcon className="size-5 fill-current" />
+                                        <SquareIcon className="size-4 fill-current" />
                                     ) : (
-                                        <ArrowUpIcon className="size-5" />
+                                        <ArrowUpIcon className="size-4" />
                                     )}
                                 </Button>
                             </PromptInputAction>
@@ -95,6 +115,6 @@ export function MultiModalInput({
                     </PromptInput>
                 )}
             />
-        </form>
+        </motion.form>
     );
 }
