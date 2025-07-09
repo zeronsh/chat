@@ -9,10 +9,11 @@ import type {
     ChatOnErrorCallback,
     IdGenerator,
 } from 'ai';
-import { Fragment, memo, useMemo } from 'react';
+import { Fragment, memo, useEffect, useMemo } from 'react';
 import { customAlphabet } from 'nanoid';
 import { ChatContainerRoot } from './container';
 import { ChatContainerContent } from './container';
+import { useDebounce } from '@uidotdev/usehooks';
 
 export const nanoid = customAlphabet(
     '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
@@ -31,6 +32,7 @@ export type ChatProps<
 > = {
     className?: string;
     contentClassName?: string;
+    initialScroll?: 'instant' | 'smooth';
     // AI SDK v5 props
     id?: string;
     generateId?: IdGenerator;
@@ -117,12 +119,9 @@ export function createChatComponent<
     const Message = memo(function Message(props: MessageProps<UIMessageWithMetaData>) {
         const { status, message, sendMessage, hasNextMessage, hasPreviousMessage } = props;
 
-        const children: React.ReactNode[] = [];
-
         if (message.role === 'assistant' && message.parts.length > 0) {
-            children.push(
+            return (
                 <AssistantMessage
-                    key={message.id}
                     status={status}
                     message={message}
                     sendMessage={sendMessage}
@@ -132,23 +131,9 @@ export function createChatComponent<
             );
         }
 
-        if (message.role === 'user') {
-            children.push(
-                <UserMessage
-                    key={message.id}
-                    status={status}
-                    message={message}
-                    sendMessage={sendMessage}
-                    hasPreviousMessage={hasPreviousMessage}
-                    hasNextMessage={true}
-                />
-            );
-        }
-
         if (message.role === 'assistant' && message.parts.length === 0) {
-            children.push(
+            return (
                 <PendingMessage
-                    key="pending"
                     hasNextMessage={hasNextMessage}
                     hasPreviousMessage={hasPreviousMessage}
                 />
@@ -156,32 +141,35 @@ export function createChatComponent<
         }
 
         if (message.role === 'user' && !props.hasNextMessage) {
-            children.push(
-                <PendingMessage
-                    key="pending"
-                    hasNextMessage={hasNextMessage}
-                    hasPreviousMessage={hasPreviousMessage}
-                />
+            return (
+                <Fragment>
+                    <UserMessage
+                        status={status}
+                        message={message}
+                        sendMessage={sendMessage}
+                        hasPreviousMessage={hasPreviousMessage}
+                        hasNextMessage={true}
+                    />
+                    <PendingMessage hasNextMessage={hasNextMessage} hasPreviousMessage={true} />
+                </Fragment>
             );
         }
 
-        return children;
+        return (
+            <UserMessage
+                status={status}
+                message={message}
+                sendMessage={sendMessage}
+                hasPreviousMessage={hasPreviousMessage}
+                hasNextMessage={hasNextMessage}
+            />
+        );
     });
 
-    return memo(function Chat(props: ChatProps<Metadata, DataParts, Tools, UIMessageWithMetaData>) {
-        const generateId = props.generateId ?? nanoid;
-
-        const id = useMemo(() => {
-            if (props.id) {
-                return props.id;
-            }
-
-            return generateId();
-        }, [props.id, generateId]);
-
+    function Chat(props: ChatProps<Metadata, DataParts, Tools, UIMessageWithMetaData>) {
         const helpers = useChat<UIMessageWithMetaData>({
-            id,
-            generateId,
+            id: props.id,
+            generateId: props.generateId,
             experimental_throttle: props.experimental_throttle,
             messages: props.messages,
             transport: props.transport,
@@ -190,8 +178,16 @@ export function createChatComponent<
             onError: props.onError,
         });
 
+        const debouncedStatus = useDebounce(helpers.status, 100);
+
+        useEffect(() => {
+            if (debouncedStatus === 'ready' && props.messages) {
+                helpers.setMessages(props.messages);
+            }
+        }, [debouncedStatus, props.messages]);
+
         return (
-            <ChatContainerRoot className={props.className}>
+            <ChatContainerRoot className={props.className} initial={props.initialScroll}>
                 <ChatContainerContent className={props.contentClassName}>
                     <Messages
                         status={helpers.status}
@@ -206,6 +202,36 @@ export function createChatComponent<
                     sendMessage={helpers.sendMessage}
                 />
             </ChatContainerRoot>
+        );
+    }
+
+    return memo(function ChatRoot(
+        props: ChatProps<Metadata, DataParts, Tools, UIMessageWithMetaData>
+    ) {
+        const generateId = props.generateId ?? nanoid;
+
+        const id = useMemo(() => {
+            if (props.id) {
+                return props.id;
+            }
+
+            return generateId();
+        }, [props.id, generateId]);
+
+        return (
+            <Chat
+                key={id}
+                id={id}
+                className={props.className}
+                contentClassName={props.contentClassName}
+                initialScroll={props.initialScroll}
+                generateId={generateId}
+                messages={props.messages}
+                transport={props.transport}
+                onData={props.onData}
+                onFinish={props.onFinish}
+                onError={props.onError}
+            />
         );
     });
 }

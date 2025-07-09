@@ -1,4 +1,4 @@
-import { ThreadMessage } from '@/components/chat/types';
+import { ThreadMessage } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import {
     PromptInput,

@@ -7,7 +7,7 @@ import { Loader } from '@/components/ui/loader';
 import { Button } from '@/components/ui/button';
 import { CopyIcon, EditIcon, GitBranchIcon, RefreshCcwIcon } from 'lucide-react';
 import { useCopyToClipboard } from 'usehooks-ts';
-import type { ThreadMessage } from '@/components/chat/types';
+import type { ThreadMessage } from '@/lib/types';
 
 export function UserMessage({
     message,

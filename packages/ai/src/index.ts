@@ -28,7 +28,7 @@ export type CreateStreamUIMessageResponseOptions<
      * @param options - The options for the stream.
      * @returns The context for the stream.
      */
-    onPrepare: (options: { body: z.infer<Schema> }) => Promise<PrepareReturn>;
+    onPrepare: (options: { body: z.infer<Schema>; request: Request }) => Promise<PrepareReturn>;
 
     /**
      * The function that will be called to stream the response.
@@ -67,6 +67,7 @@ export type CreateStreamUIMessageResponseOptions<
         messages: Message[];
         isContinuation: boolean;
         responseMessage: Message;
+        context: PrepareReturn;
     }) => Promise<void>;
 };
 
@@ -123,7 +124,7 @@ export function createUIMessageStreamResponse<Message extends UIMessage>() {
             });
 
             const context = yield* Effect.tryPromise({
-                try: () => onPrepare({ body }),
+                try: () => onPrepare({ body, request }),
                 catch: error => {
                     if (error instanceof AIError) {
                         return new InternalError({
@@ -146,7 +147,16 @@ export function createUIMessageStreamResponse<Message extends UIMessage>() {
             const stream = yield* Effect.try({
                 try: () => {
                     return createUIMessageStream<Message>({
-                        onFinish,
+                        onFinish: async ({ messages, isContinuation, responseMessage }) => {
+                            if (onFinish) {
+                                await onFinish({
+                                    messages,
+                                    isContinuation,
+                                    responseMessage,
+                                    context,
+                                });
+                            }
+                        },
                         execute: ({ writer }) => {
                             const options = onStream({
                                 body,

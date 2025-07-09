@@ -1,4 +1,4 @@
-import { MessagePart } from '@/components/chat/types';
+import { MessagePart } from '@/lib/types';
 import { MessageContent } from '@/components/ui/message';
 import { match } from 'ts-pattern';
 

@@ -1,6 +1,6 @@
 import { relations } from 'drizzle-orm';
 import { jsonb, pgEnum, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
-import type { ThreadMessage } from '@/components/chat/types';
+import type { ThreadMessage } from '@/lib/types';
 import { user } from '@/database/auth-schema';
 
 export const message = pgTable('message', {
