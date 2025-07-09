@@ -51,13 +51,11 @@ export function MultiModalInput({
     });
 
     return (
-        <motion.form
-            layout
-            layoutId="prompt-input"
+        <form
             className={cn({
                 'absolute px-4 pt-4 flex flex-col gap-4': true,
                 'bottom-0 left-0 right-0': threadId,
-                'top-48 left-0 right-0': !threadId,
+                'inset-0': !threadId,
             })}
             onSubmit={e => {
                 e.preventDefault();
@@ -68,79 +66,73 @@ export function MultiModalInput({
                 }
             }}
         >
-            <div
-                className={cn({
-                    'absolute top-0 left-0 right-0 translate-y-[-100%] transition-opacity duration-300 opacity-100': true,
-                    'opacity-0 pointer-events-none': threadId,
-                })}
-            >
-                <div className="flex items-center justify-center h-full">
-                    <p className="text-2xl font-semibold text-muted-foreground">
-                        What's on your mind?
-                    </p>
-                </div>
-            </div>
             <form.Field
                 name="message"
                 children={field => (
-                    <PromptInput
-                        className="max-w-3xl mx-auto p-3 bg-muted/50 backdrop-blur-md w-full"
-                        value={field.state.value}
-                        onValueChange={field.handleChange}
-                        onSubmit={form.handleSubmit}
-                    >
-                        <PromptInputTextarea placeholder="Ask me anything..." />
-                        <PromptInputActions className="flex items-center">
-                            <PromptInputAction tooltip={'Search the web'}>
-                                <Button variant="outline" size="sm" className="h-6 rounded-full">
-                                    <GlobeIcon className="size-4" />
-                                    <span className="text-sm">Search</span>
-                                </Button>
-                            </PromptInputAction>
-                            <div className="flex-1" />
-                            <PromptInputAction tooltip="Attach files">
-                                <Button
-                                    asChild
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-6 w-6 rounded-full"
+                    <motion.div layoutId="prompt-input">
+                        <PromptInput
+                            className="max-w-3xl mx-auto p-3 bg-muted/50 backdrop-blur-md w-full"
+                            value={field.state.value}
+                            onValueChange={field.handleChange}
+                            onSubmit={form.handleSubmit}
+                        >
+                            <PromptInputTextarea placeholder="Ask me anything..." />
+                            <PromptInputActions className="flex items-center">
+                                <PromptInputAction tooltip={'Search the web'}>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="h-6 rounded-full"
+                                    >
+                                        <GlobeIcon className="size-4" />
+                                        <span className="text-sm">Search</span>
+                                    </Button>
+                                </PromptInputAction>
+                                <div className="flex-1" />
+                                <PromptInputAction tooltip="Attach files">
+                                    <Button
+                                        asChild
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-6 w-6 rounded-full"
+                                    >
+                                        <label htmlFor="file-upload">
+                                            <input
+                                                type="file"
+                                                multiple
+                                                className="hidden"
+                                                accept="image/*"
+                                                id="file-upload"
+                                            />
+                                            <Paperclip className="size-4" />
+                                        </label>
+                                    </Button>
+                                </PromptInputAction>
+                                <PromptInputAction
+                                    tooltip={
+                                        status === 'streaming' || status === 'submitted'
+                                            ? 'Stop generation'
+                                            : 'Send message'
+                                    }
                                 >
-                                    <label htmlFor="file-upload">
-                                        <input
-                                            type="file"
-                                            multiple
-                                            className="hidden"
-                                            accept="image/*"
-                                            id="file-upload"
-                                        />
-                                        <Paperclip className="size-4" />
-                                    </label>
-                                </Button>
-                            </PromptInputAction>
-                            <PromptInputAction
-                                tooltip={
-                                    status === 'streaming' || status === 'submitted'
-                                        ? 'Stop generation'
-                                        : 'Send message'
-                                }
-                            >
-                                <Button
-                                    type="submit"
-                                    variant="default"
-                                    size="icon"
-                                    className="h-6 w-6 rounded-full"
-                                >
-                                    {status === 'streaming' || status === 'submitted' ? (
-                                        <SquareIcon className="size-4 fill-current" />
-                                    ) : (
-                                        <ArrowUpIcon className="size-4" />
-                                    )}
-                                </Button>
-                            </PromptInputAction>
-                        </PromptInputActions>
-                    </PromptInput>
+                                    <Button
+                                        type="submit"
+                                        variant="default"
+                                        size="icon"
+                                        className="h-6 w-6 rounded-full"
+                                    >
+                                        {status === 'streaming' || status === 'submitted' ? (
+                                            <SquareIcon className="size-4 fill-current" />
+                                        ) : (
+                                            <ArrowUpIcon className="size-4" />
+                                        )}
+                                    </Button>
+                                </PromptInputAction>
+                            </PromptInputActions>
+                        </PromptInput>
+                    </motion.div>
                 )}
             />
-        </motion.form>
+        </form>
     );
 }
