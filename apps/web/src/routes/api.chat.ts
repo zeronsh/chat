@@ -54,8 +54,10 @@ export const ServerRoute = createServerFileRoute('/api/chat').methods({
                 };
             },
             onAfterStream: async ({ context: { threadId, message, streamId }, stream }) => {
-                await generateThreadTitle(threadId, message.message);
-                await streamContext.createNewResumableStream(streamId, () => stream);
+                await Promise.all([
+                    generateThreadTitle(threadId, message.message),
+                    streamContext.createNewResumableStream(streamId, () => stream),
+                ]);
             },
             onFinish: async ({ responseMessage, context: { threadId, userId } }) => {
                 await saveMessageAndResetThreadStatus({
