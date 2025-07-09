@@ -1,6 +1,6 @@
 import type { ThreadMessage } from '@/lib/types';
 import { createServerFileRoute } from '@tanstack/react-start/server';
-import { convertToModelMessages } from 'ai';
+import { convertToModelMessages, smoothStream } from 'ai';
 import { createUIMessageStreamResponse } from '@zeronsh/ai';
 import z from 'zod';
 import { auth } from '@/lib/auth';
@@ -54,6 +54,9 @@ export const ServerRoute = createServerFileRoute('/api/chat').methods({
                 return {
                     model: model.model,
                     messages,
+                    experimental_transform: smoothStream({
+                        chunking: 'word',
+                    }),
                 };
             },
             onStreamMessageMetadata: ({ part, context: { model } }) => {

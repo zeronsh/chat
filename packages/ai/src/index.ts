@@ -8,7 +8,7 @@ import {
     type TextStreamPart,
     type ToolSet,
 } from 'ai';
-import { Data, Effect, Schedule } from 'effect';
+import { Data, Duration, Effect, Schedule } from 'effect';
 import { type ResumableStreamContext } from 'resumable-stream';
 
 export type StreamTextOptions = Omit<Parameters<typeof streamText>[0], 'onError' | 'onFinish'>;

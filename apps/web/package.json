@@ -16,6 +16,8 @@
     },
     "dependencies": {
         "@radix-ui/react-avatar": "^1.1.10",
+        "@radix-ui/react-dialog": "^1.1.14",
+        "@radix-ui/react-separator": "^1.1.7",
         "@radix-ui/react-slot": "^1.2.3",
         "@radix-ui/react-tooltip": "^1.2.7",
         "@rocicorp/zero": "^0.21.2025070200",
@@ -31,6 +33,7 @@
         "framer-motion": "^12.23.1",
         "lucide-react": "^0.525.0",
         "marked": "^16.0.0",
+        "motion": "^12.23.1",
         "pg": "^8.16.3",
         "react": "^19",
         "react-dom": "^19",

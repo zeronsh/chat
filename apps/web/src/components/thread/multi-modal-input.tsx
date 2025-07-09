@@ -92,7 +92,7 @@ export function MultiModalInput({
                         <PromptInputTextarea placeholder="Ask me anything..." />
                         <PromptInputActions className="flex items-center">
                             <PromptInputAction tooltip={'Search the web'}>
-                                <Button variant="outline" className={cn('h-6 rounded-full')}>
+                                <Button variant="outline" size="sm" className="h-6 rounded-full">
                                     <GlobeIcon className="size-4" />
                                     <span className="text-sm">Search</span>
                                 </Button>
