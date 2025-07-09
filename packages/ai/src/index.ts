@@ -1,4 +1,4 @@
-import { z, ZodType } from 'zod';
+import { z, ZodError, ZodType } from 'zod';
 import {
     createUIMessageStream,
     streamText,
@@ -81,16 +81,6 @@ export function createUIMessageStreamResponse<Message extends UIMessage>() {
             const json = yield* Effect.tryPromise({
                 try: () => request.json(),
                 catch: error => {
-                    if (error instanceof AIError) {
-                        return new InternalError({
-                            code: error.code,
-                            message: error.message,
-                            metadata: error.metadata,
-                            cause: error.cause,
-                            status: error.status,
-                        });
-                    }
-
                     return new InternalError({
                         code: 'UnexpectedError',
                         message: 'Unexpected error while parsing the request body',
@@ -110,6 +100,16 @@ export function createUIMessageStreamResponse<Message extends UIMessage>() {
                             metadata: error.metadata,
                             cause: error.cause,
                             status: error.status,
+                        });
+                    }
+
+                    if (error instanceof ZodError) {
+                        return new InternalError({
+                            code: 'InvalidRequest',
+                            message: 'Invalid request body',
+                            metadata: error.errors,
+                            cause: error,
+                            status: 400,
                         });
                     }
 
@@ -252,7 +252,7 @@ export type AIErrorOptions = {
     status?: number;
     cause?: unknown;
     message?: string;
-    metadata?: Record<string, unknown>;
+    metadata?: any;
 };
 
 export class AIError<T extends string> {
@@ -264,7 +264,7 @@ export class AIError<T extends string> {
 
     constructor(code: T, options?: AIErrorOptions) {
         this.code = code;
-        this.status = options?.status;
+        this.status = options?.status ?? 500;
         this.cause = options?.cause;
         this.message = options?.message;
         this.metadata = options?.metadata;
@@ -275,6 +275,6 @@ class InternalError extends Data.TaggedError('InternalError')<{
     code: string;
     status?: number;
     message?: string;
-    metadata?: Record<string, unknown>;
+    metadata?: any;
     cause?: unknown;
 }> {}

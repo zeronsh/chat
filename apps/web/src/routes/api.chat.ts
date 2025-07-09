@@ -1,7 +1,7 @@
 import type { ThreadMessage } from '@/components/chat/types';
 import { createServerFileRoute } from '@tanstack/react-start/server';
 import { convertToModelMessages } from 'ai';
-import { createUIMessageStreamResponse } from '@zeronsh/ai';
+import { AIError, createUIMessageStreamResponse } from '@zeronsh/ai';
 import z from 'zod';
 
 export const ServerRoute = createServerFileRoute('/api/chat').methods({
