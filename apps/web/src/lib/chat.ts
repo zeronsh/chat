@@ -4,7 +4,6 @@ import * as queries from '@/database/queries';
 import { ThreadError } from '@/lib/error';
 import { convertToModelMessages, generateText } from 'ai';
 import { createResumableStreamContext } from 'resumable-stream';
-import { t } from 'node_modules/better-auth/dist/shared/better-auth.DdmVKCUf';
 
 export const streamContext = createResumableStreamContext({
     waitUntil: promise => promise,
@@ -14,13 +13,25 @@ export async function prepareThread(args: {
     userId: string;
     threadId: string;
     streamId: string;
+    modelId: string;
     message: ThreadMessage;
 }) {
     return db.transaction(async tx => {
-        let [thread, message] = await Promise.all([
+        let [thread, message, model] = await Promise.all([
             queries.getThreadById(tx, args.threadId),
             queries.getMessageById(tx, args.message.id),
+            queries.getModelById(tx, args.modelId),
         ]);
+
+        if (!model) {
+            throw new ThreadError('ModelNotFound', {
+                status: 404,
+                message: 'Model with (modelId) does not exist',
+                metadata: {
+                    modelId: args.modelId,
+                },
+            });
+        }
 
         if (!thread) {
             [thread] = await queries.createThread(tx, {
@@ -79,6 +90,7 @@ export async function prepareThread(args: {
         const history = await queries.getThreadMessageHistory(tx, args.threadId);
 
         return {
+            model,
             thread,
             message,
             history,

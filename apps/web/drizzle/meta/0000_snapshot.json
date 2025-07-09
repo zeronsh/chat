@@ -1,5 +1,5 @@
 {
-  "id": "163320d8-e64c-4fcd-ac8a-43fd4840b189",
+  "id": "0358ad43-ed1b-4632-9a7e-43e1c07c1141",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -425,6 +425,79 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.model": {
+      "name": "model",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "model": {
+          "name": "model",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "capabilities": {
+          "name": "capabilities",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'[]'::jsonb"
+        },
+        "icon": {
+          "name": "icon",
+          "type": "icon",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "access": {
+          "name": "access",
+          "type": "access",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'public'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.thread": {
       "name": "thread",
       "schema": "",
@@ -449,6 +522,12 @@
           "notNull": true,
           "default": "'ready'"
         },
+        "stream_id": {
+          "name": "stream_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -470,7 +549,23 @@
           "notNull": true
         }
       },
-      "indexes": {},
+      "indexes": {
+        "stream_id_index": {
+          "name": "stream_id_index",
+          "columns": [
+            {
+              "expression": "stream_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "thread_user_id_user_id_fk": {
           "name": "thread_user_id_user_id_fk",
@@ -494,6 +589,34 @@
     }
   },
   "enums": {
+    "public.access": {
+      "name": "access",
+      "schema": "public",
+      "values": [
+        "public",
+        "account_required",
+        "premium_required"
+      ]
+    },
+    "public.icon": {
+      "name": "icon",
+      "schema": "public",
+      "values": [
+        "anthropic",
+        "claude",
+        "deepseek",
+        "gemini",
+        "google",
+        "grok",
+        "meta",
+        "mistral",
+        "ollama",
+        "openai",
+        "openrouter",
+        "x",
+        "xai"
+      ]
+    },
     "public.status": {
       "name": "status",
       "schema": "public",

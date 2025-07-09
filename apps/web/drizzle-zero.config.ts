@@ -20,6 +20,18 @@ export default drizzleZeroConfig(schema, {
             createdAt: true,
             updatedAt: true,
         },
+        model: {
+            id: true,
+            name: true,
+            model: true,
+            provider: true,
+            description: true,
+            capabilities: true,
+            icon: true,
+            access: true,
+            createdAt: true,
+            updatedAt: true,
+        },
         user: {
             id: true,
             name: true,

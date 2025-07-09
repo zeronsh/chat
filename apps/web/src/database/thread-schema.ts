@@ -1,6 +1,6 @@
 import { relations } from 'drizzle-orm';
 import { index, jsonb, pgEnum, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
-import type { ThreadMessage } from '@/lib/types';
+import type { Capability, ThreadMessage } from '@/lib/types';
 import { user } from '@/database/auth-schema';
 
 export const message = pgTable('message', {
@@ -33,6 +33,36 @@ export const thread = pgTable(
     },
     table => [index('stream_id_index').on(table.streamId)]
 );
+
+export const modelAccessEnum = pgEnum('access', ['public', 'account_required', 'premium_required']);
+
+export const modelIconEnum = pgEnum('icon', [
+    'anthropic',
+    'claude',
+    'deepseek',
+    'gemini',
+    'google',
+    'grok',
+    'meta',
+    'mistral',
+    'ollama',
+    'openai',
+    'openrouter',
+    'x',
+    'xai',
+]);
+
+export const model = pgTable('model', {
+    id: text('id').primaryKey(),
+    name: text('name').notNull(),
+    model: text('model').notNull(),
+    description: text('description').notNull(),
+    capabilities: jsonb('capabilities').$type<Capability[]>().notNull().default([]),
+    icon: modelIconEnum('icon').notNull(),
+    access: modelAccessEnum('access').notNull().default('public'),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
 
 export const threadRelations = relations(thread, ({ many, one }) => ({
     user: one(user, {

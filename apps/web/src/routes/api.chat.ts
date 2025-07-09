@@ -19,6 +19,7 @@ export const ServerRoute = createServerFileRoute('/api/chat').methods({
             request,
             schema: z.object({
                 id: z.string(),
+                modelId: z.string(),
                 message: z.any(),
             }),
             onPrepare: async ({ body, request }) => {
@@ -32,8 +33,9 @@ export const ServerRoute = createServerFileRoute('/api/chat').methods({
 
                 const streamId = nanoid();
 
-                const { history, thread, message } = await prepareThread({
+                const { history, thread, message, model } = await prepareThread({
                     streamId,
+                    modelId: body.modelId,
                     userId: session.user.id,
                     threadId: body.id,
                     message: body.message,
@@ -43,15 +45,27 @@ export const ServerRoute = createServerFileRoute('/api/chat').methods({
                     streamId,
                     threadId: thread.id,
                     userId: session.user.id,
+                    model,
                     message,
                     messages: convertToModelMessages(history),
                 };
             },
-            onStream: ({ context: { messages } }) => {
+            onStream: ({ context: { messages, model } }) => {
                 return {
-                    model: 'gpt-4o-mini',
+                    model: model.model,
                     messages,
                 };
+            },
+            onStreamMessageMetadata: ({ part, context: { model } }) => {
+                if (part.type === 'start') {
+                    return {
+                        model: {
+                            id: model.id,
+                            name: model.name,
+                            icon: model.icon,
+                        },
+                    };
+                }
             },
             onAfterStream: async ({ context: { threadId, message, streamId }, stream }) => {
                 await Promise.all([

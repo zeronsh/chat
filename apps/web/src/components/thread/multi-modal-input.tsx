@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/prompt-input';
 import { useForm } from '@tanstack/react-form';
 import { PromptInputProps } from '@zeronsh/ai/react';
-import { SquareIcon, ArrowUpIcon } from 'lucide-react';
+import { SquareIcon, ArrowUpIcon, GlobeIcon, Paperclip } from 'lucide-react';
 import { z } from 'zod';
 import { useNavigate } from '@tanstack/react-router';
 import { useParamsThreadId } from '@/hooks/use-params-thread-id';
@@ -55,7 +55,7 @@ export function MultiModalInput({
             layout
             layoutId="prompt-input"
             className={cn({
-                'absolute px-4 pt-4': true,
+                'absolute px-4 pt-4 flex flex-col gap-4': true,
                 'bottom-0 left-0 right-0': threadId,
                 'top-48 left-0 right-0': !threadId,
             })}
@@ -70,7 +70,7 @@ export function MultiModalInput({
         >
             <div
                 className={cn({
-                    'absolute top-0 left-0 right-0 translate-y-[-100%] transition-opacity duration-300 p-4': true,
+                    'absolute top-0 left-0 right-0 translate-y-[-100%] transition-opacity duration-300 opacity-100': true,
                     'opacity-0 pointer-events-none': threadId,
                 })}
             >
@@ -84,13 +84,39 @@ export function MultiModalInput({
                 name="message"
                 children={field => (
                     <PromptInput
-                        className="max-w-3xl mx-auto p-3 bg-muted/50 backdrop-blur-md"
+                        className="max-w-3xl mx-auto p-3 bg-muted/50 backdrop-blur-md w-full"
                         value={field.state.value}
                         onValueChange={field.handleChange}
                         onSubmit={form.handleSubmit}
                     >
                         <PromptInputTextarea placeholder="Ask me anything..." />
-                        <PromptInputActions className="flex items-center justify-end">
+                        <PromptInputActions className="flex items-center">
+                            <PromptInputAction tooltip={'Search the web'}>
+                                <Button variant="outline" className={cn('h-6 rounded-full')}>
+                                    <GlobeIcon className="size-4" />
+                                    <span className="text-sm">Search</span>
+                                </Button>
+                            </PromptInputAction>
+                            <div className="flex-1" />
+                            <PromptInputAction tooltip="Attach files">
+                                <Button
+                                    asChild
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-6 w-6 rounded-full"
+                                >
+                                    <label htmlFor="file-upload">
+                                        <input
+                                            type="file"
+                                            multiple
+                                            className="hidden"
+                                            accept="image/*"
+                                            id="file-upload"
+                                        />
+                                        <Paperclip className="size-4" />
+                                    </label>
+                                </Button>
+                            </PromptInputAction>
                             <PromptInputAction
                                 tooltip={
                                     status === 'streaming' || status === 'submitted'

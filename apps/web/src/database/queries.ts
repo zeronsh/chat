@@ -17,6 +17,12 @@ export async function getMessageById(db: Database, messageId: string) {
     });
 }
 
+export async function getModelById(db: Database, modelId: string) {
+    return db.query.model.findFirst({
+        where: (model, { eq }) => eq(model.id, modelId),
+    });
+}
+
 export async function createThread(db: Database, args: { userId: string; threadId: string }) {
     return db
         .insert(schema.thread)

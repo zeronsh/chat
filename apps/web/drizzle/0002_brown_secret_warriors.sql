@@ -1,1 +1,0 @@
-CREATE INDEX "stream_id_index" ON "thread" USING btree ("stream_id");

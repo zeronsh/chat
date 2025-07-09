@@ -48,6 +48,7 @@ function RouteComponent() {
                                 body: {
                                     id,
                                     message: messages.at(-1),
+                                    modelId: 'gpt-4o-mini',
                                 },
                             };
                         },

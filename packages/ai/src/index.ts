@@ -5,11 +5,23 @@ import {
     type UIMessage,
     type UIMessageStreamWriter,
     JsonToSseTransformStream,
+    type TextStreamPart,
+    type ToolSet,
 } from 'ai';
 import { Data, Effect, Schedule } from 'effect';
 import { type ResumableStreamContext } from 'resumable-stream';
 
 export type StreamTextOptions = Omit<Parameters<typeof streamText>[0], 'onError' | 'onFinish'>;
+
+export type InferMessageToolSet<Message extends UIMessage> =
+    Message extends UIMessage<infer Metadata, infer DataParts, infer Tools>
+        ? Tools extends ToolSet
+            ? Tools
+            : never
+        : {};
+
+export type InferMessageMetadata<Message extends UIMessage> =
+    Message extends UIMessage<infer Metadata, infer DataParts, infer Tools> ? Metadata : {};
 
 export type CreateStreamUIMessageResponseOptions<
     Message extends UIMessage,
@@ -43,6 +55,11 @@ export type CreateStreamUIMessageResponseOptions<
         writer: UIMessageStreamWriter<Message>;
         context: PrepareReturn;
     }) => StreamTextOptions;
+
+    onStreamMessageMetadata?: (options: {
+        part: TextStreamPart<InferMessageToolSet<Message>>;
+        context: PrepareReturn;
+    }) => InferMessageMetadata<Message> | undefined;
 
     onStreamError?: (options: {
         body: z.infer<Schema>;
@@ -79,8 +96,16 @@ export function createUIMessageStreamResponse<Message extends UIMessage>() {
     return async <Schema extends ZodType, PrepareReturn = any>(
         options: CreateStreamUIMessageResponseOptions<Message, Schema, PrepareReturn>
     ): Promise<Response> => {
-        const { request, schema, onPrepare, onStream, onAfterStream, onFinish, onStreamError } =
-            options;
+        const {
+            request,
+            schema,
+            onPrepare,
+            onStream,
+            onAfterStream,
+            onFinish,
+            onStreamError,
+            onStreamMessageMetadata,
+        } = options;
 
         const effect = Effect.gen(function* () {
             const json = yield* Effect.tryPromise({
@@ -175,6 +200,15 @@ export function createUIMessageStreamResponse<Message extends UIMessage>() {
                             writer.merge(
                                 result.toUIMessageStream({
                                     sendReasoning: true,
+                                    messageMetadata: options => {
+                                        if (onStreamMessageMetadata) {
+                                            return onStreamMessageMetadata({
+                                                // @ts-expect-error - TODO: fix this
+                                                part: options.part,
+                                                context,
+                                            });
+                                        }
+                                    },
                                 })
                             );
                         },
