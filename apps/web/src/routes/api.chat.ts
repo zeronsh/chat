@@ -1,6 +1,6 @@
 import type { ThreadMessage } from '@/lib/types';
 import { createServerFileRoute } from '@tanstack/react-start/server';
-import { convertToModelMessages, JsonToSseTransformStream } from 'ai';
+import { convertToModelMessages } from 'ai';
 import { createUIMessageStreamResponse } from '@zeronsh/ai';
 import z from 'zod';
 import { auth } from '@/lib/auth';
