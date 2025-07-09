@@ -15,6 +15,7 @@ export default drizzleZeroConfig(schema, {
             id: true,
             title: true,
             userId: true,
+            streamId: true,
             status: true,
             createdAt: true,
             updatedAt: true,

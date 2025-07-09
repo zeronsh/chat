@@ -4,7 +4,8 @@
     "type": "module",
     "exports": {
         ".": "./src/index.ts",
-        "./react": "./src/react/index.tsx"
+        "./react": "./src/react/index.tsx",
+        "./utils": "./src/utils.ts"
     },
     "peerDependencies": {
         "@ai-sdk/react": "2.0.0-beta.9",
@@ -13,6 +14,7 @@
         "effect": "^3.16.12",
         "nanoid": "^5.1.5",
         "react": "^19",
+        "resumable-stream": "^2.2.1",
         "typescript": "^5",
         "usehooks-ts": "^3.1.1",
         "zod": "^3.25.75"
@@ -28,6 +30,7 @@
         "effect": "^3.16.12",
         "nanoid": "^5.1.5",
         "react": "^19",
+        "resumable-stream": "^2.2.1",
         "usehooks-ts": "^3.1.1",
         "zod": "^3.25.75"
     }

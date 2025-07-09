@@ -16,6 +16,7 @@ import { Route as ThreadIndexRouteImport } from './routes/_thread.index'
 import { Route as ThreadThreadIdRouteImport } from './routes/_thread.$threadId'
 import { ServerRoute as ApiChatServerRouteImport } from './routes/api.chat'
 import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api.auth.$'
+import { ServerRoute as ApiChatThreadIdStreamServerRouteImport } from './routes/api.chat.$threadId.stream'
 
 const rootServerRouteImport = createServerRootRoute()
 
@@ -43,6 +44,12 @@ const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootServerRouteImport,
 } as any)
+const ApiChatThreadIdStreamServerRoute =
+  ApiChatThreadIdStreamServerRouteImport.update({
+    id: '/$threadId/stream',
+    path: '/$threadId/stream',
+    getParentRoute: () => ApiChatServerRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/$threadId': typeof ThreadThreadIdRoute
@@ -70,28 +77,31 @@ export interface RootRouteChildren {
   ThreadRoute: typeof ThreadRouteWithChildren
 }
 export interface FileServerRoutesByFullPath {
-  '/api/chat': typeof ApiChatServerRoute
+  '/api/chat': typeof ApiChatServerRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatServerRoute
+  '/api/chat/$threadId/stream': typeof ApiChatThreadIdStreamServerRoute
 }
 export interface FileServerRoutesByTo {
-  '/api/chat': typeof ApiChatServerRoute
+  '/api/chat': typeof ApiChatServerRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatServerRoute
+  '/api/chat/$threadId/stream': typeof ApiChatThreadIdStreamServerRoute
 }
 export interface FileServerRoutesById {
   __root__: typeof rootServerRouteImport
-  '/api/chat': typeof ApiChatServerRoute
+  '/api/chat': typeof ApiChatServerRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatServerRoute
+  '/api/chat/$threadId/stream': typeof ApiChatThreadIdStreamServerRoute
 }
 export interface FileServerRouteTypes {
   fileServerRoutesByFullPath: FileServerRoutesByFullPath
-  fullPaths: '/api/chat' | '/api/auth/$'
+  fullPaths: '/api/chat' | '/api/auth/$' | '/api/chat/$threadId/stream'
   fileServerRoutesByTo: FileServerRoutesByTo
-  to: '/api/chat' | '/api/auth/$'
-  id: '__root__' | '/api/chat' | '/api/auth/$'
+  to: '/api/chat' | '/api/auth/$' | '/api/chat/$threadId/stream'
+  id: '__root__' | '/api/chat' | '/api/auth/$' | '/api/chat/$threadId/stream'
   fileServerRoutesById: FileServerRoutesById
 }
 export interface RootServerRouteChildren {
-  ApiChatServerRoute: typeof ApiChatServerRoute
+  ApiChatServerRoute: typeof ApiChatServerRouteWithChildren
   ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute
 }
 
@@ -136,6 +146,13 @@ declare module '@tanstack/react-start/server' {
       preLoaderRoute: typeof ApiAuthSplatServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
+    '/api/chat/$threadId/stream': {
+      id: '/api/chat/$threadId/stream'
+      path: '/$threadId/stream'
+      fullPath: '/api/chat/$threadId/stream'
+      preLoaderRoute: typeof ApiChatThreadIdStreamServerRouteImport
+      parentRoute: typeof ApiChatServerRoute
+    }
   }
 }
 
@@ -152,6 +169,18 @@ const ThreadRouteChildren: ThreadRouteChildren = {
 const ThreadRouteWithChildren =
   ThreadRoute._addFileChildren(ThreadRouteChildren)
 
+interface ApiChatServerRouteChildren {
+  ApiChatThreadIdStreamServerRoute: typeof ApiChatThreadIdStreamServerRoute
+}
+
+const ApiChatServerRouteChildren: ApiChatServerRouteChildren = {
+  ApiChatThreadIdStreamServerRoute: ApiChatThreadIdStreamServerRoute,
+}
+
+const ApiChatServerRouteWithChildren = ApiChatServerRoute._addFileChildren(
+  ApiChatServerRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   ThreadRoute: ThreadRouteWithChildren,
 }
@@ -159,7 +188,7 @@ export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
 const rootServerRouteChildren: RootServerRouteChildren = {
-  ApiChatServerRoute: ApiChatServerRoute,
+  ApiChatServerRoute: ApiChatServerRouteWithChildren,
   ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,
 }
 export const serverRouteTree = rootServerRouteImport

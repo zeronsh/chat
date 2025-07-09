@@ -284,6 +284,16 @@ export const schema = {
             "status"
           >,
         },
+        streamId: {
+          type: "string",
+          optional: true,
+          customType: null as unknown as ZeroCustomType<
+            typeof zeroSchema,
+            "thread",
+            "streamId"
+          >,
+          serverName: "stream_id",
+        },
         createdAt: {
           type: "number",
           optional: true,

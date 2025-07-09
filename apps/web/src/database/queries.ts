@@ -100,12 +100,13 @@ export async function updateThread(
     args: {
         threadId: string;
         status: 'ready' | 'streaming' | 'submitted';
+        streamId?: string | null;
         updatedAt?: Date;
     }
 ) {
     return db
         .update(schema.thread)
-        .set({ status: args.status, updatedAt: args.updatedAt })
+        .set({ status: args.status, streamId: args.streamId, updatedAt: args.updatedAt })
         .where(eq(schema.thread.id, args.threadId));
 }
 
@@ -114,4 +115,14 @@ export async function updateThreadTitle(db: Database, args: { threadId: string; 
         .update(schema.thread)
         .set({ title: args.title, updatedAt: new Date() })
         .where(eq(schema.thread.id, args.threadId));
+}
+
+export async function getThreadByStreamId(db: Database, streamId: string) {
+    const thread = await db.query.thread.findFirst({
+        where: (thread, { eq }) => eq(thread.streamId, streamId),
+    });
+
+    console.log(thread);
+
+    return thread;
 }

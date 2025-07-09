@@ -10,15 +10,10 @@ import type {
     IdGenerator,
 } from 'ai';
 import { Fragment, memo, useEffect, useMemo } from 'react';
-import { customAlphabet } from 'nanoid';
 import { ChatContainerRoot } from './container';
 import { ChatContainerContent } from './container';
 import { useDebounce } from '@uidotdev/usehooks';
-
-export const nanoid = customAlphabet(
-    '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
-    21
-);
+import { nanoid } from '../utils';
 
 export type ChatProps<
     Metadata = {},
@@ -35,6 +30,7 @@ export type ChatProps<
     initialScroll?: 'instant' | 'smooth';
     // AI SDK v5 props
     id?: string;
+    streamId?: string | null;
     generateId?: IdGenerator;
     messages?: UIMessageWithMetaData[];
     transport?: ChatTransport<UIMessageWithMetaData>;
@@ -186,6 +182,15 @@ export function createChatComponent<
             }
         }, [debouncedStatus, props.messages]);
 
+        useEffect(() => {
+            if (props.streamId && helpers.messages && helpers.status === 'ready') {
+                const lastMessage = helpers.messages.at(-1);
+                if (lastMessage && lastMessage.role === 'user') {
+                    helpers.resumeStream();
+                }
+            }
+        }, [props.streamId, helpers.messages, helpers.status]);
+
         return (
             <ChatContainerRoot className={props.className} initial={props.initialScroll}>
                 <ChatContainerContent className={props.contentClassName}>
@@ -222,6 +227,7 @@ export function createChatComponent<
             <Chat
                 key={id}
                 id={id}
+                streamId={props.streamId}
                 className={props.className}
                 contentClassName={props.contentClassName}
                 initialScroll={props.initialScroll}

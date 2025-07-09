@@ -1,0 +1,1 @@
+ALTER TABLE "thread" ADD COLUMN "stream_id" text;

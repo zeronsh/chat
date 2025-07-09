@@ -3,11 +3,17 @@ import { ThreadMessage } from '@/lib/types';
 import * as queries from '@/database/queries';
 import { ThreadError } from '@/lib/error';
 import { convertToModelMessages, generateText } from 'ai';
+import { createResumableStreamContext } from 'resumable-stream';
+import { t } from 'node_modules/better-auth/dist/shared/better-auth.DdmVKCUf';
 
-export function prepareThread(args: {
+export const streamContext = createResumableStreamContext({
+    waitUntil: promise => promise,
+});
+
+export async function prepareThread(args: {
     userId: string;
     threadId: string;
-    nextMessageId: string;
+    streamId: string;
     message: ThreadMessage;
 }) {
     return db.transaction(async tx => {
@@ -43,6 +49,7 @@ export function prepareThread(args: {
         await queries.updateThread(tx, {
             threadId: args.threadId,
             status: 'streaming',
+            streamId: args.streamId,
             updatedAt: new Date(),
         });
 
@@ -77,6 +84,42 @@ export function prepareThread(args: {
             history,
         };
     });
+}
+
+export async function prepareResumeThread(args: { threadId: string; userId: string }) {
+    const thread = await queries.getThreadById(db, args.threadId);
+
+    if (!thread) {
+        throw new ThreadError('ThreadNotFound', {
+            status: 404,
+            metadata: {
+                threadId: args.threadId,
+                userId: args.userId,
+            },
+        });
+    }
+
+    if (thread.userId !== args.userId) {
+        throw new ThreadError('NotAuthorized', {
+            status: 403,
+            metadata: {
+                threadId: args.threadId,
+                userId: args.userId,
+            },
+        });
+    }
+
+    if (!thread.streamId) {
+        throw new ThreadError('StreamNotFound', {
+            status: 404,
+            metadata: {
+                threadId: args.threadId,
+                userId: args.userId,
+            },
+        });
+    }
+
+    return thread.streamId;
 }
 
 export async function generateThreadTitle(threadId: string, message: ThreadMessage) {
@@ -116,6 +159,7 @@ export async function saveMessageAndResetThreadStatus({
             await queries.updateThread(tx, {
                 threadId,
                 status: 'ready',
+                streamId: null,
             }),
         ]);
     });

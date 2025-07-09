@@ -1,5 +1,5 @@
 import { relations } from 'drizzle-orm';
-import { jsonb, pgEnum, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import { index, jsonb, pgEnum, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 import type { ThreadMessage } from '@/lib/types';
 import { user } from '@/database/auth-schema';
 
@@ -18,16 +18,21 @@ export const message = pgTable('message', {
 
 export const statusEnum = pgEnum('status', ['ready', 'streaming', 'submitted']);
 
-export const thread = pgTable('thread', {
-    id: text('id').primaryKey(),
-    title: text('title'),
-    status: statusEnum('status').notNull().default('ready'),
-    createdAt: timestamp('created_at').notNull().defaultNow(),
-    updatedAt: timestamp('updated_at').notNull().defaultNow(),
-    userId: text('user_id')
-        .notNull()
-        .references(() => user.id, { onDelete: 'cascade' }),
-});
+export const thread = pgTable(
+    'thread',
+    {
+        id: text('id').primaryKey(),
+        title: text('title'),
+        status: statusEnum('status').notNull().default('ready'),
+        streamId: text('stream_id'),
+        createdAt: timestamp('created_at').notNull().defaultNow(),
+        updatedAt: timestamp('updated_at').notNull().defaultNow(),
+        userId: text('user_id')
+            .notNull()
+            .references(() => user.id, { onDelete: 'cascade' }),
+    },
+    table => [index('stream_id_index').on(table.streamId)]
+);
 
 export const threadRelations = relations(thread, ({ many, one }) => ({
     user: one(user, {

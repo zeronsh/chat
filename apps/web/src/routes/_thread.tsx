@@ -33,6 +33,7 @@ function RouteComponent() {
             <title>{thread?.title ?? 'Zeron'}</title>
             <Thread
                 id={threadId}
+                streamId={thread?.streamId}
                 messages={messages}
                 initialScroll="instant"
                 className="absolute inset-0 overflow-y-auto"

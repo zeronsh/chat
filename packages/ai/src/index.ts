@@ -6,7 +6,8 @@ import {
     type UIMessageStreamWriter,
     JsonToSseTransformStream,
 } from 'ai';
-import { Data, Effect } from 'effect';
+import { Data, Effect, Schedule } from 'effect';
+import { type ResumableStreamContext } from 'resumable-stream';
 
 export type StreamTextOptions = Omit<Parameters<typeof streamText>[0], 'onError' | 'onFinish'>;
 
@@ -69,6 +70,9 @@ export type CreateStreamUIMessageResponseOptions<
         responseMessage: Message;
         context: PrepareReturn;
     }) => Promise<void>;
+
+    streamContext?: ResumableStreamContext;
+    onGetStreamId?: (options: { context: PrepareReturn }) => string;
 };
 
 export function createUIMessageStreamResponse<Message extends UIMessage>() {
@@ -94,16 +98,6 @@ export function createUIMessageStreamResponse<Message extends UIMessage>() {
             const body = yield* Effect.try({
                 try: () => schema.parse(json),
                 catch: error => {
-                    if (error instanceof AIError) {
-                        return new InternalError({
-                            code: error.code,
-                            message: error.message,
-                            metadata: error.metadata,
-                            cause: error.cause,
-                            status: error.status,
-                        });
-                    }
-
                     if (error instanceof ZodError) {
                         return new InternalError({
                             code: 'InvalidRequest',
@@ -206,7 +200,7 @@ export function createUIMessageStreamResponse<Message extends UIMessage>() {
                 },
             });
 
-            const streams = stream.tee();
+            const streams = stream.pipeThrough(new JsonToSseTransformStream()).tee();
 
             if (onAfterStream) {
                 yield* Effect.forkDaemon(
@@ -233,13 +227,13 @@ export function createUIMessageStreamResponse<Message extends UIMessage>() {
                     })
                 );
             }
-            const readable: ReadableStream = streams[0].pipeThrough(new JsonToSseTransformStream());
 
-            return new Response(readable);
+            return new Response(streams[0]);
         });
 
         return effect.pipe(
             Effect.catchTag('InternalError', error => {
+                console.log(error);
                 return Effect.succeed(
                     Response.json(
                         {
@@ -256,6 +250,98 @@ export function createUIMessageStreamResponse<Message extends UIMessage>() {
             Effect.runPromise
         );
     };
+}
+
+export type CreateResumeStreamOptions = {
+    streamContext: ResumableStreamContext;
+
+    /**
+     * This is where you should do any setup that you need to do before the stream resumes
+     * such as fetching data from the database, etc.
+     *
+     * @param options
+     * @returns the stream id for the resumable stream
+     */
+    onPrepare: () => Promise<string>;
+};
+
+export function createResumeStreamResponse(options: CreateResumeStreamOptions) {
+    const { streamContext, onPrepare } = options;
+
+    const effect = Effect.gen(function* () {
+        const streamId = yield* Effect.tryPromise({
+            try: () => onPrepare(),
+            catch: error => {
+                if (error instanceof AIError) {
+                    return new InternalError({
+                        code: error.code,
+                        message: error.message,
+                        metadata: error.metadata,
+                        cause: error.cause,
+                        status: error.status,
+                    });
+                }
+
+                return new InternalError({
+                    code: 'UnexpectedError',
+                    message: 'Unexpected error while preparing the stream',
+                    cause: error,
+                    status: 500,
+                });
+            },
+        });
+
+        const stream = yield* Effect.tryPromise({
+            try: async () => {
+                const emptyDataStream = createUIMessageStream({
+                    execute: () => {},
+                });
+                const stream = await streamContext.resumableStream(streamId, () =>
+                    emptyDataStream.pipeThrough(new JsonToSseTransformStream())
+                );
+
+                if (!stream) {
+                    throw new AIError('StreamNotFound', {
+                        message: 'Stream not found',
+                        metadata: {
+                            streamId,
+                        },
+                    });
+                }
+
+                return stream;
+            },
+            catch: error => {
+                return new InternalError({
+                    code: 'UnexpectedError',
+                    message: 'Unexpected error while resuming the stream',
+                    cause: error,
+                    status: 500,
+                });
+            },
+        }).pipe(Effect.retry(Schedule.exponential(200).pipe(Schedule.compose(Schedule.recurs(5)))));
+
+        return new Response(stream);
+    });
+
+    return effect.pipe(
+        Effect.catchTag('InternalError', error => {
+            console.log(error);
+            return Effect.succeed(
+                Response.json(
+                    {
+                        error: {
+                            code: error.code,
+                            message: error.message,
+                            metadata: error.metadata,
+                        },
+                    },
+                    { status: error.status }
+                )
+            );
+        }),
+        Effect.runPromise
+    );
 }
 
 export type AIErrorOptions = {
