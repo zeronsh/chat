@@ -24,7 +24,6 @@ export default drizzleZeroConfig(schema, {
             id: true,
             name: true,
             model: true,
-            provider: true,
             description: true,
             capabilities: true,
             icon: true,

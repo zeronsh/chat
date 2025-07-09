@@ -284,15 +284,6 @@ export const schema = {
             "model"
           >,
         },
-        provider: {
-          type: "string",
-          optional: false,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "model",
-            "provider"
-          >,
-        },
         description: {
           type: "string",
           optional: false,

@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { CopyIcon, EditIcon, GitBranchIcon, RefreshCcwIcon } from 'lucide-react';
 import { useCopyToClipboard } from 'usehooks-ts';
 import type { ThreadMessage } from '@/lib/types';
+import ModelIcon from '@/components/thread/model-icon';
 
 export function UserMessage({
     message,
@@ -100,6 +101,23 @@ export function AssistantMessage({
                             <GitBranchIcon className="size-3" />
                         </Button>
                     </MessageAction>
+                    {message.metadata && message.metadata.model && (
+                        <Button
+                            variant="ghost"
+                            className="hover:bg-transparent! cursor-default"
+                            asChild
+                        >
+                            <div>
+                                <ModelIcon
+                                    className="fill-primary"
+                                    model={message.metadata.model.icon}
+                                />
+                                <span className="text-xs text-muted-foreground font-normal">
+                                    {message.metadata.model.name}
+                                </span>
+                            </div>
+                        </Button>
+                    )}
                 </MessageActions>
             </Message>
         </MessageContainer>
