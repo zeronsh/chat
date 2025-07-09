@@ -184,6 +184,9 @@ importers:
       effect:
         specifier: ^3.16.12
         version: 3.16.12
+      nanoid:
+        specifier: ^5.1.5
+        version: 5.1.5
       react:
         specifier: ^19
         version: 19.1.0

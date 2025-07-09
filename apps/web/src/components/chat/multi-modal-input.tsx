@@ -10,12 +10,20 @@ import { useForm } from '@tanstack/react-form';
 import { PromptInputProps } from '@zeronsh/ai/react';
 import { SquareIcon, ArrowUpIcon } from 'lucide-react';
 import { z } from 'zod';
+import { useNavigate } from '@tanstack/react-router';
 
 const PromptSchema = z.object({
     message: z.string().min(1),
 });
 
-export function MultiModalInput({ sendMessage, status, stop }: PromptInputProps<ThreadMessage>) {
+export function MultiModalInput({
+    id,
+    sendMessage,
+    status,
+    stop,
+}: PromptInputProps<ThreadMessage>) {
+    const navigate = useNavigate();
+
     const form = useForm({
         defaultValues: {
             message: '',
@@ -26,6 +34,7 @@ export function MultiModalInput({ sendMessage, status, stop }: PromptInputProps<
             onSubmit: PromptSchema,
         },
         onSubmit: async ({ value }) => {
+            window.history.replaceState({}, '', `/t/${id}`);
             sendMessage({ text: value.message });
             form.reset();
         },

@@ -10,6 +10,7 @@
         "@ai-sdk/react": "2.0.0-beta.9",
         "ai": "5.0.0-beta.9",
         "effect": "^3.16.12",
+        "nanoid": "^5.1.5",
         "react": "^19",
         "typescript": "^5",
         "zod": "^3.25.75"
@@ -22,6 +23,7 @@
         "@types/node": "^24.0.11",
         "@types/react": "^19",
         "effect": "^3.16.12",
+        "nanoid": "^5.1.5",
         "react": "^19",
         "zod": "^3.25.75"
     }

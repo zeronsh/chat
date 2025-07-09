@@ -11,16 +11,27 @@
 import { createServerRootRoute } from '@tanstack/react-start/server'
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as ThreadRouteImport } from './routes/_thread'
+import { Route as ThreadIndexRouteImport } from './routes/_thread.index'
+import { Route as ThreadThreadIdRouteImport } from './routes/_thread.$threadId'
 import { ServerRoute as ApiChatServerRouteImport } from './routes/api.chat'
 import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api.auth.$'
 
 const rootServerRouteImport = createServerRootRoute()
 
-const IndexRoute = IndexRouteImport.update({
+const ThreadRoute = ThreadRouteImport.update({
+  id: '/_thread',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ThreadIndexRoute = ThreadIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => ThreadRoute,
+} as any)
+const ThreadThreadIdRoute = ThreadThreadIdRouteImport.update({
+  id: '/$threadId',
+  path: '/$threadId',
+  getParentRoute: () => ThreadRoute,
 } as any)
 const ApiChatServerRoute = ApiChatServerRouteImport.update({
   id: '/api/chat',
@@ -34,25 +45,29 @@ const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/$threadId': typeof ThreadThreadIdRoute
+  '/': typeof ThreadIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
+  '/$threadId': typeof ThreadThreadIdRoute
+  '/': typeof ThreadIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+  '/_thread': typeof ThreadRouteWithChildren
+  '/_thread/$threadId': typeof ThreadThreadIdRoute
+  '/_thread/': typeof ThreadIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/$threadId' | '/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/$threadId' | '/'
+  id: '__root__' | '/_thread' | '/_thread/$threadId' | '/_thread/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  ThreadRoute: typeof ThreadRouteWithChildren
 }
 export interface FileServerRoutesByFullPath {
   '/api/chat': typeof ApiChatServerRoute
@@ -82,12 +97,26 @@ export interface RootServerRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
+    '/_thread': {
+      id: '/_thread'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof ThreadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_thread/': {
+      id: '/_thread/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof ThreadIndexRouteImport
+      parentRoute: typeof ThreadRoute
+    }
+    '/_thread/$threadId': {
+      id: '/_thread/$threadId'
+      path: '/$threadId'
+      fullPath: '/$threadId'
+      preLoaderRoute: typeof ThreadThreadIdRouteImport
+      parentRoute: typeof ThreadRoute
     }
   }
 }
@@ -110,8 +139,21 @@ declare module '@tanstack/react-start/server' {
   }
 }
 
+interface ThreadRouteChildren {
+  ThreadThreadIdRoute: typeof ThreadThreadIdRoute
+  ThreadIndexRoute: typeof ThreadIndexRoute
+}
+
+const ThreadRouteChildren: ThreadRouteChildren = {
+  ThreadThreadIdRoute: ThreadThreadIdRoute,
+  ThreadIndexRoute: ThreadIndexRoute,
+}
+
+const ThreadRouteWithChildren =
+  ThreadRoute._addFileChildren(ThreadRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  ThreadRoute: ThreadRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
