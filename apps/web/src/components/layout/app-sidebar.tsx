@@ -1,4 +1,12 @@
 import { Button } from '@/components/ui/button';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 
 import {
     Sidebar,
@@ -16,12 +24,17 @@ import { useDatabase } from '@/context/database';
 import { useThreadsByTimeRange } from '@/hooks/use-chats-by-time-range';
 import { Thread } from '@/zero/types';
 import { useQuery } from '@rocicorp/zero/react';
-import { Link } from '@tanstack/react-router';
+import { Link, useNavigate, useParams } from '@tanstack/react-router';
 import { HashIcon, Loader2Icon, PencilIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import { useState } from 'react';
 import { Fragment } from 'react/jsx-runtime';
+import { useForm } from '@tanstack/react-form';
+import z from 'zod';
 
 export function AppSidebar() {
+    const [threadToEdit, setThreadToEdit] = useState<Thread | null>(null);
+    const [threadToDelete, setThreadToDelete] = useState<Thread | null>(null);
+
     return (
         <Sidebar>
             <SidebarHeader>
@@ -29,8 +42,13 @@ export function AppSidebar() {
             </SidebarHeader>
             <SidebarContent>
                 <AppSidebarActions />
-                <AppSidebarThreads />
+                <AppSidebarThreads
+                    setThreadToEdit={setThreadToEdit}
+                    setThreadToDelete={setThreadToDelete}
+                />
             </SidebarContent>
+            <EditThreadTitleDialog thread={threadToEdit} setThreadToEdit={setThreadToEdit} />
+            <DeleteThreadDialog thread={threadToDelete} setThreadToDelete={setThreadToDelete} />
         </Sidebar>
     );
 }
@@ -73,9 +91,13 @@ function AppSidebarActions() {
     );
 }
 
-function AppSidebarThreads() {
-    const [threadToEdit, setThreadToEdit] = useState<Thread | null>(null);
-    const [threadToDelete, setThreadToDelete] = useState<Thread | null>(null);
+function AppSidebarThreads({
+    setThreadToEdit,
+    setThreadToDelete,
+}: {
+    setThreadToEdit: (thread: Thread | null) => void;
+    setThreadToDelete: (thread: Thread | null) => void;
+}) {
     const db = useDatabase();
     const [threads] = useQuery(db.query.thread.orderBy('updatedAt', 'desc'));
     const groups = useThreadsByTimeRange(threads);
@@ -199,5 +221,149 @@ function ThreadItem({
                 </div>
             </SidebarMenuButton>
         </SidebarMenuItem>
+    );
+}
+
+const editThreadTitleSchema = z.object({
+    title: z.string().min(1).max(200),
+});
+
+function EditThreadTitleDialog({
+    thread,
+    setThreadToEdit,
+}: {
+    thread: Thread | null;
+    setThreadToEdit: (thread: Thread | null) => void;
+}) {
+    const db = useDatabase();
+    const form = useForm({
+        defaultValues: {
+            title: thread?.title ?? '',
+        },
+        validators: {
+            onMount: editThreadTitleSchema,
+            onChange: editThreadTitleSchema,
+            onSubmit: editThreadTitleSchema,
+        },
+        onSubmit: async ({ value }) => {
+            if (!thread) return;
+
+            await db.mutate.thread.update({
+                id: thread.id,
+                title: value.title,
+            });
+            setThreadToEdit(null);
+        },
+    });
+
+    return (
+        <Dialog open={!!thread} onOpenChange={() => setThreadToEdit(null)}>
+            <DialogContent className="max-w-sm">
+                <DialogHeader>
+                    <DialogTitle>Edit Thread Title</DialogTitle>
+                </DialogHeader>
+                <DialogDescription>Edit the title of the thread.</DialogDescription>
+                <form
+                    onSubmit={async e => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        form.handleSubmit();
+                    }}
+                >
+                    <div className="grid gap-4 py-4">
+                        <div className="grid gap-2">
+                            <form.Field
+                                name="title"
+                                validators={{
+                                    onChange: ({ value }) => {
+                                        if (value.length === 0) return 'Title is required';
+                                        if (value.length > 100)
+                                            return 'Title must be less than 100 characters';
+                                    },
+                                }}
+                            >
+                                {field => (
+                                    <>
+                                        <input
+                                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                            value={field.state.value}
+                                            onChange={e => field.handleChange(e.target.value)}
+                                        />
+                                        {field.state.meta.errors ? (
+                                            <p className="text-sm text-destructive">
+                                                {field.state.meta.errors.join(', ')}
+                                            </p>
+                                        ) : null}
+                                    </>
+                                )}
+                            </form.Field>
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button type="button" variant="ghost" onClick={() => setThreadToEdit(null)}>
+                            Cancel
+                        </Button>
+                        <form.Subscribe
+                            selector={state => [state.canSubmit, state.isSubmitting]}
+                            children={([canSubmit, isSubmitting]) => (
+                                <Button
+                                    type="submit"
+                                    disabled={!canSubmit || isSubmitting}
+                                    onClick={() => form.handleSubmit()}
+                                >
+                                    {isSubmitting && (
+                                        <Loader2Icon className="w-4 h-4 animate-spin" />
+                                    )}
+                                    <span>Save</span>
+                                </Button>
+                            )}
+                        />
+                    </DialogFooter>
+                </form>
+            </DialogContent>
+        </Dialog>
+    );
+}
+
+function DeleteThreadDialog({
+    thread,
+    setThreadToDelete,
+}: {
+    thread: Thread | null;
+    setThreadToDelete: (thread: Thread | null) => void;
+}) {
+    const db = useDatabase();
+    const params = useParams({ from: '/_thread/$threadId', shouldThrow: false });
+
+    const navigate = useNavigate();
+
+    async function handleDelete() {
+        if (!thread) return;
+        await db.mutate.thread.delete({ id: thread.id });
+        if (params?.threadId === thread.id) {
+            navigate({ to: '/' });
+        }
+        setThreadToDelete(null);
+    }
+
+    return (
+        <Dialog open={!!thread} onOpenChange={() => setThreadToDelete(null)}>
+            <DialogContent className="max-w-sm">
+                <DialogHeader>
+                    <DialogTitle>Delete Thread</DialogTitle>
+                </DialogHeader>
+                <DialogDescription>
+                    Are you sure you want to delete this thread? This action cannot be undone.
+                </DialogDescription>
+                <DialogFooter>
+                    <Button type="button" variant="ghost" onClick={() => setThreadToDelete(null)}>
+                        Cancel
+                    </Button>
+                    <Button type="button" variant="destructive" onClick={handleDelete}>
+                        Delete
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     );
 }

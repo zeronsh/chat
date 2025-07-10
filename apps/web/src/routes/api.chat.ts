@@ -55,6 +55,7 @@ export const ServerRoute = createServerFileRoute('/api/chat').methods({
                 return {
                     model: model.model,
                     messages,
+                    temperature: 0.8,
                     experimental_transform: smoothStream({
                         chunking: 'word',
                     }),
