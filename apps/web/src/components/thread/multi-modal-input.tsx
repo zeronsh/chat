@@ -79,17 +79,6 @@ export function MultiModalInput({
                         >
                             <PromptInputTextarea placeholder="Ask me anything..." />
                             <PromptInputActions className="flex items-center">
-                                <PromptInputAction tooltip={'Search the web'}>
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        className="h-8 rounded-full"
-                                    >
-                                        <GlobeIcon className="size-5" />
-                                        <span className="text-sm">Search</span>
-                                    </Button>
-                                </PromptInputAction>
-                                <div className="flex-1" />
                                 <PromptInputAction tooltip="Attach files">
                                     <Button
                                         asChild
@@ -109,6 +98,18 @@ export function MultiModalInput({
                                         </label>
                                     </Button>
                                 </PromptInputAction>
+                                <PromptInputAction tooltip={'Search the web'}>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="h-8 rounded-full"
+                                    >
+                                        <GlobeIcon className="size-5" />
+                                        <span className="text-sm">Search</span>
+                                    </Button>
+                                </PromptInputAction>
+                                <div className="flex-1" />
+
                                 <PromptInputAction
                                     tooltip={
                                         status === 'streaming' || status === 'submitted'
