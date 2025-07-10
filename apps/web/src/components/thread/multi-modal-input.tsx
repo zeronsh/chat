@@ -70,7 +70,7 @@ export function MultiModalInput({
             <form.Field
                 name="message"
                 children={field => (
-                    <motion.div layoutId="prompt-input">
+                    <motion.div layoutId="prompt-input" layout="position">
                         <PromptInput
                             className="max-w-3xl mx-auto p-3 bg-muted/50 backdrop-blur-md w-full"
                             value={field.state.value}
