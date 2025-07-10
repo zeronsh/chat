@@ -46,6 +46,7 @@ export const ServerRoute = createServerFileRoute('/api/chat').methods({
                     threadId: thread.id,
                     userId: session.user.id,
                     model,
+                    thread,
                     message,
                     messages: convertToModelMessages(history),
                 };
@@ -70,11 +71,16 @@ export const ServerRoute = createServerFileRoute('/api/chat').methods({
                     };
                 }
             },
-            onAfterStream: async ({ context: { threadId, message, streamId }, stream }) => {
-                await Promise.all([
-                    generateThreadTitle(threadId, message.message),
-                    streamContext.createNewResumableStream(streamId, () => stream),
-                ]);
+            onAfterStream: async ({ context: { threadId, message, streamId, thread }, stream }) => {
+                const promises: Promise<any>[] = [];
+
+                if (!thread.title) {
+                    promises.push(generateThreadTitle(threadId, message.message));
+                }
+
+                promises.push(streamContext.createNewResumableStream(streamId, () => stream));
+
+                await Promise.all(promises);
             },
             onFinish: async ({ responseMessage, context: { threadId, userId } }) => {
                 await saveMessageAndResetThreadStatus({

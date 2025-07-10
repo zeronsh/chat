@@ -12,8 +12,16 @@ import { createServerRootRoute } from '@tanstack/react-start/server'
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ThreadRouteImport } from './routes/_thread'
+import { Route as AccountRouteImport } from './routes/_account'
 import { Route as ThreadIndexRouteImport } from './routes/_thread.index'
 import { Route as ThreadThreadIdRouteImport } from './routes/_thread.$threadId'
+import { Route as AccountMagicLinkRouteImport } from './routes/_account.magic-link'
+import { Route as AccountLoggedOutRouteImport } from './routes/_account.logged-out'
+import { Route as AccountAccountRouteImport } from './routes/_account.account'
+import { Route as AccountLoginIndexRouteImport } from './routes/_account.login.index'
+import { Route as AccountAccountIndexRouteImport } from './routes/_account.account.index'
+import { Route as AccountAccountPreferencesRouteImport } from './routes/_account.account.preferences'
+import { Route as AccountAccountAppearanceRouteImport } from './routes/_account.account.appearance'
 import { ServerRoute as ApiChatServerRouteImport } from './routes/api.chat'
 import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api.auth.$'
 import { ServerRoute as ApiChatThreadIdStreamServerRouteImport } from './routes/api.chat.$threadId.stream'
@@ -22,6 +30,10 @@ const rootServerRouteImport = createServerRootRoute()
 
 const ThreadRoute = ThreadRouteImport.update({
   id: '/_thread',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountRoute = AccountRouteImport.update({
+  id: '/_account',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ThreadIndexRoute = ThreadIndexRouteImport.update({
@@ -34,6 +46,43 @@ const ThreadThreadIdRoute = ThreadThreadIdRouteImport.update({
   path: '/$threadId',
   getParentRoute: () => ThreadRoute,
 } as any)
+const AccountMagicLinkRoute = AccountMagicLinkRouteImport.update({
+  id: '/magic-link',
+  path: '/magic-link',
+  getParentRoute: () => AccountRoute,
+} as any)
+const AccountLoggedOutRoute = AccountLoggedOutRouteImport.update({
+  id: '/logged-out',
+  path: '/logged-out',
+  getParentRoute: () => AccountRoute,
+} as any)
+const AccountAccountRoute = AccountAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => AccountRoute,
+} as any)
+const AccountLoginIndexRoute = AccountLoginIndexRouteImport.update({
+  id: '/login/',
+  path: '/login/',
+  getParentRoute: () => AccountRoute,
+} as any)
+const AccountAccountIndexRoute = AccountAccountIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AccountAccountRoute,
+} as any)
+const AccountAccountPreferencesRoute =
+  AccountAccountPreferencesRouteImport.update({
+    id: '/preferences',
+    path: '/preferences',
+    getParentRoute: () => AccountAccountRoute,
+  } as any)
+const AccountAccountAppearanceRoute =
+  AccountAccountAppearanceRouteImport.update({
+    id: '/appearance',
+    path: '/appearance',
+    getParentRoute: () => AccountAccountRoute,
+  } as any)
 const ApiChatServerRoute = ApiChatServerRouteImport.update({
   id: '/api/chat',
   path: '/api/chat',
@@ -52,28 +101,79 @@ const ApiChatThreadIdStreamServerRoute =
   } as any)
 
 export interface FileRoutesByFullPath {
+  '/account': typeof AccountAccountRouteWithChildren
+  '/logged-out': typeof AccountLoggedOutRoute
+  '/magic-link': typeof AccountMagicLinkRoute
   '/$threadId': typeof ThreadThreadIdRoute
   '/': typeof ThreadIndexRoute
+  '/account/appearance': typeof AccountAccountAppearanceRoute
+  '/account/preferences': typeof AccountAccountPreferencesRoute
+  '/account/': typeof AccountAccountIndexRoute
+  '/login': typeof AccountLoginIndexRoute
 }
 export interface FileRoutesByTo {
+  '/logged-out': typeof AccountLoggedOutRoute
+  '/magic-link': typeof AccountMagicLinkRoute
   '/$threadId': typeof ThreadThreadIdRoute
   '/': typeof ThreadIndexRoute
+  '/account/appearance': typeof AccountAccountAppearanceRoute
+  '/account/preferences': typeof AccountAccountPreferencesRoute
+  '/account': typeof AccountAccountIndexRoute
+  '/login': typeof AccountLoginIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/_account': typeof AccountRouteWithChildren
   '/_thread': typeof ThreadRouteWithChildren
+  '/_account/account': typeof AccountAccountRouteWithChildren
+  '/_account/logged-out': typeof AccountLoggedOutRoute
+  '/_account/magic-link': typeof AccountMagicLinkRoute
   '/_thread/$threadId': typeof ThreadThreadIdRoute
   '/_thread/': typeof ThreadIndexRoute
+  '/_account/account/appearance': typeof AccountAccountAppearanceRoute
+  '/_account/account/preferences': typeof AccountAccountPreferencesRoute
+  '/_account/account/': typeof AccountAccountIndexRoute
+  '/_account/login/': typeof AccountLoginIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/$threadId' | '/'
+  fullPaths:
+    | '/account'
+    | '/logged-out'
+    | '/magic-link'
+    | '/$threadId'
+    | '/'
+    | '/account/appearance'
+    | '/account/preferences'
+    | '/account/'
+    | '/login'
   fileRoutesByTo: FileRoutesByTo
-  to: '/$threadId' | '/'
-  id: '__root__' | '/_thread' | '/_thread/$threadId' | '/_thread/'
+  to:
+    | '/logged-out'
+    | '/magic-link'
+    | '/$threadId'
+    | '/'
+    | '/account/appearance'
+    | '/account/preferences'
+    | '/account'
+    | '/login'
+  id:
+    | '__root__'
+    | '/_account'
+    | '/_thread'
+    | '/_account/account'
+    | '/_account/logged-out'
+    | '/_account/magic-link'
+    | '/_thread/$threadId'
+    | '/_thread/'
+    | '/_account/account/appearance'
+    | '/_account/account/preferences'
+    | '/_account/account/'
+    | '/_account/login/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  AccountRoute: typeof AccountRouteWithChildren
   ThreadRoute: typeof ThreadRouteWithChildren
 }
 export interface FileServerRoutesByFullPath {
@@ -114,6 +214,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ThreadRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_account': {
+      id: '/_account'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AccountRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_thread/': {
       id: '/_thread/'
       path: '/'
@@ -127,6 +234,55 @@ declare module '@tanstack/react-router' {
       fullPath: '/$threadId'
       preLoaderRoute: typeof ThreadThreadIdRouteImport
       parentRoute: typeof ThreadRoute
+    }
+    '/_account/magic-link': {
+      id: '/_account/magic-link'
+      path: '/magic-link'
+      fullPath: '/magic-link'
+      preLoaderRoute: typeof AccountMagicLinkRouteImport
+      parentRoute: typeof AccountRoute
+    }
+    '/_account/logged-out': {
+      id: '/_account/logged-out'
+      path: '/logged-out'
+      fullPath: '/logged-out'
+      preLoaderRoute: typeof AccountLoggedOutRouteImport
+      parentRoute: typeof AccountRoute
+    }
+    '/_account/account': {
+      id: '/_account/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AccountAccountRouteImport
+      parentRoute: typeof AccountRoute
+    }
+    '/_account/login/': {
+      id: '/_account/login/'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof AccountLoginIndexRouteImport
+      parentRoute: typeof AccountRoute
+    }
+    '/_account/account/': {
+      id: '/_account/account/'
+      path: '/'
+      fullPath: '/account/'
+      preLoaderRoute: typeof AccountAccountIndexRouteImport
+      parentRoute: typeof AccountAccountRoute
+    }
+    '/_account/account/preferences': {
+      id: '/_account/account/preferences'
+      path: '/preferences'
+      fullPath: '/account/preferences'
+      preLoaderRoute: typeof AccountAccountPreferencesRouteImport
+      parentRoute: typeof AccountAccountRoute
+    }
+    '/_account/account/appearance': {
+      id: '/_account/account/appearance'
+      path: '/appearance'
+      fullPath: '/account/appearance'
+      preLoaderRoute: typeof AccountAccountAppearanceRouteImport
+      parentRoute: typeof AccountAccountRoute
     }
   }
 }
@@ -156,6 +312,39 @@ declare module '@tanstack/react-start/server' {
   }
 }
 
+interface AccountAccountRouteChildren {
+  AccountAccountAppearanceRoute: typeof AccountAccountAppearanceRoute
+  AccountAccountPreferencesRoute: typeof AccountAccountPreferencesRoute
+  AccountAccountIndexRoute: typeof AccountAccountIndexRoute
+}
+
+const AccountAccountRouteChildren: AccountAccountRouteChildren = {
+  AccountAccountAppearanceRoute: AccountAccountAppearanceRoute,
+  AccountAccountPreferencesRoute: AccountAccountPreferencesRoute,
+  AccountAccountIndexRoute: AccountAccountIndexRoute,
+}
+
+const AccountAccountRouteWithChildren = AccountAccountRoute._addFileChildren(
+  AccountAccountRouteChildren,
+)
+
+interface AccountRouteChildren {
+  AccountAccountRoute: typeof AccountAccountRouteWithChildren
+  AccountLoggedOutRoute: typeof AccountLoggedOutRoute
+  AccountMagicLinkRoute: typeof AccountMagicLinkRoute
+  AccountLoginIndexRoute: typeof AccountLoginIndexRoute
+}
+
+const AccountRouteChildren: AccountRouteChildren = {
+  AccountAccountRoute: AccountAccountRouteWithChildren,
+  AccountLoggedOutRoute: AccountLoggedOutRoute,
+  AccountMagicLinkRoute: AccountMagicLinkRoute,
+  AccountLoginIndexRoute: AccountLoginIndexRoute,
+}
+
+const AccountRouteWithChildren =
+  AccountRoute._addFileChildren(AccountRouteChildren)
+
 interface ThreadRouteChildren {
   ThreadThreadIdRoute: typeof ThreadThreadIdRoute
   ThreadIndexRoute: typeof ThreadIndexRoute
@@ -182,6 +371,7 @@ const ApiChatServerRouteWithChildren = ApiChatServerRoute._addFileChildren(
 )
 
 const rootRouteChildren: RootRouteChildren = {
+  AccountRoute: AccountRouteWithChildren,
   ThreadRoute: ThreadRouteWithChildren,
 }
 export const routeTree = rootRouteImport

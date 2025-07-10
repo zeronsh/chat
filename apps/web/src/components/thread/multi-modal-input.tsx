@@ -54,6 +54,7 @@ export function MultiModalInput({
         <form
             className={cn({
                 'absolute px-4 pt-4 flex flex-col gap-4': true,
+                'pt-84': !threadId,
                 'bottom-0 left-0 right-0': threadId,
                 'inset-0': !threadId,
             })}
@@ -82,9 +83,9 @@ export function MultiModalInput({
                                     <Button
                                         variant="outline"
                                         size="sm"
-                                        className="h-6 rounded-full"
+                                        className="h-8 rounded-full"
                                     >
-                                        <GlobeIcon className="size-4" />
+                                        <GlobeIcon className="size-5" />
                                         <span className="text-sm">Search</span>
                                     </Button>
                                 </PromptInputAction>
@@ -94,7 +95,7 @@ export function MultiModalInput({
                                         asChild
                                         variant="ghost"
                                         size="icon"
-                                        className="h-6 w-6 rounded-full"
+                                        className="h-8 w-8 rounded-full"
                                     >
                                         <label htmlFor="file-upload">
                                             <input
@@ -104,7 +105,7 @@ export function MultiModalInput({
                                                 accept="image/*"
                                                 id="file-upload"
                                             />
-                                            <Paperclip className="size-4" />
+                                            <Paperclip className="size-5" />
                                         </label>
                                     </Button>
                                 </PromptInputAction>
@@ -119,12 +120,12 @@ export function MultiModalInput({
                                         type="submit"
                                         variant="default"
                                         size="icon"
-                                        className="h-6 w-6 rounded-full"
+                                        className="h-8 w-8 rounded-full"
                                     >
                                         {status === 'streaming' || status === 'submitted' ? (
-                                            <SquareIcon className="size-4 fill-current" />
+                                            <SquareIcon className="size-5 fill-current" />
                                         ) : (
-                                            <ArrowUpIcon className="size-4" />
+                                            <ArrowUpIcon className="size-5" />
                                         )}
                                     </Button>
                                 </PromptInputAction>

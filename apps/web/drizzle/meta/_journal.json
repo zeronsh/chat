@@ -15,6 +15,20 @@
       "when": 1752091564812,
       "tag": "0001_seed-models",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1752120652167,
+      "tag": "0002_nappy_stryfe",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1752120662291,
+      "tag": "0003_seed-models-2",
+      "breakpoints": true
     }
   ]
 }

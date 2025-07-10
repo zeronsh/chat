@@ -343,6 +343,86 @@ export const schema = {
       },
       primaryKey: ["id"],
     },
+    setting: {
+      name: "setting",
+      columns: {
+        id: {
+          type: "string",
+          optional: false,
+          customType: null as unknown as ZeroCustomType<
+            typeof zeroSchema,
+            "setting",
+            "id"
+          >,
+        },
+        mode: {
+          type: "string",
+          optional: true,
+          customType: null as unknown as ZeroCustomType<
+            typeof zeroSchema,
+            "setting",
+            "mode"
+          >,
+        },
+        theme: {
+          type: "string",
+          optional: true,
+          customType: null as unknown as ZeroCustomType<
+            typeof zeroSchema,
+            "setting",
+            "theme"
+          >,
+        },
+        userId: {
+          type: "string",
+          optional: false,
+          customType: null as unknown as ZeroCustomType<
+            typeof zeroSchema,
+            "setting",
+            "userId"
+          >,
+          serverName: "user_id",
+        },
+        nickname: {
+          type: "string",
+          optional: true,
+          customType: null as unknown as ZeroCustomType<
+            typeof zeroSchema,
+            "setting",
+            "nickname"
+          >,
+        },
+        biography: {
+          type: "string",
+          optional: true,
+          customType: null as unknown as ZeroCustomType<
+            typeof zeroSchema,
+            "setting",
+            "biography"
+          >,
+        },
+        instructions: {
+          type: "string",
+          optional: true,
+          customType: null as unknown as ZeroCustomType<
+            typeof zeroSchema,
+            "setting",
+            "instructions"
+          >,
+        },
+        modelId: {
+          type: "string",
+          optional: true,
+          customType: null as unknown as ZeroCustomType<
+            typeof zeroSchema,
+            "setting",
+            "modelId"
+          >,
+          serverName: "model_id",
+        },
+      },
+      primaryKey: ["id"],
+    },
     thread: {
       name: "thread",
       columns: {
@@ -436,6 +516,24 @@ export const schema = {
         },
       ],
     },
+    setting: {
+      user: [
+        {
+          sourceField: ["userId"],
+          destField: ["id"],
+          destSchema: "user",
+          cardinality: "one",
+        },
+      ],
+      model: [
+        {
+          sourceField: ["modelId"],
+          destField: ["id"],
+          destSchema: "model",
+          cardinality: "one",
+        },
+      ],
+    },
     thread: {
       user: [
         {
@@ -469,6 +567,14 @@ export const schema = {
           destField: ["userId"],
           destSchema: "message",
           cardinality: "many",
+        },
+      ],
+      settings: [
+        {
+          sourceField: ["id"],
+          destField: ["userId"],
+          destSchema: "setting",
+          cardinality: "one",
         },
       ],
     },

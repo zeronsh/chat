@@ -64,6 +64,21 @@ export const model = pgTable('model', {
     updatedAt: timestamp('updated_at').notNull().defaultNow(),
 });
 
+export const modeEnum = pgEnum('mode', ['light', 'dark']);
+
+export const setting = pgTable('setting', {
+    id: text('id').primaryKey(),
+    mode: modeEnum('mode').notNull().default('dark'),
+    theme: text('theme'),
+    userId: text('user_id')
+        .notNull()
+        .references(() => user.id, { onDelete: 'cascade' }),
+    nickname: text('nickname'),
+    biography: text('biography'),
+    instructions: text('instructions'),
+    modelId: text('model_id').notNull().default('gpt-4o-mini'),
+});
+
 export const threadRelations = relations(thread, ({ many, one }) => ({
     user: one(user, {
         fields: [thread.userId],
@@ -72,9 +87,24 @@ export const threadRelations = relations(thread, ({ many, one }) => ({
     messages: many(message),
 }));
 
-export const userRelations = relations(user, ({ many }) => ({
+export const userRelations = relations(user, ({ many, one }) => ({
     threads: many(thread),
     messages: many(message),
+    settings: one(setting, {
+        fields: [user.id],
+        references: [setting.userId],
+    }),
+}));
+
+export const settingRelations = relations(setting, ({ one }) => ({
+    user: one(user, {
+        fields: [setting.userId],
+        references: [user.id],
+    }),
+    model: one(model, {
+        fields: [setting.modelId],
+        references: [model.id],
+    }),
 }));
 
 export const messageRelations = relations(message, ({ one }) => ({

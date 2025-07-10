@@ -31,6 +31,16 @@ export default drizzleZeroConfig(schema, {
             createdAt: true,
             updatedAt: true,
         },
+        setting: {
+            id: true,
+            mode: true,
+            theme: true,
+            userId: true,
+            nickname: true,
+            biography: true,
+            instructions: true,
+            modelId: true,
+        },
         user: {
             id: true,
             name: true,

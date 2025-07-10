@@ -3,6 +3,8 @@ import appCss from '@/global.css?url';
 
 import { HeadContent, Outlet, Scripts, createRootRoute } from '@tanstack/react-router';
 import { DatabaseProvider } from '@/context/database';
+import { useSettings } from '@/hooks/use-settings';
+import { cn } from '@/lib/utils';
 
 export const Route = createRootRoute({
     head: () => ({
@@ -38,8 +40,11 @@ export const Route = createRootRoute({
 });
 
 function RootComponent() {
+    const settings = useSettings();
     return (
-        <body className="fixed inset-0 dark">
+        <body
+            className={cn('fixed inset-0', settings?.mode ?? 'dark', settings?.theme ?? 'default')}
+        >
             <div className="fixed inset-0 flex text-foreground">
                 <Outlet />
                 {/* <TanStackRouterDevtools /> */}

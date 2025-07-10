@@ -1,15 +1,15 @@
-import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
+import { UserMenu } from '@/components/app/user-menu';
+import { ThemeSelector } from '@/components/app/theme-selector';
+import { ModelSelector } from '@/components/app/model-selector';
+import { SidebarTrigger } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
 import { useParams } from '@tanstack/react-router';
-import { Fragment } from 'react/jsx-runtime';
 
 export function Header() {
     const params = useParams({
         from: '/_thread/$threadId',
         shouldThrow: false,
     }) ?? { threadId: undefined };
-    const sidebar = useSidebar();
-
     return (
         <div
             className={cn(
@@ -20,8 +20,12 @@ export function Header() {
         >
             <div className="flex items-center gap-2 p-3">
                 <SidebarTrigger />
+                <ModelSelector />
             </div>
-            <div className="flex items-center gap-2 p-3"></div>
+            <div className="flex items-center gap-2 p-3">
+                <ThemeSelector />
+                <UserMenu />
+            </div>
         </div>
     );
 }

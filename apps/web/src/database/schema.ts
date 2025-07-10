@@ -1,10 +1,10 @@
-import * as threadSchema from '@/database/thread-schema';
+import * as appSchema from '@/database/app-schema';
 import * as authSchema from '@/database/auth-schema';
 
 export const schema = {
     ...authSchema,
-    ...threadSchema,
+    ...appSchema,
 };
 
 export * from '@/database/auth-schema';
-export * from '@/database/thread-schema';
+export * from '@/database/app-schema';

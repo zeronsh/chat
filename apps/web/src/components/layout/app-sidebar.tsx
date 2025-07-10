@@ -17,7 +17,7 @@ import { useThreadsByTimeRange } from '@/hooks/use-chats-by-time-range';
 import { Thread } from '@/zero/types';
 import { useQuery } from '@rocicorp/zero/react';
 import { Link } from '@tanstack/react-router';
-import { Loader2Icon, PencilIcon, PlusIcon, TrashIcon } from 'lucide-react';
+import { HashIcon, Loader2Icon, PencilIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import { useState } from 'react';
 import { Fragment } from 'react/jsx-runtime';
 
@@ -161,6 +161,7 @@ function ThreadItem({
                         activeOptions={{ exact: true }}
                         activeProps={{ className: 'bg-muted' }}
                     >
+                        <HashIcon className="size-4" />
                         <span className="truncate flex-1">{thread.title}</span>
                         {(thread.status === 'streaming' || thread.status === 'submitted') && (
                             <Loader2Icon className="size-4 animate-spin text-muted-foreground" />

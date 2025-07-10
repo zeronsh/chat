@@ -11,6 +11,7 @@ import { useMemo } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/layout/app-sidebar';
 import { Header } from '@/components/layout/header';
+import { Title } from '@/components/meta/title';
 
 export const Route = createFileRoute('/_thread')({
     component: RouteComponent,
@@ -34,9 +35,9 @@ function RouteComponent() {
 
     return (
         <SidebarProvider>
-            <title>{thread?.title ?? 'Zeron'}</title>
+            <Title title={thread?.title} />
             <AppSidebar />
-            <main className="relative flex-1">
+            <main className="relative flex flex-col flex-1">
                 <Header />
                 <Thread
                     id={threadId}
@@ -50,11 +51,15 @@ function RouteComponent() {
                         new DefaultChatTransport({
                             api: '/api/chat',
                             prepareSendMessagesRequest: async ({ id, messages }) => {
+                                const settings = db.query.setting
+                                    .where('userId', '=', db.userID)
+                                    .one()
+                                    .materialize();
                                 return {
                                     body: {
                                         id,
                                         message: messages.at(-1),
-                                        modelId: 'gpt-4o-mini',
+                                        modelId: settings.data?.modelId,
                                     },
                                 };
                             },
