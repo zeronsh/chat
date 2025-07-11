@@ -48,7 +48,7 @@ export function FileDropArea({
             <div style={{ pointerEvents: 'auto' }}>{children}</div>
 
             {isDragActive && (
-                <div className="absolute inset-0 flex size-full items-center justify-center rounded-none border-none bg-background/50 p-0 backdrop-blur transition-opacity duration-200 ease-out z-10">
+                <div className="absolute inset-0 flex size-full items-center justify-center border-none bg-background/50 p-0 backdrop-blur transition-opacity duration-200 ease-out z-10 rounded-3xl">
                     <p className="font-medium text-sm">{overlayText}</p>
                 </div>
             )}

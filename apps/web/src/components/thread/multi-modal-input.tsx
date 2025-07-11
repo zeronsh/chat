@@ -130,7 +130,7 @@ export function MultiModalInput({
                 }
             }}
         >
-            <FileDropArea onUpload={handleFileUpload}>
+            <FileDropArea onUpload={handleFileUpload} className="max-w-3xl mx-auto w-full">
                 <form.Field
                     name="message"
                     children={field => (

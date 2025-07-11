@@ -48,7 +48,10 @@ export const ServerRoute = createServerFileRoute('/api/chat').methods({
                     model,
                     thread,
                     message,
-                    messages: await convertUIMessagesToModelMessages(history),
+                    messages: await convertUIMessagesToModelMessages(history, {
+                        supportsImages: model.capabilities.includes('vision'),
+                        supportsDocuments: model.capabilities.includes('documents'),
+                    }),
                 };
             },
             onStream: ({ context: { messages, model } }) => {

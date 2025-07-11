@@ -4,6 +4,7 @@ export const Capabilities = {
     REASONING: 'reasoning',
     TOOLS: 'tools',
     VISION: 'vision',
+    DOCUMENTS: 'documents',
 } as const;
 
 export type Capability = (typeof Capabilities)[keyof typeof Capabilities];

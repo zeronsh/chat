@@ -406,10 +406,34 @@ class InternalError extends Data.TaggedError('InternalError')<{
     cause?: unknown;
 }> {}
 
-export async function convertUIMessagesToModelMessages<T extends UIMessage>(messages: T[]) {
+export async function convertUIMessagesToModelMessages<T extends UIMessage>(
+    messages: T[],
+    options: {
+        supportsImages?: boolean;
+        supportsDocuments?: boolean;
+    } = {
+        supportsImages: false,
+        supportsDocuments: false,
+    }
+) {
     return convertToModelMessages(
         await Promise.all(
             messages.map(async message => {
+                message.parts = message.parts.filter(part => {
+                    if (part.type === 'file') {
+                        if (
+                            part.mediaType.startsWith('application/pdf') &&
+                            !options.supportsDocuments
+                        ) {
+                            return false;
+                        }
+                        if (part.mediaType.startsWith('image/') && !options.supportsImages) {
+                            return false;
+                        }
+                    }
+                    return true;
+                });
+
                 for (const part of message.parts) {
                     if (part.type === 'file') {
                         if (part.mediaType.startsWith('application/pdf')) {
@@ -420,6 +444,7 @@ export async function convertUIMessagesToModelMessages<T extends UIMessage>(mess
                         }
                     }
                 }
+
                 return message;
             })
         )
