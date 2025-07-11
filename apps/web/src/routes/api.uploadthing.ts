@@ -24,8 +24,6 @@ const router = {
             maxFileCount: 5,
         },
     }).onUploadComplete(({ metadata, file }) => {
-        console.log('File url', file.ufsUrl);
-
         return {};
     }),
 } satisfies FileRouter;

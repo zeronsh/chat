@@ -63,32 +63,28 @@ export function FileAttachment({ url, name, mediaType, onRemove, className }: Fi
     if (isImage) {
         return (
             <>
-                <div className="relative">
-                    <motion.div
+                <div
+                    className={cn(
+                        'relative h-24 w-24 rounded-2xl bg-muted/50 cursor-pointer',
+                        className
+                    )}
+                    onClick={() => setIsFullScreen(true)}
+                >
+                    {isLoading && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-muted/50">
+                            <LoaderIcon className="size-6 animate-spin" />
+                        </div>
+                    )}
+                    <img
+                        src={url}
+                        alt={name}
                         className={cn(
-                            'relative h-24 w-24 rounded-2xl bg-muted/50 cursor-pointer',
-                            className
+                            'h-full w-full object-cover transition-opacity duration-200 rounded-2xl',
+                            imageLoaded ? 'opacity-100' : 'opacity-0'
                         )}
-                        onClick={() => setIsFullScreen(true)}
-                        layoutId={`image-${url}`}
-                    >
-                        {isLoading && (
-                            <div className="absolute inset-0 flex items-center justify-center bg-muted/50">
-                                <LoaderIcon className="size-6 animate-spin" />
-                            </div>
-                        )}
-                        <motion.img
-                            src={url}
-                            alt={name}
-                            className={cn(
-                                'h-full w-full object-cover transition-opacity duration-200 rounded-2xl',
-                                imageLoaded ? 'opacity-100' : 'opacity-0'
-                            )}
-                            onLoad={handleImageLoad}
-                            onError={handleImageError}
-                            layoutId={`image-content-${url}`}
-                        />
-                    </motion.div>
+                        onLoad={handleImageLoad}
+                        onError={handleImageError}
+                    />
                     {onRemove && (
                         <Button
                             variant="ghost"
@@ -106,21 +102,17 @@ export function FileAttachment({ url, name, mediaType, onRemove, className }: Fi
 
                 {isFullScreen &&
                     createPortal(
-                        <motion.div
+                        <div
                             className="fixed inset-0 z-[9999] bg-background/50 backdrop-blur-sm"
                             onClick={() => setIsFullScreen(false)}
                         >
-                            <motion.div
-                                className="absolute inset-0 flex items-center justify-center p-4"
-                                layoutId={`image-${url}`}
-                            >
-                                <motion.img
+                            <div className="absolute inset-0 flex items-center justify-center p-4">
+                                <img
                                     src={url}
                                     alt={name}
                                     className="max-h-full max-w-full object-contain rounded-lg"
-                                    layoutId={`image-content-${url}`}
                                 />
-                            </motion.div>
+                            </div>
 
                             <Button
                                 variant="ghost"
@@ -130,7 +122,7 @@ export function FileAttachment({ url, name, mediaType, onRemove, className }: Fi
                             >
                                 <X className="size-6" />
                             </Button>
-                        </motion.div>,
+                        </div>,
                         document.body
                     )}
             </>
