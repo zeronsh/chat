@@ -8,14 +8,7 @@ import {
 } from '@/components/ui/prompt-input';
 import { useForm } from '@tanstack/react-form';
 import { PromptInputProps } from '@zeronsh/ai/react';
-import {
-    SquareIcon,
-    ArrowUpIcon,
-    GlobeIcon,
-    Paperclip,
-    UploadIcon,
-    LoaderIcon,
-} from 'lucide-react';
+import { SquareIcon, ArrowUpIcon, GlobeIcon, Paperclip, LoaderIcon } from 'lucide-react';
 import { z } from 'zod';
 import { useNavigate } from '@tanstack/react-router';
 import { useParamsThreadId } from '@/hooks/use-params-thread-id';
