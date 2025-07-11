@@ -14,9 +14,19 @@ import { useNavigate } from '@tanstack/react-router';
 import { useParamsThreadId } from '@/hooks/use-params-thread-id';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
+import { useUploadThing } from '@/lib/uploadthing';
+import { useRef } from 'react';
 
 const PromptSchema = z.object({
     message: z.string().min(1),
+    attachments: z.array(
+        z.object({
+            type: z.literal('file'),
+            url: z.string(),
+            name: z.string(),
+            mediaType: z.string(),
+        })
+    ),
 });
 
 export function MultiModalInput({
@@ -25,12 +35,40 @@ export function MultiModalInput({
     status,
     stop,
 }: PromptInputProps<ThreadMessage>) {
+    const { startUpload } = useUploadThing('imageUploader');
+    const fileInputRef = useRef<HTMLInputElement>(null);
     const threadId = useParamsThreadId();
     const navigate = useNavigate();
+
+    const handleFileUpload = async (files: FileList | null) => {
+        if (!files || files.length === 0) return;
+
+        try {
+            const uploadedFiles = await startUpload(Array.from(files));
+            if (uploadedFiles && uploadedFiles.length > 0) {
+                form.setFieldValue('attachments', [
+                    ...form.getFieldValue('attachments'),
+                    ...uploadedFiles.map(file => ({
+                        type: 'file' as const,
+                        url: file.ufsUrl,
+                        name: file.name,
+                        mediaType: file.type,
+                    })),
+                ]);
+            }
+        } catch (error) {
+            console.error('Upload failed:', error);
+        }
+    };
+
+    const handlePaperclipClick = () => {
+        fileInputRef.current?.click();
+    };
 
     const form = useForm({
         defaultValues: {
             message: '',
+            attachments: [] as z.infer<typeof PromptSchema>['attachments'],
         },
         validators: {
             onMount: PromptSchema,
@@ -45,7 +83,16 @@ export function MultiModalInput({
                 },
                 replace: Boolean(threadId),
             });
-            sendMessage({ text: value.message });
+            sendMessage({
+                role: 'user',
+                parts: [
+                    ...value.attachments,
+                    {
+                        type: 'text',
+                        text: value.message,
+                    },
+                ],
+            });
             form.reset();
         },
     });
@@ -81,21 +128,21 @@ export function MultiModalInput({
                             <PromptInputActions className="flex items-center">
                                 <PromptInputAction tooltip="Attach files">
                                     <Button
-                                        asChild
-                                        variant="ghost"
+                                        variant="outline"
                                         size="icon"
                                         className="h-8 w-8 rounded-full"
+                                        type="button"
+                                        onClick={handlePaperclipClick}
                                     >
-                                        <label htmlFor="file-upload">
-                                            <input
-                                                type="file"
-                                                multiple
-                                                className="hidden"
-                                                accept="image/*"
-                                                id="file-upload"
-                                            />
-                                            <Paperclip className="size-5" />
-                                        </label>
+                                        <Paperclip className="size-5" />
+                                        <input
+                                            ref={fileInputRef}
+                                            type="file"
+                                            accept="image/*"
+                                            multiple={false}
+                                            className="hidden"
+                                            onChange={e => handleFileUpload(e.target.files)}
+                                        />
                                     </Button>
                                 </PromptInputAction>
                                 <PromptInputAction tooltip={'Search the web'}>

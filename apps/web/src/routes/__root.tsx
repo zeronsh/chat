@@ -5,6 +5,7 @@ import { HeadContent, Outlet, Scripts, createRootRoute } from '@tanstack/react-r
 import { DatabaseProvider } from '@/context/database';
 import { useSettings } from '@/hooks/use-settings';
 import { cn } from '@/lib/utils';
+import { Toaster } from '@/components/ui/sonner';
 
 export const Route = createRootRoute({
     head: () => ({
@@ -47,6 +48,7 @@ function RootComponent() {
         >
             <div className="fixed inset-0 flex text-foreground">
                 <Outlet />
+                <Toaster position="top-center" />
                 {/* <TanStackRouterDevtools /> */}
             </div>
         </body>

@@ -27,6 +27,7 @@
         "@t3-oss/env-core": "^0.13.8",
         "@tanstack/react-form": "^1.14.1",
         "@tanstack/react-router": "^1.125.6",
+        "@uploadthing/react": "^7.3.2",
         "@zeronsh/ai": "workspace:*",
         "ai": "5.0.0-beta.9",
         "better-auth": "^1.2.12",
@@ -53,6 +54,7 @@
         "tailwind-merge": "^3.3.1",
         "ts-pattern": "^5.7.1",
         "ua-parser-js": "^2.0.4",
+        "uploadthing": "^7.7.3",
         "usehooks-ts": "^3.1.1",
         "zod": "^3.25.75"
     },

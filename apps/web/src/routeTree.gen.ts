@@ -22,6 +22,7 @@ import { Route as AccountLoginIndexRouteImport } from './routes/_account.login.i
 import { Route as AccountAccountIndexRouteImport } from './routes/_account.account.index'
 import { Route as AccountAccountPreferencesRouteImport } from './routes/_account.account.preferences'
 import { Route as AccountAccountAppearanceRouteImport } from './routes/_account.account.appearance'
+import { ServerRoute as ApiUploadthingServerRouteImport } from './routes/api.uploadthing'
 import { ServerRoute as ApiChatServerRouteImport } from './routes/api.chat'
 import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api.auth.$'
 import { ServerRoute as ApiChatThreadIdStreamServerRouteImport } from './routes/api.chat.$threadId.stream'
@@ -83,6 +84,11 @@ const AccountAccountAppearanceRoute =
     path: '/appearance',
     getParentRoute: () => AccountAccountRoute,
   } as any)
+const ApiUploadthingServerRoute = ApiUploadthingServerRouteImport.update({
+  id: '/api/uploadthing',
+  path: '/api/uploadthing',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
 const ApiChatServerRoute = ApiChatServerRouteImport.update({
   id: '/api/chat',
   path: '/api/chat',
@@ -178,30 +184,47 @@ export interface RootRouteChildren {
 }
 export interface FileServerRoutesByFullPath {
   '/api/chat': typeof ApiChatServerRouteWithChildren
+  '/api/uploadthing': typeof ApiUploadthingServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
   '/api/chat/$threadId/stream': typeof ApiChatThreadIdStreamServerRoute
 }
 export interface FileServerRoutesByTo {
   '/api/chat': typeof ApiChatServerRouteWithChildren
+  '/api/uploadthing': typeof ApiUploadthingServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
   '/api/chat/$threadId/stream': typeof ApiChatThreadIdStreamServerRoute
 }
 export interface FileServerRoutesById {
   __root__: typeof rootServerRouteImport
   '/api/chat': typeof ApiChatServerRouteWithChildren
+  '/api/uploadthing': typeof ApiUploadthingServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
   '/api/chat/$threadId/stream': typeof ApiChatThreadIdStreamServerRoute
 }
 export interface FileServerRouteTypes {
   fileServerRoutesByFullPath: FileServerRoutesByFullPath
-  fullPaths: '/api/chat' | '/api/auth/$' | '/api/chat/$threadId/stream'
+  fullPaths:
+    | '/api/chat'
+    | '/api/uploadthing'
+    | '/api/auth/$'
+    | '/api/chat/$threadId/stream'
   fileServerRoutesByTo: FileServerRoutesByTo
-  to: '/api/chat' | '/api/auth/$' | '/api/chat/$threadId/stream'
-  id: '__root__' | '/api/chat' | '/api/auth/$' | '/api/chat/$threadId/stream'
+  to:
+    | '/api/chat'
+    | '/api/uploadthing'
+    | '/api/auth/$'
+    | '/api/chat/$threadId/stream'
+  id:
+    | '__root__'
+    | '/api/chat'
+    | '/api/uploadthing'
+    | '/api/auth/$'
+    | '/api/chat/$threadId/stream'
   fileServerRoutesById: FileServerRoutesById
 }
 export interface RootServerRouteChildren {
   ApiChatServerRoute: typeof ApiChatServerRouteWithChildren
+  ApiUploadthingServerRoute: typeof ApiUploadthingServerRoute
   ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute
 }
 
@@ -288,6 +311,13 @@ declare module '@tanstack/react-router' {
 }
 declare module '@tanstack/react-start/server' {
   interface ServerFileRoutesByPath {
+    '/api/uploadthing': {
+      id: '/api/uploadthing'
+      path: '/api/uploadthing'
+      fullPath: '/api/uploadthing'
+      preLoaderRoute: typeof ApiUploadthingServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
     '/api/chat': {
       id: '/api/chat'
       path: '/api/chat'
@@ -379,6 +409,7 @@ export const routeTree = rootRouteImport
   ._addFileTypes<FileRouteTypes>()
 const rootServerRouteChildren: RootServerRouteChildren = {
   ApiChatServerRoute: ApiChatServerRouteWithChildren,
+  ApiUploadthingServerRoute: ApiUploadthingServerRoute,
   ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,
 }
 export const serverRouteTree = rootServerRouteImport

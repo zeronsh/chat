@@ -12,6 +12,8 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/layout/app-sidebar';
 import { Header } from '@/components/layout/header';
 import { Title } from '@/components/meta/title';
+import { motion } from 'framer-motion';
+import { Stars } from '@/components/ui/stars';
 
 export const Route = createFileRoute('/_thread')({
     component: RouteComponent,
@@ -38,6 +40,22 @@ function RouteComponent() {
             <Title title={thread?.title} />
             <AppSidebar />
             <main className="relative flex flex-col flex-1">
+                <motion.div
+                    className="absolute inset-0 w-full"
+                    initial={{ opacity: 0, scale: 0.7, y: 0 }}
+                    animate={{
+                        opacity: threadId ? 0 : 1,
+                        scale: threadId ? 0.7 : 1,
+                        y: threadId ? 50 : 0,
+                    }}
+                    transition={{
+                        duration: 0.4,
+                        ease: [0.4, 0, 0.2, 1],
+                    }}
+                >
+                    {!threadId && <Stars />}
+                    <div className="moon" />
+                </motion.div>
                 <Header />
                 <Thread
                     id={threadId}
