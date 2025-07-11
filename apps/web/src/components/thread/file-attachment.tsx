@@ -36,7 +36,7 @@ export function FileAttachment({ url, name, mediaType, onRemove, className }: Fi
         return (
             <div
                 className={cn(
-                    'relative h-24 w-24 bg-destructive/10 border border-destructive/20 rounded-md flex items-center justify-center',
+                    'relative h-24 w-24 bg-destructive/10 border border-destructive/20 rounded-2xl flex items-center justify-center',
                     className
                 )}
             >
@@ -66,11 +66,10 @@ export function FileAttachment({ url, name, mediaType, onRemove, className }: Fi
                 <div className="relative">
                     <motion.div
                         className={cn(
-                            'relative h-24 w-24 rounded-md bg-muted/50 cursor-pointer',
+                            'relative h-24 w-24 rounded-2xl bg-muted/50 cursor-pointer',
                             className
                         )}
                         onClick={() => setIsFullScreen(true)}
-                        layoutId={`image-${url}`}
                     >
                         {isLoading && (
                             <div className="absolute inset-0 flex items-center justify-center bg-muted/50">
@@ -81,7 +80,7 @@ export function FileAttachment({ url, name, mediaType, onRemove, className }: Fi
                             src={url}
                             alt={name}
                             className={cn(
-                                'h-full w-full object-cover transition-opacity duration-200 rounded-md',
+                                'h-full w-full object-cover transition-opacity duration-200 rounded-2xl',
                                 imageLoaded ? 'opacity-100' : 'opacity-0'
                             )}
                             onLoad={handleImageLoad}
@@ -110,10 +109,7 @@ export function FileAttachment({ url, name, mediaType, onRemove, className }: Fi
                             className="fixed inset-0 z-[9999] bg-background/50 backdrop-blur-sm"
                             onClick={() => setIsFullScreen(false)}
                         >
-                            <motion.div
-                                className="absolute inset-0 flex items-center justify-center p-4"
-                                layoutId={`image-${url}`}
-                            >
+                            <motion.div className="absolute inset-0 flex items-center justify-center p-4">
                                 <motion.img
                                     src={url}
                                     alt={name}
@@ -141,7 +137,7 @@ export function FileAttachment({ url, name, mediaType, onRemove, className }: Fi
         return (
             <div
                 className={cn(
-                    'relative h-24 w-24 bg-muted/50 border rounded-md flex items-center justify-center',
+                    'relative h-24 w-24 bg-muted/50 border rounded-2xl flex items-center justify-center',
                     className
                 )}
             >
@@ -169,7 +165,7 @@ export function FileAttachment({ url, name, mediaType, onRemove, className }: Fi
     return (
         <div
             className={cn(
-                'relative h-24 w-24 bg-muted/50 border rounded-md flex items-center justify-center',
+                'relative h-24 w-24 bg-muted/50 border rounded-2xl flex items-center justify-center',
                 className
             )}
         >

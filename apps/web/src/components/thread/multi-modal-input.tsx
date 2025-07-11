@@ -168,7 +168,7 @@ export function MultiModalInput({
                                 {Array.from({ length: pendingCount }).map((_, index) => (
                                     <div
                                         key={index}
-                                        className="h-24 w-24 bg-muted/50 rounded-md animate-pulse border relative"
+                                        className="h-24 w-24 bg-muted/50 rounded-2xl animate-pulse border relative"
                                     >
                                         <div className="absolute inset-0 flex items-center justify-center bg-muted/50">
                                             <LoaderIcon className="size-6 animate-spin" />
