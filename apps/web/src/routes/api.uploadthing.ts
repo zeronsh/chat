@@ -16,7 +16,7 @@ const f = createUploadthing();
 const router = {
     fileUploader: f({
         image: {
-            maxFileSize: '2MB',
+            maxFileSize: '8MB',
             maxFileCount: 5,
         },
         pdf: {

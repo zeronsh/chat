@@ -25,6 +25,7 @@ import { useUploadThing } from '@/lib/uploadthing';
 import { useRef, useState } from 'react';
 import { FileAttachment } from './file-attachment';
 import { FileDropArea } from '@/components/thread/file-drop-area';
+import { toast } from 'sonner';
 
 const PromptSchema = z.object({
     message: z.string().min(1),
@@ -46,12 +47,8 @@ export function MultiModalInput({
 }: PromptInputProps<ThreadMessage>) {
     const [pendingCount, setPendingCount] = useState(0);
     const { startUpload, isUploading } = useUploadThing('fileUploader', {
-        onUploadBegin: fileName => {
-            console.log('Uploading file:', fileName);
+        onUploadBegin: () => {
             setPendingCount(prev => prev + 1);
-        },
-        onUploadProgress: progress => {
-            console.log('Upload progress:', progress);
         },
         onClientUploadComplete: files => {
             setPendingCount(prev => prev - files.length);
@@ -66,7 +63,7 @@ export function MultiModalInput({
             ]);
         },
         onUploadError: error => {
-            console.error('Upload error:', error);
+            toast.error(error.message);
             setPendingCount(prev => prev - 1);
         },
     });
