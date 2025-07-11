@@ -1,7 +1,7 @@
 import type { ThreadMessage } from '@/lib/types';
 import { createServerFileRoute } from '@tanstack/react-start/server';
-import { convertToModelMessages, smoothStream } from 'ai';
-import { createUIMessageStreamResponse } from '@zeronsh/ai';
+import { smoothStream } from 'ai';
+import { convertUIMessagesToModelMessages, createUIMessageStreamResponse } from '@zeronsh/ai';
 import z from 'zod';
 import { auth } from '@/lib/auth';
 import { ThreadError } from '@/lib/error';
@@ -48,7 +48,7 @@ export const ServerRoute = createServerFileRoute('/api/chat').methods({
                     model,
                     thread,
                     message,
-                    messages: convertToModelMessages(history),
+                    messages: await convertUIMessagesToModelMessages(history),
                 };
             },
             onStream: ({ context: { messages, model } }) => {
@@ -82,6 +82,13 @@ export const ServerRoute = createServerFileRoute('/api/chat').methods({
                 promises.push(streamContext.createNewResumableStream(streamId, () => stream));
 
                 await Promise.all(promises);
+            },
+            onStreamError: ({ error, writer }) => {
+                console.error(error);
+                writer.write({
+                    type: 'data-error',
+                    data: 'Error generating response.',
+                });
             },
             onFinish: async ({ responseMessage, context: { threadId, userId } }) => {
                 await saveMessageAndResetThreadStatus({

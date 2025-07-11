@@ -16,7 +16,9 @@ export type Metadata = {
     };
 };
 
-export type DataParts = {};
+export type DataParts = {
+    error: string;
+};
 
 export type Tools = {};
 

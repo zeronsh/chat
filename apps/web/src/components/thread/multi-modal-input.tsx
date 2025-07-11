@@ -8,14 +8,22 @@ import {
 } from '@/components/ui/prompt-input';
 import { useForm } from '@tanstack/react-form';
 import { PromptInputProps } from '@zeronsh/ai/react';
-import { SquareIcon, ArrowUpIcon, GlobeIcon, Paperclip } from 'lucide-react';
+import {
+    SquareIcon,
+    ArrowUpIcon,
+    GlobeIcon,
+    Paperclip,
+    UploadIcon,
+    LoaderIcon,
+} from 'lucide-react';
 import { z } from 'zod';
 import { useNavigate } from '@tanstack/react-router';
 import { useParamsThreadId } from '@/hooks/use-params-thread-id';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { useUploadThing } from '@/lib/uploadthing';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
+import { FileAttachment } from './file-attachment';
 
 const PromptSchema = z.object({
     message: z.string().min(1),
@@ -23,7 +31,7 @@ const PromptSchema = z.object({
         z.object({
             type: z.literal('file'),
             url: z.string(),
-            name: z.string(),
+            filename: z.string(),
             mediaType: z.string(),
         })
     ),
@@ -35,7 +43,32 @@ export function MultiModalInput({
     status,
     stop,
 }: PromptInputProps<ThreadMessage>) {
-    const { startUpload } = useUploadThing('imageUploader');
+    const [pendingCount, setPendingCount] = useState(0);
+    const { startUpload, isUploading } = useUploadThing('fileUploader', {
+        onUploadBegin: fileName => {
+            console.log('Uploading file:', fileName);
+            setPendingCount(prev => prev + 1);
+        },
+        onUploadProgress: progress => {
+            console.log('Upload progress:', progress);
+        },
+        onClientUploadComplete: files => {
+            setPendingCount(prev => prev - files.length);
+            form.setFieldValue('attachments', [
+                ...form.getFieldValue('attachments'),
+                ...files.map(file => ({
+                    type: 'file' as const,
+                    url: file.ufsUrl,
+                    filename: file.name,
+                    mediaType: file.type,
+                })),
+            ]);
+        },
+        onUploadError: error => {
+            console.error('Upload error:', error);
+            setPendingCount(prev => prev - 1);
+        },
+    });
     const fileInputRef = useRef<HTMLInputElement>(null);
     const threadId = useParamsThreadId();
     const navigate = useNavigate();
@@ -43,22 +76,7 @@ export function MultiModalInput({
     const handleFileUpload = async (files: FileList | null) => {
         if (!files || files.length === 0) return;
 
-        try {
-            const uploadedFiles = await startUpload(Array.from(files));
-            if (uploadedFiles && uploadedFiles.length > 0) {
-                form.setFieldValue('attachments', [
-                    ...form.getFieldValue('attachments'),
-                    ...uploadedFiles.map(file => ({
-                        type: 'file' as const,
-                        url: file.ufsUrl,
-                        name: file.name,
-                        mediaType: file.type,
-                    })),
-                ]);
-            }
-        } catch (error) {
-            console.error('Upload failed:', error);
-        }
+        await startUpload(Array.from(files));
     };
 
     const handlePaperclipClick = () => {
@@ -124,6 +142,40 @@ export function MultiModalInput({
                             onValueChange={field.handleChange}
                             onSubmit={form.handleSubmit}
                         >
+                            <div className="flex gap-2 p-2">
+                                <form.Subscribe selector={form => form.values.attachments}>
+                                    {attachments =>
+                                        attachments.map(attachment => (
+                                            <FileAttachment
+                                                key={attachment.url}
+                                                url={attachment.url}
+                                                name={attachment.filename}
+                                                mediaType={attachment.mediaType}
+                                                onRemove={() => {
+                                                    const currentAttachments =
+                                                        form.getFieldValue('attachments');
+                                                    form.setFieldValue(
+                                                        'attachments',
+                                                        currentAttachments.filter(
+                                                            a => a.url !== attachment.url
+                                                        )
+                                                    );
+                                                }}
+                                            />
+                                        ))
+                                    }
+                                </form.Subscribe>
+                                {Array.from({ length: pendingCount }).map((_, index) => (
+                                    <div
+                                        key={index}
+                                        className="h-24 w-24 bg-muted/50 rounded-md animate-pulse border relative"
+                                    >
+                                        <div className="absolute inset-0 flex items-center justify-center bg-muted/50">
+                                            <LoaderIcon className="size-6 animate-spin" />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                             <PromptInputTextarea placeholder="Ask me anything..." />
                             <PromptInputActions className="flex items-center">
                                 <PromptInputAction tooltip="Attach files">
@@ -138,8 +190,8 @@ export function MultiModalInput({
                                         <input
                                             ref={fileInputRef}
                                             type="file"
-                                            accept="image/*"
-                                            multiple={false}
+                                            accept="image/*,application/pdf"
+                                            multiple={true}
                                             className="hidden"
                                             onChange={e => handleFileUpload(e.target.files)}
                                         />
@@ -164,18 +216,28 @@ export function MultiModalInput({
                                             : 'Send message'
                                     }
                                 >
-                                    <Button
-                                        type="submit"
-                                        variant="default"
-                                        size="icon"
-                                        className="h-8 w-8 rounded-full"
+                                    <form.Subscribe
+                                        selector={form => ({
+                                            canSubmit: form.canSubmit,
+                                        })}
                                     >
-                                        {status === 'streaming' || status === 'submitted' ? (
-                                            <SquareIcon className="size-5 fill-current" />
-                                        ) : (
-                                            <ArrowUpIcon className="size-5" />
+                                        {({ canSubmit }) => (
+                                            <Button
+                                                type="submit"
+                                                variant="default"
+                                                size="icon"
+                                                className="h-8 w-8 rounded-full"
+                                                disabled={!canSubmit || isUploading}
+                                            >
+                                                {status === 'streaming' ||
+                                                status === 'submitted' ? (
+                                                    <SquareIcon className="size-5 fill-current" />
+                                                ) : (
+                                                    <ArrowUpIcon className="size-5" />
+                                                )}
+                                            </Button>
                                         )}
-                                    </Button>
+                                    </form.Subscribe>
                                 </PromptInputAction>
                             </PromptInputActions>
                         </PromptInput>

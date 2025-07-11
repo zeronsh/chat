@@ -14,17 +14,17 @@ export const ServerRoute = createServerFileRoute('/api/uploadthing').methods({
 const f = createUploadthing();
 
 const router = {
-    imageUploader: f({
+    fileUploader: f({
         image: {
             maxFileSize: '2MB',
-            maxFileCount: 1,
+            maxFileCount: 5,
         },
         pdf: {
             maxFileSize: '8MB',
-            maxFileCount: 1,
+            maxFileCount: 5,
         },
     }).onUploadComplete(({ metadata, file }) => {
-        console.log('File url', file.url);
+        console.log('File url', file.ufsUrl);
 
         return {};
     }),

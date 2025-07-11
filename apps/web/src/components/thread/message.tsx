@@ -9,6 +9,8 @@ import { CopyIcon, EditIcon, GitBranchIcon, RefreshCcwIcon } from 'lucide-react'
 import { useCopyToClipboard } from 'usehooks-ts';
 import type { ThreadMessage } from '@/lib/types';
 import ModelIcon from '@/components/thread/model-icon';
+import { useMemo } from 'react';
+import { FileAttachment } from '@/components/thread/file-attachment';
 
 export function UserMessage({
     message,
@@ -31,11 +33,34 @@ export function UserMessage({
         await copy(text);
     }
 
+    const fileParts = useMemo(() => {
+        return message.parts.filter(part => part.type === 'file');
+    }, [message.parts]);
+
+    const messageWithoutFileParts = useMemo(() => {
+        return {
+            ...message,
+            parts: message.parts.filter(part => part.type !== 'file'),
+        };
+    }, [message.parts]);
+
     return (
         <MessageContainer hasPreviousMessage={hasPreviousMessage} hasNextMessage={hasNextMessage}>
             <Message className="flex flex-col items-end group/user-message w-full">
+                {fileParts.length > 0 && (
+                    <div className="flex items-end gap-2">
+                        {fileParts.map((part, index) => (
+                            <FileAttachment
+                                key={index}
+                                url={part.url}
+                                name={part.filename}
+                                mediaType={part.mediaType}
+                            />
+                        ))}
+                    </div>
+                )}
                 <div className="bg-muted py-4 px-6 rounded-l-3xl rounded-tr-3xl rounded-br-lg max-w-[80%]">
-                    <UIMessage message={message} />
+                    <UIMessage message={messageWithoutFileParts} />
                 </div>
                 <MessageActions className="group-hover/user-message:opacity-100 md:opacity-0 transition-opacity duration-200 gap-1">
                     <MessageAction tooltip="Copy" side="bottom">

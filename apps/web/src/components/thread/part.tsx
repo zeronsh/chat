@@ -2,16 +2,18 @@ import { MessagePart } from '@/lib/types';
 import { MessageContent } from '@/components/ui/message';
 import { match } from 'ts-pattern';
 import { cn } from '@/lib/utils';
-import { ReasoningUIPart } from 'ai';
+import type { ReasoningUIPart } from 'ai';
 import { AnimatePresence, motion } from 'framer-motion';
-import { BrainIcon, Loader2Icon } from 'lucide-react';
+import { BrainIcon, InfoIcon, Loader2Icon } from 'lucide-react';
 import { useState, useCallback } from 'react';
 import { useDebounce } from '@uidotdev/usehooks';
+import { Alert, AlertTitle } from '@/components/ui/alert';
 
 export function Part({ part }: { part: MessagePart }) {
     return match(part)
         .with({ type: 'reasoning' }, part => <ReasoningPart part={part} />)
         .with({ type: 'text' }, ({ text }) => <MessageContent markdown>{text}</MessageContent>)
+        .with({ type: 'data-error' }, part => <DataErrorPart part={part} />)
         .otherwise(() => null);
 }
 
@@ -56,5 +58,22 @@ function ReasoningPart({ part }: { part: ReasoningUIPart }) {
                 )}
             </AnimatePresence>
         </div>
+    );
+}
+
+function DataErrorPart({
+    part,
+}: {
+    part: {
+        type: 'data-error';
+        id?: string;
+        data: string;
+    };
+}) {
+    return (
+        <Alert variant="destructive">
+            <InfoIcon />
+            <AlertTitle>{part.data}</AlertTitle>
+        </Alert>
     );
 }

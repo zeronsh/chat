@@ -7,6 +7,7 @@ import {
     JsonToSseTransformStream,
     type TextStreamPart,
     type ToolSet,
+    convertToModelMessages,
 } from 'ai';
 import { Data, Duration, Effect, Schedule } from 'effect';
 import { type ResumableStreamContext } from 'resumable-stream';
@@ -66,7 +67,7 @@ export type CreateStreamUIMessageResponseOptions<
         writer: UIMessageStreamWriter<Message>;
         context: PrepareReturn;
         error: unknown;
-    }) => Promise<any>;
+    }) => any | Promise<any>;
 
     /**
      * The function that will be called after the stream has been created.
@@ -187,11 +188,7 @@ export function createUIMessageStreamResponse<Message extends UIMessage>() {
                                 ...options,
                                 onError: async error => {
                                     if (onStreamError) {
-                                        await onStreamError({ body, writer, context, error }).catch(
-                                            e => {
-                                                console.log(e);
-                                            }
-                                        );
+                                        await onStreamError({ body, writer, context, error });
                                     }
                                 },
                             });
@@ -408,3 +405,23 @@ class InternalError extends Data.TaggedError('InternalError')<{
     metadata?: any;
     cause?: unknown;
 }> {}
+
+export async function convertUIMessagesToModelMessages<T extends UIMessage>(messages: T[]) {
+    return convertToModelMessages(
+        await Promise.all(
+            messages.map(async message => {
+                for (const part of message.parts) {
+                    if (part.type === 'file') {
+                        if (part.mediaType.startsWith('application/pdf')) {
+                            // @ts-expect-error - TODO: fix this
+                            part.url = await fetch(part.url)
+                                .then(res => res.blob())
+                                .then(blob => blob.arrayBuffer());
+                        }
+                    }
+                }
+                return message;
+            })
+        )
+    );
+}

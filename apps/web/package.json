@@ -27,6 +27,7 @@
         "@t3-oss/env-core": "^0.13.8",
         "@tanstack/react-form": "^1.14.1",
         "@tanstack/react-router": "^1.125.6",
+        "@uidotdev/usehooks": "^2.4.1",
         "@uploadthing/react": "^7.3.2",
         "@zeronsh/ai": "workspace:*",
         "ai": "5.0.0-beta.9",
