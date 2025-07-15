@@ -62,6 +62,11 @@ export const ServerRoute = createServerFileRoute('/api/chat').methods({
                     experimental_transform: smoothStream({
                         chunking: 'word',
                     }),
+                    providerOptions: {
+                        gateway: {
+                            order: ['groq'],
+                        },
+                    },
                 };
             },
             onStreamMessageMetadata: ({ part, context: { model } }) => {
