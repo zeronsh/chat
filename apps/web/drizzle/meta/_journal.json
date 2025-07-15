@@ -36,6 +36,13 @@
       "when": 1752178961668,
       "tag": "0004_seed-models-3",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1752435140845,
+      "tag": "0005_seed-models-4",
+      "breakpoints": true
     }
   ]
 }
