@@ -15,14 +15,14 @@ import { type ResumableStreamContext } from 'resumable-stream';
 export type StreamTextOptions = Omit<Parameters<typeof streamText>[0], 'onError' | 'onFinish'>;
 
 export type InferMessageToolSet<Message extends UIMessage> =
-    Message extends UIMessage<infer Metadata, infer DataParts, infer Tools>
+    Message extends UIMessage<infer _, infer __, infer Tools>
         ? Tools extends ToolSet
             ? Tools
             : never
         : {};
 
 export type InferMessageMetadata<Message extends UIMessage> =
-    Message extends UIMessage<infer Metadata, infer DataParts, infer Tools> ? Metadata : {};
+    Message extends UIMessage<infer Metadata, infer _, infer __> ? Metadata : {};
 
 export type CreateStreamUIMessageResponseOptions<
     Message extends UIMessage,
@@ -350,7 +350,13 @@ export function createResumeStreamResponse(options: CreateResumeStreamOptions) {
                     status: 500,
                 });
             },
-        }).pipe(Effect.retry(Schedule.exponential(200).pipe(Schedule.compose(Schedule.recurs(5)))));
+        }).pipe(
+            Effect.retry(
+                Schedule.exponential(Duration.millis(200)).pipe(
+                    Schedule.compose(Schedule.recurs(3))
+                )
+            )
+        );
 
         return new Response(stream);
     });
