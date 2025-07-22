@@ -1,6 +1,8 @@
 import { Part } from '@/components/thread/message/part';
-import { ThreadMessage } from '@/ai/types';
+import { memo } from 'react';
+import { useThreadSelector } from '@/context/thread';
 
-export function UIMessage({ message }: { message: ThreadMessage }) {
-    return message.parts.map((part, i) => <Part key={i} part={part} />);
-}
+export const UIMessage = memo(function PureUIMessage({ id }: { id: string }) {
+    const partsLength = useThreadSelector(state => state.messageMap[id].parts.length);
+    return Array.from({ length: partsLength }).map((_, i) => <Part key={i} id={id} index={i} />);
+});

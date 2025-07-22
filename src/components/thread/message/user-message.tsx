@@ -38,13 +38,6 @@ export const UserMessage = memo(function PureUserMessage({
         return message.parts.filter(part => part.type === 'file');
     }, [message.parts]);
 
-    const messageWithoutFileParts = useMemo(() => {
-        return {
-            ...message,
-            parts: message.parts.filter(part => part.type !== 'file'),
-        };
-    }, [message.parts]);
-
     return (
         <MessageContainer hasPreviousMessage={hasPreviousMessage} hasNextMessage={hasNextMessage}>
             <Message className="flex flex-col items-end group/user-message w-full">
@@ -61,7 +54,7 @@ export const UserMessage = memo(function PureUserMessage({
                     </div>
                 )}
                 <div className="bg-muted py-4 px-6 rounded-l-3xl rounded-tr-3xl rounded-br-lg max-w-[80%]">
-                    <UIMessage message={messageWithoutFileParts} />
+                    <UIMessage id={message.id} />
                 </div>
                 <MessageActions className="group-hover/user-message:opacity-100 md:opacity-0 transition-opacity duration-200 gap-1">
                     <MessageAction tooltip="Copy" side="bottom">

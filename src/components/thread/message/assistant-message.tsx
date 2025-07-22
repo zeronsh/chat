@@ -17,8 +17,11 @@ export const AssistantMessage = memo(function PureAssistantMessage({
     hasPreviousMessage: boolean;
     hasNextMessage: boolean;
 }) {
-    const message = useThreadSelector(state => state.messageMap[id]);
     const status = useThreadSelector(state => state.status);
+    const metadata = useThreadSelector(
+        state => state.messageMap[id].metadata,
+        (a, b) => a?.model?.id === b?.model?.id
+    );
 
     return (
         <MessageContainer
@@ -27,7 +30,7 @@ export const AssistantMessage = memo(function PureAssistantMessage({
             hasNextMessage={hasNextMessage}
         >
             <Message className="flex flex-col items-start w-full">
-                <UIMessage message={message} />
+                <UIMessage id={id} />
                 <MessageActions
                     className={cn(
                         'gap-1 transition-opacity duration-200 opacity-100',
@@ -56,19 +59,16 @@ export const AssistantMessage = memo(function PureAssistantMessage({
                             <GitBranchIcon className="size-3" />
                         </Button>
                     </MessageAction>
-                    {message.metadata && message.metadata.model && (
+                    {metadata && metadata.model && (
                         <Button
                             variant="ghost"
                             className="hover:bg-transparent! cursor-default"
                             asChild
                         >
                             <div>
-                                <ModelIcon
-                                    className="fill-primary"
-                                    model={message.metadata.model.icon}
-                                />
+                                <ModelIcon className="fill-primary" model={metadata.model.icon} />
                                 <span className="text-xs text-muted-foreground font-normal">
-                                    {message.metadata.model.name}
+                                    {metadata.model.name}
                                 </span>
                             </div>
                         </Button>
