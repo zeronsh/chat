@@ -1,4 +1,4 @@
-import { getResearchPlanPrompt, getResearchPrompt } from '@/ai/prompt';
+import { getResearchPrompt } from '@/ai/prompt';
 import { ToolContext } from '.';
 import { generateObject, generateText, NoSuchToolError, stepCountIs, tool } from 'ai';
 import z from 'zod';
@@ -135,18 +135,3 @@ export function getResearchTool(ctx: ToolContext) {
         },
     });
 }
-
-export const planSchema = z.object({
-    plan: z.array(
-        z.object({
-            title: z.string().min(10).max(70).describe('A title for the research topic'),
-            todos: z
-                .array(z.string())
-                .min(3)
-                .max(5)
-                .describe('A list of what to research for the given title'),
-        })
-    ),
-});
-
-export type Plan = z.infer<typeof planSchema>['plan'];

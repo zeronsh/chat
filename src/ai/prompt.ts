@@ -1,5 +1,3 @@
-import { Plan } from '@/ai/tools/research-tool';
-
 export function getSystemPrompt(
     settings: {
         nickname: string | null;
@@ -171,30 +169,5 @@ export function getResearchPrompt(prompt: string) {
 
     Research Topic: 
     ${prompt}
-    `;
-}
-
-export function getResearchPlanPrompt(topic: string) {
-    return `
-    Plan out the research to perform on the topic: ${topic}
-    Today is ${new Date().toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: '2-digit',
-        weekday: 'short',
-    })}.
-
-    Plan Guidelines:
-    - Break down the topic into key aspects to research
-    - Generate specific, diverse search queries for each aspect
-    - Search for relevant information using the web search tool
-    - Read the contents of sites that are searched for
-    - Analyze the results and identify important facts and insights
-    - The plan is limited to 15 actions, do not exceed this limit
-    - Follow up with more specific queries as you learn more
-    - No need to synthesize your findings into a comprehensive response, just return the results
-    - The plan should be concise and to the point, no more than 10 items
-    - Keep the titles concise and to the point, no more than 70 characters
-    - Make the plan technical and specific to the topic
     `;
 }
