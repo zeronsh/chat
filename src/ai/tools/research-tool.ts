@@ -31,15 +31,9 @@ export function getResearchTool(ctx: ToolContext) {
                 },
             });
 
-            const { object } = await generateObject({
-                model: 'openai/gpt-4.1',
-                prompt: getResearchPlanPrompt(prompt),
-                schema: planSchema,
-            });
-
             const { text: summary } = await generateText({
                 model: 'moonshotai/kimi-k2',
-                prompt: getResearchPrompt(object.plan),
+                prompt: getResearchPrompt(prompt),
                 stopWhen: stepCountIs(50),
                 tools: {
                     search: tool({

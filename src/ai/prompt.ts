@@ -118,9 +118,9 @@ const toolPrompts: Record<string, string> = {
     `,
 } as const;
 
-export function getResearchPrompt(plan: Plan) {
+export function getResearchPrompt(prompt: string) {
     return `
-    You are an autonomous deep research analyst. Your goal is to research the given research plan thoroughly with the given tools.
+    You are an autonomous deep research analyst. Your goal is to research the given research topic thoroughly with the given tools.
 
     Today is ${new Date().toLocaleDateString('en-US', {
         year: 'numeric',
@@ -164,14 +164,13 @@ export function getResearchPrompt(plan: Plan) {
     6. Continue searching and reading sites to fill any gaps in understanding
 
     For research:
-    - Carefully follow the plan, do not skip any steps
     - Do not use the same query twice to avoid duplicates
     - PRIORITIZE READING THE WEBSITE CONTENT OVER SEARCHING THE WEB
     - ⚠️ MANDATORY: YOU MUST USE read_site TOOL AT LEAST 5 SITES BEFORE FINISHING THE RESEARCH
     - You have up to 40 actions to complete the research
 
-    Research Plan: 
-    ${JSON.stringify(plan)}
+    Research Topic: 
+    ${prompt}
     `;
 }
 
