@@ -53,6 +53,8 @@ function RouteComponent() {
                 {!threadId && <Stars />}
                 <div className="moon" />
             </motion.div>
+            <AppSidebar />
+
             <ThreadProvider
                 key={threadId}
                 id={threadId}
@@ -77,7 +79,6 @@ function RouteComponent() {
                     })
                 }
             >
-                <AppSidebar />
                 <main className="relative flex flex-col flex-1">
                     <Header />
                     <MessageList />

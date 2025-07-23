@@ -87,16 +87,15 @@ export const useCodeHighlighter = ({
                 setIsHighlighting(true);
                 const highlighter = await getHighlighter();
 
-                // Check if the language is supported, fallback to plaintext if not
-                const supportedLangs = highlighter.getLoadedLanguages();
-                const langToUse = supportedLangs.includes(language) ? language : 'plaintext';
-
-                const highlighted = highlighter.codeToHtml(codeString, {
-                    lang: langToUse,
-                    theme: 'css-variables',
-                });
-
-                setHighlightedCode(highlighted);
+                setTimeout(() => {
+                    const supportedLangs = highlighter.getLoadedLanguages();
+                    const langToUse = supportedLangs.includes(language) ? language : 'plaintext';
+                    const highlighted = highlighter.codeToHtml(codeString, {
+                        lang: langToUse,
+                        theme: 'css-variables',
+                    });
+                    setHighlightedCode(highlighted);
+                }, 0);
             } catch (error) {
                 console.error('Error highlighting code:', error);
                 // Fallback to plain text if highlighting fails

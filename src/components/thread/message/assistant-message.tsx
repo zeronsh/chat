@@ -1,4 +1,5 @@
 import { MessageContainer } from '@/components/thread/message/message-container';
+import { PendingMessage } from '@/components/thread/message/pending-message';
 import { UIMessage } from '@/components/thread/message/ui-message';
 import { UrlResultButton } from '@/components/thread/message/url-result-button';
 import ModelIcon from '@/components/thread/model-icon';
@@ -19,6 +20,11 @@ export const AssistantMessage = memo(function PureAssistantMessage({
     hasNextMessage: boolean;
 }) {
     const status = useThreadSelector(state => state.status);
+    const length = useThreadSelector(state => state.messageMap[id].parts.length);
+
+    if (length === 0) {
+        return <PendingMessage />;
+    }
 
     return (
         <MessageContainer

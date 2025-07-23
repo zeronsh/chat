@@ -3,7 +3,7 @@ import tsConfigPaths from 'vite-tsconfig-paths';
 import { tanstackStart } from '@tanstack/react-start/plugin/vite';
 import tailwindcss from '@tailwindcss/vite';
 
-const config = defineConfig({
+export default defineConfig({
     plugins: [
         tsConfigPaths({
             projects: ['./tsconfig.json'],
@@ -12,5 +12,3 @@ const config = defineConfig({
         tanstackStart(),
     ],
 });
-
-export default config;
