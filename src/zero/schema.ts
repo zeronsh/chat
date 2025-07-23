@@ -24,6 +24,121 @@ import type { default as zeroSchema } from "../../drizzle-zero.config";
  */
 export const schema = {
   tables: {
+    member: {
+      name: "member",
+      columns: {
+        id: {
+          type: "string",
+          optional: false,
+          customType: null as unknown as ZeroCustomType<
+            typeof zeroSchema,
+            "member",
+            "id"
+          >,
+        },
+        organizationId: {
+          type: "string",
+          optional: false,
+          customType: null as unknown as ZeroCustomType<
+            typeof zeroSchema,
+            "member",
+            "organizationId"
+          >,
+          serverName: "organization_id",
+        },
+        userId: {
+          type: "string",
+          optional: false,
+          customType: null as unknown as ZeroCustomType<
+            typeof zeroSchema,
+            "member",
+            "userId"
+          >,
+          serverName: "user_id",
+        },
+        role: {
+          type: "string",
+          optional: true,
+          customType: null as unknown as ZeroCustomType<
+            typeof zeroSchema,
+            "member",
+            "role"
+          >,
+        },
+        createdAt: {
+          type: "number",
+          optional: false,
+          customType: null as unknown as ZeroCustomType<
+            typeof zeroSchema,
+            "member",
+            "createdAt"
+          >,
+          serverName: "created_at",
+        },
+      },
+      primaryKey: ["id"],
+    },
+    organization: {
+      name: "organization",
+      columns: {
+        id: {
+          type: "string",
+          optional: false,
+          customType: null as unknown as ZeroCustomType<
+            typeof zeroSchema,
+            "organization",
+            "id"
+          >,
+        },
+        name: {
+          type: "string",
+          optional: false,
+          customType: null as unknown as ZeroCustomType<
+            typeof zeroSchema,
+            "organization",
+            "name"
+          >,
+        },
+        slug: {
+          type: "string",
+          optional: true,
+          customType: null as unknown as ZeroCustomType<
+            typeof zeroSchema,
+            "organization",
+            "slug"
+          >,
+        },
+        logo: {
+          type: "string",
+          optional: true,
+          customType: null as unknown as ZeroCustomType<
+            typeof zeroSchema,
+            "organization",
+            "logo"
+          >,
+        },
+        createdAt: {
+          type: "number",
+          optional: false,
+          customType: null as unknown as ZeroCustomType<
+            typeof zeroSchema,
+            "organization",
+            "createdAt"
+          >,
+          serverName: "created_at",
+        },
+        metadata: {
+          type: "string",
+          optional: true,
+          customType: null as unknown as ZeroCustomType<
+            typeof zeroSchema,
+            "organization",
+            "metadata"
+          >,
+        },
+      },
+      primaryKey: ["id"],
+    },
     session: {
       name: "session",
       columns: {
@@ -104,6 +219,16 @@ export const schema = {
             "userId"
           >,
           serverName: "user_id",
+        },
+        activeOrganizationId: {
+          type: "string",
+          optional: true,
+          customType: null as unknown as ZeroCustomType<
+            typeof zeroSchema,
+            "session",
+            "activeOrganizationId"
+          >,
+          serverName: "active_organization_id",
         },
       },
       primaryKey: ["id"],
@@ -343,6 +468,32 @@ export const schema = {
       },
       primaryKey: ["id"],
     },
+    organizationCustomer: {
+      name: "organizationCustomer",
+      columns: {
+        id: {
+          type: "string",
+          optional: false,
+          customType: null as unknown as ZeroCustomType<
+            typeof zeroSchema,
+            "organizationCustomer",
+            "id"
+          >,
+        },
+        organizationId: {
+          type: "string",
+          optional: false,
+          customType: null as unknown as ZeroCustomType<
+            typeof zeroSchema,
+            "organizationCustomer",
+            "organizationId"
+          >,
+          serverName: "organization_id",
+        },
+      },
+      primaryKey: ["id"],
+      serverName: "organization_customer",
+    },
     setting: {
       name: "setting",
       columns: {
@@ -423,6 +574,40 @@ export const schema = {
       },
       primaryKey: ["id"],
     },
+    subscription: {
+      name: "subscription",
+      columns: {
+        id: {
+          type: "string",
+          optional: false,
+          customType: null as unknown as ZeroCustomType<
+            typeof zeroSchema,
+            "subscription",
+            "id"
+          >,
+        },
+        customerId: {
+          type: "string",
+          optional: false,
+          customType: null as unknown as ZeroCustomType<
+            typeof zeroSchema,
+            "subscription",
+            "customerId"
+          >,
+          serverName: "customer_id",
+        },
+        data: {
+          type: "json",
+          optional: false,
+          customType: null as unknown as ZeroCustomType<
+            typeof zeroSchema,
+            "subscription",
+            "data"
+          >,
+        },
+      },
+      primaryKey: ["id"],
+    },
     thread: {
       name: "thread",
       columns: {
@@ -496,8 +681,44 @@ export const schema = {
       },
       primaryKey: ["id"],
     },
+    userCustomer: {
+      name: "userCustomer",
+      columns: {
+        id: {
+          type: "string",
+          optional: false,
+          customType: null as unknown as ZeroCustomType<
+            typeof zeroSchema,
+            "userCustomer",
+            "id"
+          >,
+        },
+        userId: {
+          type: "string",
+          optional: false,
+          customType: null as unknown as ZeroCustomType<
+            typeof zeroSchema,
+            "userCustomer",
+            "userId"
+          >,
+          serverName: "user_id",
+        },
+      },
+      primaryKey: ["id"],
+      serverName: "user_customer",
+    },
   },
   relationships: {
+    member: {
+      organization: [
+        {
+          sourceField: ["organizationId"],
+          destField: ["id"],
+          destSchema: "organization",
+          cardinality: "one",
+        },
+      ],
+    },
     message: {
       thread: [
         {
@@ -513,6 +734,42 @@ export const schema = {
           destField: ["id"],
           destSchema: "user",
           cardinality: "one",
+        },
+      ],
+    },
+    organizationCustomer: {
+      organization: [
+        {
+          sourceField: ["organizationId"],
+          destField: ["id"],
+          destSchema: "organization",
+          cardinality: "one",
+        },
+      ],
+      subscription: [
+        {
+          sourceField: ["id"],
+          destField: ["customerId"],
+          destSchema: "subscription",
+          cardinality: "one",
+        },
+      ],
+    },
+    organization: {
+      customer: [
+        {
+          sourceField: ["id"],
+          destField: ["organizationId"],
+          destSchema: "organizationCustomer",
+          cardinality: "one",
+        },
+      ],
+      members: [
+        {
+          sourceField: ["id"],
+          destField: ["organizationId"],
+          destSchema: "member",
+          cardinality: "many",
         },
       ],
     },
@@ -534,6 +791,24 @@ export const schema = {
         },
       ],
     },
+    subscription: {
+      userCustomer: [
+        {
+          sourceField: ["customerId"],
+          destField: ["id"],
+          destSchema: "userCustomer",
+          cardinality: "one",
+        },
+      ],
+      organizationCustomer: [
+        {
+          sourceField: ["customerId"],
+          destField: ["id"],
+          destSchema: "organizationCustomer",
+          cardinality: "one",
+        },
+      ],
+    },
     thread: {
       user: [
         {
@@ -549,6 +824,24 @@ export const schema = {
           destField: ["threadId"],
           destSchema: "message",
           cardinality: "many",
+        },
+      ],
+    },
+    userCustomer: {
+      user: [
+        {
+          sourceField: ["userId"],
+          destField: ["id"],
+          destSchema: "user",
+          cardinality: "one",
+        },
+      ],
+      subscription: [
+        {
+          sourceField: ["id"],
+          destField: ["customerId"],
+          destSchema: "subscription",
+          cardinality: "one",
         },
       ],
     },
@@ -574,6 +867,14 @@ export const schema = {
           sourceField: ["id"],
           destField: ["userId"],
           destSchema: "setting",
+          cardinality: "one",
+        },
+      ],
+      customer: [
+        {
+          sourceField: ["id"],
+          destField: ["userId"],
+          destSchema: "userCustomer",
           cardinality: "one",
         },
       ],

@@ -6,6 +6,9 @@ export const env = createEnv({
         ZERO_UPSTREAM_DB: z.string().url(),
         AI_GATEWAY_API_KEY: z.string().min(1),
         EXA_API_KEY: z.string().min(1),
+        STRIPE_SECRET_KEY: z.string().min(1),
+        STRIPE_WEBHOOK_SECRET: z.string().min(1),
+        PRO_MONTHLY_PRICE_ID: z.string().min(1),
     },
     clientPrefix: 'VITE_PUBLIC_',
     client: {

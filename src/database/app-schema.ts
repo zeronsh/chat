@@ -1,7 +1,8 @@
 import { relations } from 'drizzle-orm';
 import { index, jsonb, pgEnum, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 import type { Capability, ThreadMessage } from '@/ai/types';
-import { user } from '@/database/auth-schema';
+import { member, organization, user } from '@/database/auth-schema';
+import { CustomerId, SubscriptionData, SubscriptionId } from '@/database/types';
 
 export const message = pgTable('message', {
     id: text('id').primaryKey(),
@@ -79,6 +80,61 @@ export const setting = pgTable('setting', {
     modelId: text('model_id').notNull().default('gpt-4o-mini'),
 });
 
+export const subscription = pgTable('subscription', {
+    id: text('id').primaryKey().$type<SubscriptionId>(),
+    customerId: text('customer_id').notNull().unique().$type<CustomerId>(),
+    data: jsonb('data').notNull().$type<SubscriptionData>(),
+});
+
+export const userCustomer = pgTable('user_customer', {
+    id: text('id').primaryKey().unique().$type<CustomerId>(),
+    userId: text('user_id')
+        .notNull()
+        .references(() => user.id, { onDelete: 'cascade' })
+        .unique(),
+});
+
+export const organizationCustomer = pgTable('organization_customer', {
+    id: text('id').primaryKey().unique().$type<CustomerId>(),
+    organizationId: text('organization_id')
+        .notNull()
+        .references(() => organization.id, { onDelete: 'cascade' })
+        .unique(),
+});
+
+export const subscriptionRelations = relations(subscription, ({ one }) => ({
+    userCustomer: one(userCustomer, {
+        fields: [subscription.customerId],
+        references: [userCustomer.id],
+    }),
+    organizationCustomer: one(organizationCustomer, {
+        fields: [subscription.customerId],
+        references: [organizationCustomer.id],
+    }),
+}));
+
+export const userCustomerRelations = relations(userCustomer, ({ one }) => ({
+    user: one(user, {
+        fields: [userCustomer.userId],
+        references: [user.id],
+    }),
+    subscription: one(subscription, {
+        fields: [userCustomer.id],
+        references: [subscription.customerId],
+    }),
+}));
+
+export const organizationCustomerRelations = relations(organizationCustomer, ({ one }) => ({
+    organization: one(organization, {
+        fields: [organizationCustomer.organizationId],
+        references: [organization.id],
+    }),
+    subscription: one(subscription, {
+        fields: [organizationCustomer.id],
+        references: [subscription.customerId],
+    }),
+}));
+
 export const threadRelations = relations(thread, ({ many, one }) => ({
     user: one(user, {
         fields: [thread.userId],
@@ -94,6 +150,25 @@ export const userRelations = relations(user, ({ many, one }) => ({
         fields: [user.id],
         references: [setting.userId],
     }),
+    customer: one(userCustomer, {
+        fields: [user.id],
+        references: [userCustomer.userId],
+    }),
+}));
+
+export const memberRelations = relations(member, ({ one }) => ({
+    organization: one(organization, {
+        fields: [member.organizationId],
+        references: [organization.id],
+    }),
+}));
+
+export const organizationRelations = relations(organization, ({ one, many }) => ({
+    customer: one(organizationCustomer, {
+        fields: [organization.id],
+        references: [organizationCustomer.organizationId],
+    }),
+    members: many(member),
 }));
 
 export const settingRelations = relations(setting, ({ one }) => ({

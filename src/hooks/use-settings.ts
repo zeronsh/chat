@@ -1,4 +1,5 @@
 import { useDatabase } from '@/context/database';
+import { CustomerId } from '@/database/types';
 import { useQuery } from '@rocicorp/zero/react';
 
 export function useSettings() {

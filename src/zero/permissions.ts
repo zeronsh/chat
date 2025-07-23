@@ -30,10 +30,69 @@ export const permissions = definePermissions<AuthData, Schema>(schema, () => {
         builder: ExpressionBuilder<Schema, 'message'>
     ) => builder.and(allowIfSignedIn(authData, builder), builder.cmp('userId', '=', authData.sub));
 
+    const allowIfInOrganization = (
+        authData: AuthData,
+        builder: ExpressionBuilder<Schema, 'organization'>
+    ) =>
+        builder.and(
+            allowIfSignedIn(authData, builder),
+            builder.exists('members', members =>
+                members.where(builder => builder.cmp('userId', '=', authData.sub))
+            )
+        );
+
+    const allowSelectMembersIfInOrganization = (
+        authData: AuthData,
+        builder: ExpressionBuilder<Schema, 'member'>
+    ) =>
+        builder.and(
+            allowIfSignedIn(authData, builder),
+            builder.exists('organization', organization =>
+                organization.whereExists('members', members =>
+                    members.where(builder => builder.cmp('userId', '=', authData.sub))
+                )
+            )
+        );
+
+    const allowSelectSubscription = (
+        authData: AuthData,
+        builder: ExpressionBuilder<Schema, 'subscription'>
+    ) =>
+        builder.and(
+            allowIfSignedIn(authData, builder),
+            builder.or(
+                builder.exists('userCustomer', userCustomer =>
+                    userCustomer.where(builder => builder.cmp('userId', '=', authData.sub))
+                ),
+                builder.exists('organizationCustomer', organizationCustomer =>
+                    organizationCustomer.whereExists('organization', organization =>
+                        organization.whereExists('members', members =>
+                            members.where(builder => builder.cmp('userId', '=', authData.sub))
+                        )
+                    )
+                )
+            )
+        );
+
     return {
         user: {
             row: {
                 select: [allowIfUser],
+            },
+        },
+        organization: {
+            row: {
+                select: [allowIfInOrganization],
+            },
+        },
+        member: {
+            row: {
+                select: [allowSelectMembersIfInOrganization],
+            },
+        },
+        subscription: {
+            row: {
+                select: [allowSelectSubscription],
             },
         },
         setting: {

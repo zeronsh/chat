@@ -43,6 +43,34 @@
       "when": 1752435140845,
       "tag": "0005_seed-models-4",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1753299954877,
+      "tag": "0006_thin_johnny_storm",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1753302914946,
+      "tag": "0007_easy_kid_colt",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1753303767613,
+      "tag": "0008_thankful_beast",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1753305655201,
+      "tag": "0009_dusty_felicia_hardy",
+      "breakpoints": true
     }
   ]
 }

@@ -1,6 +1,7 @@
 import { type db, schema } from '@/database';
 import { ThreadMessage } from '@/ai/types';
 import { and, eq, gt, not } from 'drizzle-orm';
+import { CustomerId, SubscriptionData, SubscriptionId } from '@/database/types';
 
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 type Database = typeof db | Transaction;
@@ -128,13 +129,80 @@ export async function getThreadByStreamId(db: Database, streamId: string) {
         where: (thread, { eq }) => eq(thread.streamId, streamId),
     });
 
-    console.log(thread);
-
     return thread;
 }
 
 export async function getSettingsByUserId(db: Database, userId: string) {
     return db.query.setting.findFirst({
         where: (setting, { eq }) => eq(setting.userId, userId),
+    });
+}
+
+export async function upsertSubscription(
+    db: Database,
+    args: {
+        id: SubscriptionId;
+        customerId: CustomerId;
+        data: SubscriptionData;
+    }
+) {
+    return db
+        .insert(schema.subscription)
+        .values({
+            id: args.id,
+            customerId: args.customerId,
+            data: args.data,
+        })
+        .onConflictDoUpdate({
+            target: [schema.subscription.customerId],
+            set: {
+                data: args.data,
+            },
+        })
+        .returning();
+}
+
+export async function createUserCustomer(
+    db: Database,
+    values: {
+        userId: string;
+        customerId: CustomerId;
+    }
+) {
+    return db
+        .insert(schema.userCustomer)
+        .values({
+            id: values.customerId,
+            userId: values.userId,
+        })
+        .returning();
+}
+
+export async function getUserCustomer(db: Database, userId: string) {
+    return db.query.userCustomer.findFirst({
+        where: (userCustomer, { eq }) => eq(userCustomer.userId, userId),
+    });
+}
+
+export async function createOrganizationCustomer(
+    db: Database,
+    values: {
+        organizationId: string;
+        customerId: CustomerId;
+    }
+) {
+    return db
+        .insert(schema.organizationCustomer)
+        .values({
+            id: values.customerId,
+            organizationId: values.organizationId,
+        })
+        .returning();
+}
+
+export async function getOrganizationCustomer(db: Database, organizationId: string) {
+    return db.query.organizationCustomer.findFirst({
+        where: (organizationCustomer, { eq }) =>
+            eq(organizationCustomer.organizationId, organizationId),
     });
 }
