@@ -246,6 +246,9 @@ export function MultiModalInput() {
                                             >
                                                 <TelescopeIcon className="size-5" />
                                                 <span className="text-sm">Research</span>
+                                                <span className="text-[10px] font-medium bg-primary/10 text-primary px-1.5 py-0.5 rounded-full hidden md:block">
+                                                    BETA
+                                                </span>
                                             </Button>
                                         </PromptInputAction>
                                     )}
