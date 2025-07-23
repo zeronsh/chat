@@ -132,3 +132,9 @@ export async function getThreadByStreamId(db: Database, streamId: string) {
 
     return thread;
 }
+
+export async function getSettingsByUserId(db: Database, userId: string) {
+    return db.query.setting.findFirst({
+        where: (setting, { eq }) => eq(setting.userId, userId),
+    });
+}

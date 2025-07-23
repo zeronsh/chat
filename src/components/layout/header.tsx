@@ -4,17 +4,18 @@ import { ModelSelector } from '@/components/app/model-selector';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
 import { useParams } from '@tanstack/react-router';
+import { useParamsThreadId } from '@/hooks/use-params-thread-id';
+import { useThreadSelector } from '@/context/thread';
 
 export function Header() {
-    const params = useParams({
-        from: '/_thread/$threadId',
-        shouldThrow: false,
-    }) ?? { threadId: undefined };
+    const threadId = useParamsThreadId();
+    const toolSidebar = useThreadSelector(state => state.toolSidebar);
+
     return (
         <div
             className={cn(
-                params.threadId && 'border-b',
-                '2xl:border-none 2xl:bg-transparent 2xl:backdrop-blur-none',
+                threadId && 'border-b',
+                !toolSidebar && '2xl:border-none 2xl:bg-transparent 2xl:backdrop-blur-none',
                 'bg-background/50 border-foreground/10 backdrop-blur-md absolute top-0 left-0 right-0 z-10 flex justify-between'
             )}
         >

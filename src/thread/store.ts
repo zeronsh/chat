@@ -1,6 +1,13 @@
 import { type ChatStatus, type UIMessage } from 'ai';
 import { createWithEqualityFn as create } from 'zustand/traditional';
 import { devtools, subscribeWithSelector } from 'zustand/middleware';
+import { ToolKeys } from '@/ai/types';
+
+export type ToolSidebar = {
+    messageId: string;
+    tool: ToolKeys;
+    toolCallId: string;
+};
 
 export interface ThreadStoreImpl<UI_MESSAGE extends UIMessage> {
     id?: string;
@@ -9,6 +16,9 @@ export interface ThreadStoreImpl<UI_MESSAGE extends UIMessage> {
     messages: UI_MESSAGE[];
     status: ChatStatus;
     error: Error | undefined;
+
+    toolSidebar: ToolSidebar | undefined;
+    setToolSidebar: (toolSidebar: ToolSidebar | undefined) => void;
 
     setMessages: (messages: UI_MESSAGE[]) => void;
     setStatus: (status: ChatStatus) => void;
@@ -32,6 +42,9 @@ export function createThreadStore<UI_MESSAGE extends UIMessage>(init: {
                     messages: init.messages,
                     status: 'ready',
                     error: undefined,
+                    toolSidebar: undefined,
+                    setToolSidebar: (toolSidebar: ToolSidebar | undefined) =>
+                        set({ toolSidebar }, false, 'thread/setToolSidebar'),
                     setStatus: (status: ChatStatus) => set({ status }, false, 'thread/setStatus'),
                     setError: (error: Error | undefined) =>
                         set({ error }, false, 'thread/setError'),

@@ -187,7 +187,6 @@ function ThreadItem({
                         activeOptions={{ exact: true }}
                         activeProps={{ className: 'bg-muted' }}
                     >
-                        <HashIcon className="size-4" />
                         <span className="truncate flex-1">{thread.title}</span>
                         {(thread.status === 'streaming' || thread.status === 'submitted') && (
                             <Loader2Icon className="size-4 animate-spin text-muted-foreground" />

@@ -12,6 +12,7 @@ import { motion } from 'framer-motion';
 import { Stars } from '@/components/ui/stars';
 import { ThreadProvider } from '@/context/thread';
 import { MessageList } from '@/components/thread/message/message-list';
+import { ToolSidebar } from '@/components/layout/tool-sidebar';
 
 export const Route = createFileRoute('/_thread')({
     component: RouteComponent,
@@ -36,51 +37,53 @@ function RouteComponent() {
     return (
         <SidebarProvider>
             <Title title={thread?.title} />
-            <AppSidebar />
-            <main className="relative flex flex-col flex-1">
-                <motion.div
-                    className="absolute inset-0 w-full"
-                    initial={{ opacity: 0, scale: 0.7, y: 0 }}
-                    animate={{
-                        opacity: threadId ? 0 : 1,
-                        scale: threadId ? 0.7 : 1,
-                        y: threadId ? 50 : 0,
-                    }}
-                    transition={{
-                        duration: 0.4,
-                        ease: [0.4, 0, 0.2, 1],
-                    }}
-                >
-                    {!threadId && <Stars />}
-                    <div className="moon" />
-                </motion.div>
-                <Header />
-                <ThreadProvider
-                    key={threadId}
-                    id={threadId}
-                    messages={messages}
-                    transport={
-                        new DefaultChatTransport({
-                            api: '/api/thread',
-                            prepareSendMessagesRequest: async ({ id, messages }) => {
-                                const settings = db.query.setting
-                                    .where('userId', '=', db.userID)
-                                    .one()
-                                    .materialize();
-                                return {
-                                    body: {
-                                        id,
-                                        message: messages.at(-1),
-                                        modelId: settings.data?.modelId,
-                                    },
-                                };
-                            },
-                        })
-                    }
-                >
+            <motion.div
+                className="absolute inset-0 w-full"
+                initial={{ opacity: 0, scale: 0.7, y: 0 }}
+                animate={{
+                    opacity: threadId ? 0 : 1,
+                    scale: threadId ? 0.7 : 1,
+                    y: threadId ? 50 : 0,
+                }}
+                transition={{
+                    duration: 0.4,
+                    ease: [0.4, 0, 0.2, 1],
+                }}
+            >
+                {!threadId && <Stars />}
+                <div className="moon" />
+            </motion.div>
+            <ThreadProvider
+                key={threadId}
+                id={threadId}
+                messages={messages}
+                transport={
+                    new DefaultChatTransport({
+                        api: '/api/thread',
+                        prepareSendMessagesRequest: async ({ id, messages, body }) => {
+                            const settings = db.query.setting
+                                .where('userId', '=', db.userID)
+                                .one()
+                                .materialize();
+                            return {
+                                body: {
+                                    id,
+                                    message: messages.at(-1),
+                                    modelId: settings.data?.modelId,
+                                    ...body,
+                                },
+                            };
+                        },
+                    })
+                }
+            >
+                <AppSidebar />
+                <main className="relative flex flex-col flex-1">
+                    <Header />
                     <MessageList />
-                </ThreadProvider>
-            </main>
+                </main>
+                <ToolSidebar />
+            </ThreadProvider>
         </SidebarProvider>
     );
 }

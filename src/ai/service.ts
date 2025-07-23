@@ -17,11 +17,22 @@ export async function prepareThread(args: {
     message: ThreadMessage;
 }) {
     return db.transaction(async tx => {
-        let [thread, message, model] = await Promise.all([
+        let [thread, message, model, settings] = await Promise.all([
             queries.getThreadById(tx, args.threadId),
             queries.getMessageById(tx, args.message.id),
             queries.getModelById(tx, args.modelId),
+            queries.getSettingsByUserId(tx, args.userId),
         ]);
+
+        if (!settings) {
+            throw new ThreadError('SettingsNotFound', {
+                status: 404,
+                message: 'Settings for user (userId) does not exist',
+                metadata: {
+                    userId: args.userId,
+                },
+            });
+        }
 
         if (!model) {
             throw new ThreadError('ModelNotFound', {
@@ -94,6 +105,7 @@ export async function prepareThread(args: {
             thread,
             message,
             history,
+            settings,
         };
     });
 }

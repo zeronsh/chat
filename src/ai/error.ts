@@ -5,6 +5,7 @@ export type ThreadErrorCodes =
     | 'ThreadNotFound'
     | 'StreamNotFound'
     | 'NotAuthorized'
-    | 'ModelNotFound';
+    | 'ModelNotFound'
+    | 'SettingsNotFound';
 
 export class ThreadError extends AIError<ThreadErrorCodes> {}

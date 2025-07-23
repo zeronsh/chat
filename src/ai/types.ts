@@ -1,4 +1,5 @@
-import type { UIMessage, UIMessagePart } from 'ai';
+import { AvailableTools } from '@/ai/tools';
+import type { InferUITool, UIMessage, UIMessagePart } from 'ai';
 
 export const Capabilities = {
     REASONING: 'reasoning',
@@ -19,9 +20,37 @@ export type Metadata = {
 
 export type DataParts = {
     error: string;
+    'research-start': {
+        toolCallId: string;
+        thoughts: string;
+    };
+    'research-search': {
+        toolCallId: string;
+        thoughts: string;
+        query: string;
+    };
+    'research-read': {
+        toolCallId: string;
+        thoughts: string;
+        url: string;
+    };
+    'research-complete': {
+        toolCallId: string;
+    };
 };
 
-export type Tools = {};
+export type Tools = {
+    search: InferUITool<AvailableTools['search']>;
+    research: InferUITool<AvailableTools['research']>;
+};
 
 export type ThreadMessage = UIMessage<Metadata, DataParts, Tools>;
+
 export type MessagePart = UIMessagePart<DataParts, Tools>;
+
+export type DataKeys = Exclude<
+    ThreadMessage['parts'][number]['type'],
+    'reasoning' | 'step-start' | 'text' | 'source-url' | 'source-document' | 'file'
+>;
+
+export type ToolKeys = keyof Tools;

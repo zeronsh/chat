@@ -1,12 +1,13 @@
 import { MessageContainer } from '@/components/thread/message/message-container';
 import { UIMessage } from '@/components/thread/message/ui-message';
+import { UrlResultButton } from '@/components/thread/message/url-result-button';
 import ModelIcon from '@/components/thread/model-icon';
 import { Button } from '@/components/ui/button';
 import { Message, MessageActions, MessageAction } from '@/components/ui/message';
 import { useThreadSelector } from '@/context/thread';
 import { cn } from '@/lib/utils';
-import { CopyIcon, RefreshCcwIcon, GitBranchIcon } from 'lucide-react';
-import { memo } from 'react';
+import { CopyIcon, RefreshCcwIcon } from 'lucide-react';
+import { Fragment, memo } from 'react';
 
 export const AssistantMessage = memo(function PureAssistantMessage({
     id,
@@ -18,10 +19,6 @@ export const AssistantMessage = memo(function PureAssistantMessage({
     hasNextMessage: boolean;
 }) {
     const status = useThreadSelector(state => state.status);
-    const metadata = useThreadSelector(
-        state => state.messageMap[id].metadata,
-        (a, b) => a?.model?.id === b?.model?.id
-    );
 
     return (
         <MessageContainer
@@ -31,50 +28,131 @@ export const AssistantMessage = memo(function PureAssistantMessage({
         >
             <Message className="flex flex-col items-start w-full">
                 <UIMessage id={id} />
-                <MessageActions
-                    className={cn(
-                        'gap-1 transition-opacity duration-200 opacity-100',
-                        (status === 'streaming' || status === 'submitted') &&
-                            !hasNextMessage &&
-                            'opacity-0 pointer-events-none'
-                    )}
-                >
-                    <MessageAction tooltip="Copy" side="bottom">
-                        <Button variant="ghost" size="icon" className="size-8">
-                            <CopyIcon className="size-3" />
-                        </Button>
-                    </MessageAction>
-                    <MessageAction tooltip="Regenerate" side="bottom">
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="size-8"
-                            disabled={status === 'streaming' || status === 'submitted'}
-                        >
-                            <RefreshCcwIcon className="size-3" />
-                        </Button>
-                    </MessageAction>
-                    <MessageAction tooltip="Branch" side="bottom">
-                        <Button variant="ghost" size="icon" className="size-8">
-                            <GitBranchIcon className="size-3" />
-                        </Button>
-                    </MessageAction>
-                    {metadata && metadata.model && (
-                        <Button
-                            variant="ghost"
-                            className="hover:bg-transparent! cursor-default"
-                            asChild
-                        >
-                            <div>
-                                <ModelIcon className="fill-primary" model={metadata.model.icon} />
-                                <span className="text-xs text-muted-foreground font-normal">
-                                    {metadata.model.name}
-                                </span>
-                            </div>
-                        </Button>
-                    )}
-                </MessageActions>
+                {status !== 'streaming' && status !== 'submitted' ? (
+                    <Fragment>
+                        <ToolResultPills id={id} />
+                        <Actions id={id} />
+                    </Fragment>
+                ) : (
+                    <MessageActions
+                        className={cn('gap-1 transition-opacity duration-200 opacity-100')}
+                    >
+                        <Button variant="ghost" size="icon" className="size-8"></Button>
+                    </MessageActions>
+                )}
             </Message>
         </MessageContainer>
+    );
+});
+
+const ToolResultPills = memo(function PureToolResultPills({ id }: { id: string }) {
+    const toolSidebar = useThreadSelector(state => state.toolSidebar);
+    const setToolSidebar = useThreadSelector(state => state.setToolSidebar);
+    const searchResults = useThreadSelector(state =>
+        state.messageMap[id].parts
+            .filter(part => part.type === 'tool-search')
+            .map(part => ({
+                toolCallId: part.toolCallId,
+                urls: part.output?.results.map(result => result.url) ?? [],
+            }))
+    );
+
+    const researchResults = useThreadSelector(state =>
+        state.messageMap[id].parts
+            .filter(part => part.type === 'tool-research')
+            .map(part => ({
+                toolCallId: part.toolCallId,
+                urls: state.messageMap[id].parts
+                    .filter(p => p.type === 'data-research-read')
+                    .filter(p => p.data.toolCallId === part.toolCallId)
+                    .map(p => p.data.url),
+            }))
+    );
+
+    if (searchResults.length === 0 && researchResults.length === 0) {
+        return null;
+    }
+
+    return (
+        <MessageActions>
+            {researchResults.map(result => (
+                <UrlResultButton
+                    urls={result.urls}
+                    count={result.urls.length}
+                    label="Sources Read"
+                    onClick={() => {
+                        if (
+                            toolSidebar?.tool === 'research' &&
+                            toolSidebar.toolCallId === result.toolCallId
+                        ) {
+                            setToolSidebar(undefined);
+                        } else {
+                            setToolSidebar({
+                                tool: 'research',
+                                toolCallId: result.toolCallId,
+                                messageId: id,
+                            });
+                        }
+                    }}
+                />
+            ))}
+            {searchResults.map(result => (
+                <UrlResultButton
+                    urls={result.urls}
+                    count={result.urls.length}
+                    label="Search Results"
+                    onClick={() => {
+                        if (
+                            toolSidebar?.tool === 'search' &&
+                            toolSidebar.toolCallId === result.toolCallId
+                        ) {
+                            setToolSidebar(undefined);
+                        } else {
+                            setToolSidebar({
+                                tool: 'search',
+                                toolCallId: result.toolCallId,
+                                messageId: id,
+                            });
+                        }
+                    }}
+                />
+            ))}
+        </MessageActions>
+    );
+});
+
+const Actions = memo(function PureActions({ id }: { id: string }) {
+    const metadata = useThreadSelector(
+        state => state.messageMap[id].metadata,
+        (a, b) => a?.model?.id === b?.model?.id
+    );
+    return (
+        <MessageActions className={cn('gap-1 transition-opacity duration-200 opacity-100')}>
+            <MessageAction tooltip="Copy" side="bottom">
+                <Button variant="ghost" size="icon" className="size-8">
+                    <CopyIcon className="size-3" />
+                </Button>
+            </MessageAction>
+            <MessageAction tooltip="Regenerate" side="bottom">
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="size-8"
+                    disabled={status === 'streaming' || status === 'submitted'}
+                >
+                    <RefreshCcwIcon className="size-3" />
+                </Button>
+            </MessageAction>
+            {metadata && metadata.model && (
+                <Button variant="ghost" className="hover:bg-transparent! cursor-default" asChild>
+                    <div>
+                        <ModelIcon className="fill-primary" model={metadata.model.icon} />
+                        <span className="text-xs text-muted-foreground font-normal">
+                            {metadata.model.name}
+                        </span>
+                    </div>
+                </Button>
+            )}
+        </MessageActions>
     );
 });

@@ -14,20 +14,28 @@ import { type ResumableStreamContext } from 'resumable-stream';
 
 export type StreamTextOptions = Omit<Parameters<typeof streamText>[0], 'onError' | 'onFinish'>;
 
-export type InferMessageToolSet<Message extends UIMessage> =
-    Message extends UIMessage<infer _, infer __, infer Tools>
-        ? Tools extends ToolSet
-            ? Tools
-            : never
-        : {};
+export type InferMessageToolSet<Message extends UIMessage> = Message extends UIMessage<
+    infer _,
+    infer __,
+    infer Tools
+>
+    ? Tools extends ToolSet
+        ? Tools
+        : never
+    : {};
 
-export type InferMessageMetadata<Message extends UIMessage> =
-    Message extends UIMessage<infer Metadata, infer _, infer __> ? Metadata : {};
+export type InferMessageMetadata<Message extends UIMessage> = Message extends UIMessage<
+    infer Metadata,
+    infer _,
+    infer __
+>
+    ? Metadata
+    : {};
 
 export type CreateStreamUIMessageResponseOptions<
     Message extends UIMessage,
     Schema extends ZodType,
-    PrepareReturn,
+    PrepareReturn
 > = {
     request: Request;
     schema: Schema;

@@ -53,7 +53,7 @@ export const UserMessage = memo(function PureUserMessage({
                         ))}
                     </div>
                 )}
-                <div className="bg-muted py-4 px-6 rounded-l-3xl rounded-tr-3xl rounded-br-lg max-w-[80%]">
+                <div className="bg-muted py-3 px-4 rounded-l-3xl rounded-tr-3xl rounded-br-lg max-w-[80%] border border-foreground/10">
                     <UIMessage id={message.id} />
                 </div>
                 <MessageActions className="group-hover/user-message:opacity-100 md:opacity-0 transition-opacity duration-200 gap-1">
