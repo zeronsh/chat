@@ -5,7 +5,7 @@ import { UrlResultButton } from '@/components/thread/message/url-result-button';
 import ModelIcon from '@/components/thread/model-icon';
 import { Button } from '@/components/ui/button';
 import { Message, MessageActions, MessageAction } from '@/components/ui/message';
-import { useThreadSelector } from '@/context/thread';
+import { useThreadContext, useThreadSelector } from '@/context/thread';
 import { cn } from '@/lib/utils';
 import { CopyIcon, RefreshCcwIcon } from 'lucide-react';
 import { Fragment, memo } from 'react';
@@ -130,6 +130,7 @@ const ToolResultPills = memo(function PureToolResultPills({ id }: { id: string }
 });
 
 const Actions = memo(function PureActions({ id }: { id: string }) {
+    const thread = useThreadContext();
     const metadata = useThreadSelector(
         state => state.messageMap[id].metadata,
         (a, b) => a?.model?.id === b?.model?.id
@@ -147,6 +148,9 @@ const Actions = memo(function PureActions({ id }: { id: string }) {
                     size="icon"
                     className="size-8"
                     disabled={status === 'streaming' || status === 'submitted'}
+                    onClick={() => {
+                        thread.regenerate({ messageId: id });
+                    }}
                 >
                     <RefreshCcwIcon className="size-3" />
                 </Button>
