@@ -192,14 +192,9 @@ const useMarkdownContext = () => {
 
 function MarkdownComponent({
     children,
-    id,
     className,
     components = INITIAL_COMPONENTS,
 }: MarkdownProps) {
-    const generatedId = useId();
-    const blockId = id ?? generatedId;
-    const blocks = useMemo(() => parseMarkdownIntoBlocks(children), [children]);
-
     const citations = useMemo(() => {
         const citations: { text: string; link: string }[] = [];
 
@@ -247,13 +242,7 @@ function MarkdownComponent({
     return (
         <MarkdownContext.Provider value={{ citations }}>
             <div className={className}>
-                {blocks.map((block, index) => (
-                    <MemoizedMarkdownBlock
-                        key={`${blockId}-block-${index}`}
-                        content={block}
-                        components={components}
-                    />
-                ))}
+                <MemoizedMarkdownBlock content={children} components={components} />
             </div>
         </MarkdownContext.Provider>
     );

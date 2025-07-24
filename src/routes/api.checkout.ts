@@ -19,6 +19,12 @@ export const ServerRoute = createServerFileRoute('/api/checkout').methods({
             });
         }
 
+        if (session.user.isAnonymous) {
+            return Response.json('anonymous user cannot checkout', {
+                status: 400,
+            });
+        }
+
         let customer = await queries.getUserCustomer(db, session.user.id);
 
         if (!customer) {
