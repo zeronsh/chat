@@ -122,9 +122,7 @@ export function MultiModalInput() {
         <form
             className={cn({
                 'absolute px-4 pt-4 flex flex-col gap-4': true,
-                'pt-84': !threadId,
-                'bottom-0 left-0 right-0': threadId,
-                'inset-0': !threadId,
+                'bottom-0 left-0 right-0': true,
             })}
             onSubmit={e => {
                 e.preventDefault();
@@ -140,7 +138,7 @@ export function MultiModalInput() {
                     name="message"
                     children={field => (
                         <PromptInput
-                            className="max-w-3xl mx-auto p-3 bg-muted/50 backdrop-blur-md w-full"
+                            className="max-w-3xl mx-auto p-3 bg-muted/50 backdrop-blur-md w-full border-foreground/10"
                             value={field.state.value}
                             onValueChange={field.handleChange}
                             onSubmit={form.handleSubmit}
@@ -181,25 +179,6 @@ export function MultiModalInput() {
                             </div>
                             <PromptInputTextarea placeholder="Ask me anything..." />
                             <PromptInputActions className="flex items-center">
-                                <PromptInputAction tooltip="Attach files">
-                                    <Button
-                                        variant="outline"
-                                        size="icon"
-                                        className="h-8 w-8 rounded-full"
-                                        type="button"
-                                        onClick={handlePaperclipClick}
-                                    >
-                                        <Paperclip className="size-5" />
-                                        <input
-                                            ref={fileInputRef}
-                                            type="file"
-                                            accept="image/*,application/pdf"
-                                            multiple={true}
-                                            className="hidden"
-                                            onChange={e => handleFileUpload(e.target.files)}
-                                        />
-                                    </Button>
-                                </PromptInputAction>
                                 <form.Subscribe selector={form => form.values.tool}>
                                     {tool => (
                                         <PromptInputAction tooltip={'Search the web'}>
@@ -254,7 +233,25 @@ export function MultiModalInput() {
                                     )}
                                 </form.Subscribe>
                                 <div className="flex-1" />
-
+                                <PromptInputAction tooltip="Attach files">
+                                    <Button
+                                        variant="outline"
+                                        size="icon"
+                                        className="h-8 w-8 rounded-full"
+                                        type="button"
+                                        onClick={handlePaperclipClick}
+                                    >
+                                        <Paperclip className="size-5" />
+                                        <input
+                                            ref={fileInputRef}
+                                            type="file"
+                                            accept="image/*,application/pdf"
+                                            multiple={true}
+                                            className="hidden"
+                                            onChange={e => handleFileUpload(e.target.files)}
+                                        />
+                                    </Button>
+                                </PromptInputAction>
                                 <PromptInputAction
                                     tooltip={
                                         status === 'streaming' || status === 'submitted'

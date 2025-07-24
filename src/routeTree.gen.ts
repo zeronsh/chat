@@ -12,6 +12,7 @@ import { createServerRootRoute } from '@tanstack/react-start/server'
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ThreadRouteImport } from './routes/_thread'
+import { Route as TeamRouteImport } from './routes/_team'
 import { Route as AccountRouteImport } from './routes/_account'
 import { Route as ThreadIndexRouteImport } from './routes/_thread.index'
 import { Route as ThreadThreadIdRouteImport } from './routes/_thread.$threadId'
@@ -20,6 +21,7 @@ import { Route as AccountLoggedOutRouteImport } from './routes/_account.logged-o
 import { Route as AccountAccountRouteImport } from './routes/_account.account'
 import { Route as AccountLoginIndexRouteImport } from './routes/_account.login.index'
 import { Route as AccountAccountIndexRouteImport } from './routes/_account.account.index'
+import { Route as TeamTeamCreateRouteImport } from './routes/_team.team.create'
 import { Route as AccountAccountPreferencesRouteImport } from './routes/_account.account.preferences'
 import { Route as AccountAccountAppearanceRouteImport } from './routes/_account.account.appearance'
 import { ServerRoute as ApiUploadthingServerRouteImport } from './routes/api.uploadthing'
@@ -35,6 +37,10 @@ const rootServerRouteImport = createServerRootRoute()
 
 const ThreadRoute = ThreadRouteImport.update({
   id: '/_thread',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TeamRoute = TeamRouteImport.update({
+  id: '/_team',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AccountRoute = AccountRouteImport.update({
@@ -75,6 +81,11 @@ const AccountAccountIndexRoute = AccountAccountIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AccountAccountRoute,
+} as any)
+const TeamTeamCreateRoute = TeamTeamCreateRouteImport.update({
+  id: '/team/create',
+  path: '/team/create',
+  getParentRoute: () => TeamRoute,
 } as any)
 const AccountAccountPreferencesRoute =
   AccountAccountPreferencesRouteImport.update({
@@ -140,6 +151,7 @@ export interface FileRoutesByFullPath {
   '/': typeof ThreadIndexRoute
   '/account/appearance': typeof AccountAccountAppearanceRoute
   '/account/preferences': typeof AccountAccountPreferencesRoute
+  '/team/create': typeof TeamTeamCreateRoute
   '/account/': typeof AccountAccountIndexRoute
   '/login': typeof AccountLoginIndexRoute
 }
@@ -150,12 +162,14 @@ export interface FileRoutesByTo {
   '/': typeof ThreadIndexRoute
   '/account/appearance': typeof AccountAccountAppearanceRoute
   '/account/preferences': typeof AccountAccountPreferencesRoute
+  '/team/create': typeof TeamTeamCreateRoute
   '/account': typeof AccountAccountIndexRoute
   '/login': typeof AccountLoginIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_account': typeof AccountRouteWithChildren
+  '/_team': typeof TeamRouteWithChildren
   '/_thread': typeof ThreadRouteWithChildren
   '/_account/account': typeof AccountAccountRouteWithChildren
   '/_account/logged-out': typeof AccountLoggedOutRoute
@@ -164,6 +178,7 @@ export interface FileRoutesById {
   '/_thread/': typeof ThreadIndexRoute
   '/_account/account/appearance': typeof AccountAccountAppearanceRoute
   '/_account/account/preferences': typeof AccountAccountPreferencesRoute
+  '/_team/team/create': typeof TeamTeamCreateRoute
   '/_account/account/': typeof AccountAccountIndexRoute
   '/_account/login/': typeof AccountLoginIndexRoute
 }
@@ -177,6 +192,7 @@ export interface FileRouteTypes {
     | '/'
     | '/account/appearance'
     | '/account/preferences'
+    | '/team/create'
     | '/account/'
     | '/login'
   fileRoutesByTo: FileRoutesByTo
@@ -187,11 +203,13 @@ export interface FileRouteTypes {
     | '/'
     | '/account/appearance'
     | '/account/preferences'
+    | '/team/create'
     | '/account'
     | '/login'
   id:
     | '__root__'
     | '/_account'
+    | '/_team'
     | '/_thread'
     | '/_account/account'
     | '/_account/logged-out'
@@ -200,12 +218,14 @@ export interface FileRouteTypes {
     | '/_thread/'
     | '/_account/account/appearance'
     | '/_account/account/preferences'
+    | '/_team/team/create'
     | '/_account/account/'
     | '/_account/login/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AccountRoute: typeof AccountRouteWithChildren
+  TeamRoute: typeof TeamRouteWithChildren
   ThreadRoute: typeof ThreadRouteWithChildren
 }
 export interface FileServerRoutesByFullPath {
@@ -289,6 +309,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ThreadRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_team': {
+      id: '/_team'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof TeamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_account': {
       id: '/_account'
       path: ''
@@ -344,6 +371,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/account/'
       preLoaderRoute: typeof AccountAccountIndexRouteImport
       parentRoute: typeof AccountAccountRoute
+    }
+    '/_team/team/create': {
+      id: '/_team/team/create'
+      path: '/team/create'
+      fullPath: '/team/create'
+      preLoaderRoute: typeof TeamTeamCreateRouteImport
+      parentRoute: typeof TeamRoute
     }
     '/_account/account/preferences': {
       id: '/_account/account/preferences'
@@ -455,6 +489,16 @@ const AccountRouteChildren: AccountRouteChildren = {
 const AccountRouteWithChildren =
   AccountRoute._addFileChildren(AccountRouteChildren)
 
+interface TeamRouteChildren {
+  TeamTeamCreateRoute: typeof TeamTeamCreateRoute
+}
+
+const TeamRouteChildren: TeamRouteChildren = {
+  TeamTeamCreateRoute: TeamTeamCreateRoute,
+}
+
+const TeamRouteWithChildren = TeamRoute._addFileChildren(TeamRouteChildren)
+
 interface ThreadRouteChildren {
   ThreadThreadIdRoute: typeof ThreadThreadIdRoute
   ThreadIndexRoute: typeof ThreadIndexRoute
@@ -495,6 +539,7 @@ const ApiThreadServerRouteWithChildren = ApiThreadServerRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   AccountRoute: AccountRouteWithChildren,
+  TeamRoute: TeamRouteWithChildren,
   ThreadRoute: ThreadRouteWithChildren,
 }
 export const routeTree = rootRouteImport

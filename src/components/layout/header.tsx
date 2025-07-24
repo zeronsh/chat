@@ -3,9 +3,9 @@ import { ThemeSelector } from '@/components/app/theme-selector';
 import { ModelSelector } from '@/components/app/model-selector';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
-import { useParams } from '@tanstack/react-router';
 import { useParamsThreadId } from '@/hooks/use-params-thread-id';
 import { useThreadSelector } from '@/context/thread';
+import { OrganizationSelector } from '@/components/app/organization-selector';
 
 export function Header() {
     const threadId = useParamsThreadId();

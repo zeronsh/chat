@@ -63,11 +63,6 @@ export function ModelSelector() {
                                                 modelId: model.id,
                                             });
                                         }
-                                        // setHoveredModel(null);
-                                        // selectModel({ modelId: model._id });
-                                    }}
-                                    onMouseEnter={() => {
-                                        // setHoveredModel(model);
                                     }}
                                 >
                                     <span className="flex items-center gap-2 flex-1">

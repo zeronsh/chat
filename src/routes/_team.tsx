@@ -4,7 +4,7 @@ import { Link, Outlet, createFileRoute } from '@tanstack/react-router';
 import { motion } from 'framer-motion';
 import { ArrowLeftIcon } from 'lucide-react';
 
-export const Route = createFileRoute('/_account')({
+export const Route = createFileRoute('/_team')({
     component: RouteComponent,
 });
 

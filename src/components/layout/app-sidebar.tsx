@@ -25,11 +25,13 @@ import { useThreadsByTimeRange } from '@/hooks/use-chats-by-time-range';
 import { Thread } from '@/zero/types';
 import { useQuery } from '@rocicorp/zero/react';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
-import { HashIcon, Loader2Icon, PencilIcon, PlusIcon, TrashIcon } from 'lucide-react';
+import { Loader2Icon, PencilIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import { useState } from 'react';
 import { Fragment } from 'react/jsx-runtime';
 import { useForm } from '@tanstack/react-form';
 import z from 'zod';
+import { OrganizationSelector } from '@/components/app/organization-selector';
+import { Label } from '@/components/ui/label';
 
 export function AppSidebar() {
     const [threadToEdit, setThreadToEdit] = useState<Thread | null>(null);
@@ -37,9 +39,7 @@ export function AppSidebar() {
 
     return (
         <Sidebar>
-            <SidebarHeader>
-                <AppSidebarHeader />
-            </SidebarHeader>
+            <AppSidebarHeader />
             <SidebarContent>
                 <AppSidebarActions />
                 <AppSidebarThreads
@@ -55,20 +55,9 @@ export function AppSidebar() {
 
 function AppSidebarHeader() {
     return (
-        <SidebarMenu className="flex-row items-center gap-2 pr-3 justify-between">
-            <SidebarMenuItem>
-                <Button variant="ghost" size="icon" asChild>
-                    <SidebarMenuButton
-                        asChild
-                        className="data-[slot=sidebar-menu-button]:!p-1.5 flex-shrink"
-                    >
-                        <Link to="/">
-                            <span className="sr-only">Zeron</span>
-                        </Link>
-                    </SidebarMenuButton>
-                </Button>
-            </SidebarMenuItem>
-        </SidebarMenu>
+        <SidebarHeader className="border-b border-foreground/10 p-3">
+            <OrganizationSelector />
+        </SidebarHeader>
     );
 }
 
@@ -261,11 +250,11 @@ function EditThreadTitleDialog({
 
     return (
         <Dialog open={!!thread} onOpenChange={() => setThreadToEdit(null)}>
-            <DialogContent className="max-w-sm">
-                <DialogHeader>
+            <DialogContent className="p-0 overflow-hidden gap-0" showCloseButton={false}>
+                <DialogHeader className="p-6 bg-sidebar border-b border-foreground/10">
                     <DialogTitle>Edit Thread Title</DialogTitle>
+                    <DialogDescription>Edit the title of the thread.</DialogDescription>
                 </DialogHeader>
-                <DialogDescription>Edit the title of the thread.</DialogDescription>
                 <form
                     onSubmit={async e => {
                         e.preventDefault();
@@ -273,7 +262,7 @@ function EditThreadTitleDialog({
                         form.handleSubmit();
                     }}
                 >
-                    <div className="grid gap-4 py-4">
+                    <div className="grid gap-4 px-6 py-4 bg-background">
                         <div className="grid gap-2">
                             <form.Field
                                 name="title"
@@ -287,6 +276,7 @@ function EditThreadTitleDialog({
                             >
                                 {field => (
                                     <>
+                                        <Label>Title</Label>
                                         <input
                                             className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                                             value={field.state.value}
@@ -302,8 +292,12 @@ function EditThreadTitleDialog({
                             </form.Field>
                         </div>
                     </div>
-                    <DialogFooter>
-                        <Button type="button" variant="ghost" onClick={() => setThreadToEdit(null)}>
+                    <DialogFooter className="px-6 py-4 border-t border-foreground/10 bg-sidebar">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => setThreadToEdit(null)}
+                        >
                             Cancel
                         </Button>
                         <form.Subscribe
@@ -351,15 +345,16 @@ function DeleteThreadDialog({
 
     return (
         <Dialog open={!!thread} onOpenChange={() => setThreadToDelete(null)}>
-            <DialogContent className="max-w-sm">
-                <DialogHeader>
+            <DialogContent className="p-0 overflow-hidden gap-0" showCloseButton={false}>
+                <DialogHeader className="p-6 bg-background">
                     <DialogTitle>Delete Thread</DialogTitle>
+                    <DialogDescription>
+                        Are you sure you want to delete this thread? This action cannot be undone.
+                    </DialogDescription>
                 </DialogHeader>
-                <DialogDescription>
-                    Are you sure you want to delete this thread? This action cannot be undone.
-                </DialogDescription>
-                <DialogFooter>
-                    <Button type="button" variant="ghost" onClick={() => setThreadToDelete(null)}>
+
+                <DialogFooter className="px-6 py-4 border-t border-foreground/10 bg-sidebar">
+                    <Button type="button" variant="outline" onClick={() => setThreadToDelete(null)}>
                         Cancel
                     </Button>
                     <Button type="button" variant="destructive" onClick={handleDelete}>

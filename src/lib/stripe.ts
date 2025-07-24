@@ -19,7 +19,6 @@ export async function syncStripeDataToDatabase(customerId: CustomerId) {
         customer: customerId,
         limit: 1,
         status: 'all',
-        expand: ['data.default_payment_method'],
     });
 
     const subscription = subscriptions.data[0];

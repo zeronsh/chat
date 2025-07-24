@@ -66,11 +66,7 @@ export function UserMenu() {
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                    <a
-                        href="https://github.com/wingleeio/chat-zeron"
-                        target="_blank"
-                        rel="noreferrer"
-                    >
+                    <a href="https://github.com/zeronsh/chat" target="_blank" rel="noreferrer">
                         <GithubIcon className="size-4" />
                         GitHub
                     </a>

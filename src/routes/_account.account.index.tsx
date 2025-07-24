@@ -78,13 +78,6 @@ function RouteComponent() {
                             What do you want to be called?
                         </p>
                     </div>
-                    <div className="flex flex-col gap-2">
-                        <Label htmlFor="email">Email</Label>
-                        <p>{session?.user.email}</p>
-                        <p className="text-xs text-muted-foreground">
-                            The main email address for your account.
-                        </p>
-                    </div>
                 </div>
             </Section>
             <Separator />
