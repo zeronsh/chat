@@ -83,6 +83,7 @@ const ToolResultPills = memo(function PureToolResultPills({ id }: { id: string }
         <MessageActions>
             {researchResults.map(result => (
                 <UrlResultButton
+                    key={result.toolCallId}
                     urls={result.urls}
                     count={result.urls.length}
                     label="Sources Read"
@@ -104,6 +105,7 @@ const ToolResultPills = memo(function PureToolResultPills({ id }: { id: string }
             ))}
             {searchResults.map(result => (
                 <UrlResultButton
+                    key={result.toolCallId}
                     urls={result.urls}
                     count={result.urls.length}
                     label="Search Results"

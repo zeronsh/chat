@@ -13,7 +13,6 @@ import { Stars } from '@/components/ui/stars';
 import { ThreadProvider } from '@/context/thread';
 import { MessageList } from '@/components/thread/message/message-list';
 import { ToolSidebar } from '@/components/layout/tool-sidebar';
-import { useSubscription } from '@/hooks/use-subscription';
 
 export const Route = createFileRoute('/_thread')({
     component: RouteComponent,
@@ -21,8 +20,6 @@ export const Route = createFileRoute('/_thread')({
 
 function RouteComponent() {
     const threadId = useParamsThreadId();
-    const test = useSubscription();
-    console.log(test);
     const db = useDatabase();
 
     const [thread] = useQuery(

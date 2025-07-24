@@ -54,26 +54,6 @@ export const permissions = definePermissions<AuthData, Schema>(schema, () => {
             )
         );
 
-    const allowSelectSubscription = (
-        authData: AuthData,
-        builder: ExpressionBuilder<Schema, 'subscription'>
-    ) =>
-        builder.and(
-            allowIfSignedIn(authData, builder),
-            builder.or(
-                builder.exists('userCustomer', userCustomer =>
-                    userCustomer.where(builder => builder.cmp('userId', '=', authData.sub))
-                ),
-                builder.exists('organizationCustomer', organizationCustomer =>
-                    organizationCustomer.whereExists('organization', organization =>
-                        organization.whereExists('members', members =>
-                            members.where(builder => builder.cmp('userId', '=', authData.sub))
-                        )
-                    )
-                )
-            )
-        );
-
     return {
         user: {
             row: {
@@ -90,11 +70,7 @@ export const permissions = definePermissions<AuthData, Schema>(schema, () => {
                 select: [allowSelectMembersIfInOrganization],
             },
         },
-        subscription: {
-            row: {
-                select: [allowSelectSubscription],
-            },
-        },
+
         setting: {
             row: {
                 select: [allowIfOwnSetting],

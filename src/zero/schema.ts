@@ -490,6 +490,15 @@ export const schema = {
           >,
           serverName: "organization_id",
         },
+        subscription: {
+          type: "json",
+          optional: true,
+          customType: null as unknown as ZeroCustomType<
+            typeof zeroSchema,
+            "organizationCustomer",
+            "subscription"
+          >,
+        },
       },
       primaryKey: ["id"],
       serverName: "organization_customer",
@@ -570,40 +579,6 @@ export const schema = {
             "modelId"
           >,
           serverName: "model_id",
-        },
-      },
-      primaryKey: ["id"],
-    },
-    subscription: {
-      name: "subscription",
-      columns: {
-        id: {
-          type: "string",
-          optional: false,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "subscription",
-            "id"
-          >,
-        },
-        customerId: {
-          type: "string",
-          optional: false,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "subscription",
-            "customerId"
-          >,
-          serverName: "customer_id",
-        },
-        data: {
-          type: "json",
-          optional: false,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "subscription",
-            "data"
-          >,
         },
       },
       primaryKey: ["id"],
@@ -703,6 +678,15 @@ export const schema = {
           >,
           serverName: "user_id",
         },
+        subscription: {
+          type: "json",
+          optional: true,
+          customType: null as unknown as ZeroCustomType<
+            typeof zeroSchema,
+            "userCustomer",
+            "subscription"
+          >,
+        },
       },
       primaryKey: ["id"],
       serverName: "user_customer",
@@ -746,14 +730,6 @@ export const schema = {
           cardinality: "one",
         },
       ],
-      subscription: [
-        {
-          sourceField: ["id"],
-          destField: ["customerId"],
-          destSchema: "subscription",
-          cardinality: "one",
-        },
-      ],
     },
     organization: {
       customer: [
@@ -791,24 +767,6 @@ export const schema = {
         },
       ],
     },
-    subscription: {
-      userCustomer: [
-        {
-          sourceField: ["customerId"],
-          destField: ["id"],
-          destSchema: "userCustomer",
-          cardinality: "one",
-        },
-      ],
-      organizationCustomer: [
-        {
-          sourceField: ["customerId"],
-          destField: ["id"],
-          destSchema: "organizationCustomer",
-          cardinality: "one",
-        },
-      ],
-    },
     thread: {
       user: [
         {
@@ -833,14 +791,6 @@ export const schema = {
           sourceField: ["userId"],
           destField: ["id"],
           destSchema: "user",
-          cardinality: "one",
-        },
-      ],
-      subscription: [
-        {
-          sourceField: ["id"],
-          destField: ["customerId"],
-          destSchema: "subscription",
           cardinality: "one",
         },
       ],

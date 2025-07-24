@@ -1,7 +1,7 @@
 import { type db, schema } from '@/database';
 import { ThreadMessage } from '@/ai/types';
 import { and, eq, gt, not } from 'drizzle-orm';
-import { CustomerId, SubscriptionData, SubscriptionId } from '@/database/types';
+import { CustomerId, OrganizationId, SubscriptionData, UserId } from '@/database/types';
 
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 type Database = typeof db | Transaction;
@@ -138,71 +138,64 @@ export async function getSettingsByUserId(db: Database, userId: string) {
     });
 }
 
-export async function upsertSubscription(
-    db: Database,
-    args: {
-        id: SubscriptionId;
-        customerId: CustomerId;
-        data: SubscriptionData;
-    }
-) {
-    return db
-        .insert(schema.subscription)
-        .values({
-            id: args.id,
-            customerId: args.customerId,
-            data: args.data,
-        })
-        .onConflictDoUpdate({
-            target: [schema.subscription.customerId],
-            set: {
-                data: args.data,
-            },
-        })
-        .returning();
-}
-
-export async function createUserCustomer(
-    db: Database,
-    values: {
-        userId: string;
-        customerId: CustomerId;
-    }
-) {
-    return db
-        .insert(schema.userCustomer)
-        .values({
-            id: values.customerId,
-            userId: values.userId,
-        })
-        .returning();
-}
-
-export async function getUserCustomer(db: Database, userId: string) {
+export async function getUserCustomerByUserId(db: Database, userId: UserId) {
     return db.query.userCustomer.findFirst({
         where: (userCustomer, { eq }) => eq(userCustomer.userId, userId),
     });
 }
 
-export async function createOrganizationCustomer(
+export async function createUserCustomer(
     db: Database,
-    values: {
-        organizationId: string;
-        customerId: CustomerId;
-    }
+    args: { userId: UserId; customerId: CustomerId }
 ) {
     return db
-        .insert(schema.organizationCustomer)
+        .insert(schema.userCustomer)
         .values({
-            id: values.customerId,
-            organizationId: values.organizationId,
+            id: args.customerId,
+            userId: args.userId,
         })
         .returning();
 }
 
-export async function getOrganizationCustomer(db: Database, organizationId: string) {
+export async function updateUserCustomerSubscription(
+    db: Database,
+    args: { customerId: CustomerId; subscription: SubscriptionData }
+) {
+    return db
+        .update(schema.userCustomer)
+        .set({ subscription: args.subscription })
+        .where(eq(schema.userCustomer.id, args.customerId));
+}
+
+export async function getOrganizationCustomerByOrganizationId(
+    db: Database,
+    organizationId: OrganizationId
+) {
     return db.query.organizationCustomer.findFirst({
         where: (organizationCustomer, { eq }) =>
             eq(organizationCustomer.organizationId, organizationId),
     });
+}
+
+export async function createOrganizationCustomer(
+    db: Database,
+    args: { organizationId: OrganizationId; customerId: CustomerId }
+) {
+    return db
+        .insert(schema.organizationCustomer)
+        .values({
+            id: args.customerId,
+            organizationId: args.organizationId,
+        })
+        .returning();
+}
+
+export async function updateOrganizationCustomerSubscription(
+    db: Database,
+    args: { customerId: CustomerId; subscription: SubscriptionData }
+) {
+    return db
+        .update(schema.organizationCustomer)
+        .set({ subscription: args.subscription })
+        .where(eq(schema.organizationCustomer.id, args.customerId));
 }

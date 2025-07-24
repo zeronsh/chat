@@ -71,6 +71,13 @@
       "when": 1753305655201,
       "tag": "0009_dusty_felicia_hardy",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1753327946194,
+      "tag": "0010_watery_tiger_shark",
+      "breakpoints": true
     }
   ]
 }

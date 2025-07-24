@@ -24,7 +24,7 @@ export const UrlResultButton = memo(function PureUrlResultButton({
             onClick={onClick}
         >
             <div className="flex -space-x-2">
-                {urls.slice(0, 5).map(url => {
+                {urls.slice(0, 5).map((url, index) => {
                     let hostname = 'example.com';
                     try {
                         const urlObj = new URL(url);
@@ -35,7 +35,7 @@ export const UrlResultButton = memo(function PureUrlResultButton({
 
                     return (
                         <img
-                            key={url}
+                            key={`${url}-${index}`}
                             src={`https://www.google.com/s2/favicons?domain=${hostname}&sz=32`}
                             alt={`${hostname} favicon`}
                             className="w-5 h-5 rounded-full"

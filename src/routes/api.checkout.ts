@@ -1,10 +1,9 @@
 import { db } from '@/database';
-import { getUserCustomer } from '@/database/queries';
 import { auth } from '@/lib/auth';
 import { stripe } from '@/lib/stripe';
 import { createServerFileRoute } from '@tanstack/react-start/server';
 import * as queries from '@/database/queries';
-import { CustomerId } from '@/database/types';
+import { CustomerId, UserId } from '@/database/types';
 import { env } from '@/lib/env';
 
 export const ServerRoute = createServerFileRoute('/api/checkout').methods({
@@ -25,7 +24,7 @@ export const ServerRoute = createServerFileRoute('/api/checkout').methods({
             });
         }
 
-        let customer = await queries.getUserCustomer(db, session.user.id);
+        let customer = await queries.getUserCustomerByUserId(db, UserId(session.user.id));
 
         if (!customer) {
             const stripeCustomer = await stripe.customers.create({
@@ -36,7 +35,7 @@ export const ServerRoute = createServerFileRoute('/api/checkout').methods({
             });
 
             [customer] = await queries.createUserCustomer(db, {
-                userId: session.user.id,
+                userId: UserId(session.user.id),
                 customerId: CustomerId(stripeCustomer.id),
             });
         }

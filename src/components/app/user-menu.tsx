@@ -38,15 +38,6 @@ export function UserMenu() {
                 align="end"
             >
                 <DropdownMenuLabel className="flex items-center gap-2">
-                    <Avatar className="rounded-md">
-                        <AvatarImage
-                            className="rounded-md"
-                            src={session?.user.image ?? undefined}
-                        />
-                        <AvatarFallback className="rounded-md">
-                            {getUsername(session?.user).charAt(0)}
-                        </AvatarFallback>
-                    </Avatar>
                     <div className="flex flex-col overflow-hidden">
                         <div className="text-sm truncate">{getUsername(session?.user)}</div>
                         <div className="text-xs text-muted-foreground truncate">
@@ -55,7 +46,6 @@ export function UserMenu() {
                     </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-
                 <DropdownMenuItem asChild>
                     <Link to="/account">
                         <UserIcon className="size-4" />

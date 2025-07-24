@@ -72,11 +72,6 @@ const processCitation = (title: string, source: string): { text: string; url: st
     return null;
 };
 
-function parseMarkdownIntoBlocks(markdown: string): string[] {
-    const tokens = marked.lexer(markdown);
-    return tokens.map(token => token.raw);
-}
-
 function extractLanguage(className?: string): string {
     if (!className) return 'plaintext';
     const match = className.match(/language-(\w+)/);

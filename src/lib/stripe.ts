@@ -1,4 +1,4 @@
-import { CustomerId, SubscriptionId } from '@/database/types';
+import { CustomerId, SubscriptionData } from '@/database/types';
 import { env } from '@/lib/env';
 import * as queries from '@/database/queries';
 import Stripe from 'stripe';
@@ -9,6 +9,12 @@ export const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
 });
 
 export async function syncStripeDataToDatabase(customerId: CustomerId) {
+    const stripeCustomer = await stripe.customers.retrieve(customerId);
+
+    if (!('metadata' in stripeCustomer)) {
+        return;
+    }
+
     const subscriptions = await stripe.subscriptions.list({
         customer: customerId,
         limit: 1,
@@ -19,24 +25,34 @@ export async function syncStripeDataToDatabase(customerId: CustomerId) {
     const subscription = subscriptions.data[0];
     const item = subscription.items.data[0];
 
-    return queries.upsertSubscription(db, {
-        id: SubscriptionId(subscription.id),
-        customerId,
-        data: {
-            priceId: subscription.items.data[0].price.id,
-            subscriptionId: subscription.id,
-            currentPeriodStart: item.current_period_start,
-            currentPeriodEnd: item.current_period_end,
-            cancelAtPeriodEnd: subscription.cancel_at_period_end,
-            seats: item.quantity ?? 1,
-            paymentMethod:
-                subscription.default_payment_method &&
-                typeof subscription.default_payment_method !== 'string'
-                    ? {
-                          brand: subscription.default_payment_method.card?.brand,
-                          last4: subscription.default_payment_method.card?.last4,
-                      }
-                    : undefined,
-        },
-    });
+    const subscriptionData: SubscriptionData = {
+        priceId: item.price.id,
+        subscriptionId: subscription.id,
+        currentPeriodStart: item.current_period_start,
+        currentPeriodEnd: item.current_period_end,
+        cancelAtPeriodEnd: subscription.cancel_at_period_end,
+        seats: item.quantity ?? 1,
+        paymentMethod:
+            subscription.default_payment_method &&
+            typeof subscription.default_payment_method !== 'string'
+                ? {
+                      brand: subscription.default_payment_method.card?.brand,
+                      last4: subscription.default_payment_method.card?.last4,
+                  }
+                : undefined,
+    };
+
+    if (stripeCustomer.metadata.userId) {
+        await queries.updateUserCustomerSubscription(db, {
+            customerId,
+            subscription: subscriptionData,
+        });
+    }
+
+    if (stripeCustomer.metadata.organizationId) {
+        await queries.updateOrganizationCustomerSubscription(db, {
+            customerId,
+            subscription: subscriptionData,
+        });
+    }
 }
