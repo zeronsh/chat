@@ -80,10 +80,12 @@ export default drizzleZeroConfig(schema, {
         userCustomer: {
             id: true,
             userId: true,
+            subscription: true,
         },
         organizationCustomer: {
             id: true,
             organizationId: true,
+            subscription: true,
         },
         userSubscription: {
             id: true,

@@ -1,3 +1,4 @@
+import type { UserId } from '@/database/types';
 import { type Schema, schema } from '@/zero/schema';
 import type { AuthData, TableName } from '@/zero/types';
 import { definePermissions, ExpressionBuilder, PermissionsConfig } from '@rocicorp/zero';
@@ -36,9 +37,7 @@ export const permissions = definePermissions<AuthData, Schema>(schema, () => {
     ) =>
         builder.and(
             allowIfSignedIn(authData, builder),
-            builder.exists('members', members =>
-                members.where(builder => builder.cmp('userId', '=', authData.sub))
-            )
+            builder.exists('members', members => members.where('userId', '=', authData.sub))
         );
 
     const allowSelectMembersIfInOrganization = (
@@ -49,7 +48,29 @@ export const permissions = definePermissions<AuthData, Schema>(schema, () => {
             allowIfSignedIn(authData, builder),
             builder.exists('organization', organization =>
                 organization.whereExists('members', members =>
-                    members.where(builder => builder.cmp('userId', '=', authData.sub))
+                    members.where('userId', '=', authData.sub)
+                )
+            )
+        );
+
+    const allowReadIfCustomerBelongsToUser = (
+        authData: AuthData,
+        builder: ExpressionBuilder<Schema, 'userCustomer'>
+    ) =>
+        builder.and(
+            allowIfSignedIn(authData, builder),
+            builder.cmp('userId', '=', authData.sub as UserId)
+        );
+
+    const allowReadIfCustomerBelongsToOrganization = (
+        authData: AuthData,
+        builder: ExpressionBuilder<Schema, 'organizationCustomer'>
+    ) =>
+        builder.and(
+            allowIfSignedIn(authData, builder),
+            builder.exists('organization', organization =>
+                organization.whereExists('members', members =>
+                    members.where('userId', '=', authData.sub)
                 )
             )
         );
@@ -58,6 +79,16 @@ export const permissions = definePermissions<AuthData, Schema>(schema, () => {
         user: {
             row: {
                 select: [allowIfUser],
+            },
+        },
+        userCustomer: {
+            row: {
+                select: [allowReadIfCustomerBelongsToUser],
+            },
+        },
+        organizationCustomer: {
+            row: {
+                select: [allowReadIfCustomerBelongsToOrganization],
             },
         },
         organization: {

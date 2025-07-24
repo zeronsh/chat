@@ -13,6 +13,7 @@ import { Stars } from '@/components/ui/stars';
 import { ThreadProvider } from '@/context/thread';
 import { MessageList } from '@/components/thread/message/message-list';
 import { ToolSidebar } from '@/components/layout/tool-sidebar';
+import { UserId } from '@/database/types';
 
 export const Route = createFileRoute('/_thread')({
     component: RouteComponent,

@@ -4,6 +4,7 @@ import { syncStripeDataToDatabase } from '@/lib/stripe';
 import { createServerFileRoute } from '@tanstack/react-start/server';
 import * as queries from '@/database/queries';
 import { UserId } from '@/database/types';
+import { env } from '@/lib/env';
 
 export const ServerRoute = createServerFileRoute('/api/checkout/success').methods({
     GET: async ({ request }) => {
@@ -27,6 +28,6 @@ export const ServerRoute = createServerFileRoute('/api/checkout/success').method
 
         await syncStripeDataToDatabase(customer.id);
 
-        return Response.redirect(redirectUrl ?? '/', 303);
+        return Response.redirect(redirectUrl ?? env.VITE_PUBLIC_API_URL, 303);
     },
 });
