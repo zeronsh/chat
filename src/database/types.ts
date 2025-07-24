@@ -16,8 +16,4 @@ export type SubscriptionData = {
     currentPeriodEnd: number;
     cancelAtPeriodEnd: boolean;
     seats: number;
-    paymentMethod?: {
-        brand: string | undefined;
-        last4: string | undefined;
-    };
 };

@@ -1,4 +1,4 @@
-import { CustomerId, SubscriptionData } from '@/database/types';
+import { CustomerId, OrganizationId, SubscriptionData, UserId } from '@/database/types';
 import { env } from '@/lib/env';
 import * as queries from '@/database/queries';
 import Stripe from 'stripe';
@@ -32,14 +32,6 @@ export async function syncStripeDataToDatabase(customerId: CustomerId) {
         currentPeriodEnd: item.current_period_end,
         cancelAtPeriodEnd: subscription.cancel_at_period_end,
         seats: item.quantity ?? 1,
-        paymentMethod:
-            subscription.default_payment_method &&
-            typeof subscription.default_payment_method !== 'string'
-                ? {
-                      brand: subscription.default_payment_method.card?.brand,
-                      last4: subscription.default_payment_method.card?.last4,
-                  }
-                : undefined,
     };
 
     if (stripeCustomer.metadata.userId) {

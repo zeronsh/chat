@@ -26,6 +26,8 @@ import { ServerRoute as ApiUploadthingServerRouteImport } from './routes/api.upl
 import { ServerRoute as ApiThreadServerRouteImport } from './routes/api.thread'
 import { ServerRoute as ApiCheckoutServerRouteImport } from './routes/api.checkout'
 import { ServerRoute as ApiWebhookStripeServerRouteImport } from './routes/api.webhook.stripe'
+import { ServerRoute as ApiCheckoutSuccessServerRouteImport } from './routes/api.checkout.success'
+import { ServerRoute as ApiCheckoutOrganizationServerRouteImport } from './routes/api.checkout.organization'
 import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api.auth.$'
 import { ServerRoute as ApiThreadThreadIdStreamServerRouteImport } from './routes/api.thread.$threadId.stream'
 
@@ -106,6 +108,18 @@ const ApiWebhookStripeServerRoute = ApiWebhookStripeServerRouteImport.update({
   path: '/api/webhook/stripe',
   getParentRoute: () => rootServerRouteImport,
 } as any)
+const ApiCheckoutSuccessServerRoute =
+  ApiCheckoutSuccessServerRouteImport.update({
+    id: '/success',
+    path: '/success',
+    getParentRoute: () => ApiCheckoutServerRoute,
+  } as any)
+const ApiCheckoutOrganizationServerRoute =
+  ApiCheckoutOrganizationServerRouteImport.update({
+    id: '/organization',
+    path: '/organization',
+    getParentRoute: () => ApiCheckoutServerRoute,
+  } as any)
 const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -195,27 +209,33 @@ export interface RootRouteChildren {
   ThreadRoute: typeof ThreadRouteWithChildren
 }
 export interface FileServerRoutesByFullPath {
-  '/api/checkout': typeof ApiCheckoutServerRoute
+  '/api/checkout': typeof ApiCheckoutServerRouteWithChildren
   '/api/thread': typeof ApiThreadServerRouteWithChildren
   '/api/uploadthing': typeof ApiUploadthingServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
+  '/api/checkout/organization': typeof ApiCheckoutOrganizationServerRoute
+  '/api/checkout/success': typeof ApiCheckoutSuccessServerRoute
   '/api/webhook/stripe': typeof ApiWebhookStripeServerRoute
   '/api/thread/$threadId/stream': typeof ApiThreadThreadIdStreamServerRoute
 }
 export interface FileServerRoutesByTo {
-  '/api/checkout': typeof ApiCheckoutServerRoute
+  '/api/checkout': typeof ApiCheckoutServerRouteWithChildren
   '/api/thread': typeof ApiThreadServerRouteWithChildren
   '/api/uploadthing': typeof ApiUploadthingServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
+  '/api/checkout/organization': typeof ApiCheckoutOrganizationServerRoute
+  '/api/checkout/success': typeof ApiCheckoutSuccessServerRoute
   '/api/webhook/stripe': typeof ApiWebhookStripeServerRoute
   '/api/thread/$threadId/stream': typeof ApiThreadThreadIdStreamServerRoute
 }
 export interface FileServerRoutesById {
   __root__: typeof rootServerRouteImport
-  '/api/checkout': typeof ApiCheckoutServerRoute
+  '/api/checkout': typeof ApiCheckoutServerRouteWithChildren
   '/api/thread': typeof ApiThreadServerRouteWithChildren
   '/api/uploadthing': typeof ApiUploadthingServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
+  '/api/checkout/organization': typeof ApiCheckoutOrganizationServerRoute
+  '/api/checkout/success': typeof ApiCheckoutSuccessServerRoute
   '/api/webhook/stripe': typeof ApiWebhookStripeServerRoute
   '/api/thread/$threadId/stream': typeof ApiThreadThreadIdStreamServerRoute
 }
@@ -226,6 +246,8 @@ export interface FileServerRouteTypes {
     | '/api/thread'
     | '/api/uploadthing'
     | '/api/auth/$'
+    | '/api/checkout/organization'
+    | '/api/checkout/success'
     | '/api/webhook/stripe'
     | '/api/thread/$threadId/stream'
   fileServerRoutesByTo: FileServerRoutesByTo
@@ -234,6 +256,8 @@ export interface FileServerRouteTypes {
     | '/api/thread'
     | '/api/uploadthing'
     | '/api/auth/$'
+    | '/api/checkout/organization'
+    | '/api/checkout/success'
     | '/api/webhook/stripe'
     | '/api/thread/$threadId/stream'
   id:
@@ -242,12 +266,14 @@ export interface FileServerRouteTypes {
     | '/api/thread'
     | '/api/uploadthing'
     | '/api/auth/$'
+    | '/api/checkout/organization'
+    | '/api/checkout/success'
     | '/api/webhook/stripe'
     | '/api/thread/$threadId/stream'
   fileServerRoutesById: FileServerRoutesById
 }
 export interface RootServerRouteChildren {
-  ApiCheckoutServerRoute: typeof ApiCheckoutServerRoute
+  ApiCheckoutServerRoute: typeof ApiCheckoutServerRouteWithChildren
   ApiThreadServerRoute: typeof ApiThreadServerRouteWithChildren
   ApiUploadthingServerRoute: typeof ApiUploadthingServerRoute
   ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute
@@ -365,6 +391,20 @@ declare module '@tanstack/react-start/server' {
       preLoaderRoute: typeof ApiWebhookStripeServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
+    '/api/checkout/success': {
+      id: '/api/checkout/success'
+      path: '/success'
+      fullPath: '/api/checkout/success'
+      preLoaderRoute: typeof ApiCheckoutSuccessServerRouteImport
+      parentRoute: typeof ApiCheckoutServerRoute
+    }
+    '/api/checkout/organization': {
+      id: '/api/checkout/organization'
+      path: '/organization'
+      fullPath: '/api/checkout/organization'
+      preLoaderRoute: typeof ApiCheckoutOrganizationServerRouteImport
+      parentRoute: typeof ApiCheckoutServerRoute
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -428,6 +468,19 @@ const ThreadRouteChildren: ThreadRouteChildren = {
 const ThreadRouteWithChildren =
   ThreadRoute._addFileChildren(ThreadRouteChildren)
 
+interface ApiCheckoutServerRouteChildren {
+  ApiCheckoutOrganizationServerRoute: typeof ApiCheckoutOrganizationServerRoute
+  ApiCheckoutSuccessServerRoute: typeof ApiCheckoutSuccessServerRoute
+}
+
+const ApiCheckoutServerRouteChildren: ApiCheckoutServerRouteChildren = {
+  ApiCheckoutOrganizationServerRoute: ApiCheckoutOrganizationServerRoute,
+  ApiCheckoutSuccessServerRoute: ApiCheckoutSuccessServerRoute,
+}
+
+const ApiCheckoutServerRouteWithChildren =
+  ApiCheckoutServerRoute._addFileChildren(ApiCheckoutServerRouteChildren)
+
 interface ApiThreadServerRouteChildren {
   ApiThreadThreadIdStreamServerRoute: typeof ApiThreadThreadIdStreamServerRoute
 }
@@ -448,7 +501,7 @@ export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
 const rootServerRouteChildren: RootServerRouteChildren = {
-  ApiCheckoutServerRoute: ApiCheckoutServerRoute,
+  ApiCheckoutServerRoute: ApiCheckoutServerRouteWithChildren,
   ApiThreadServerRoute: ApiThreadServerRouteWithChildren,
   ApiUploadthingServerRoute: ApiUploadthingServerRoute,
   ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,

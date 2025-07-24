@@ -3,13 +3,20 @@ import { auth } from '@/lib/auth';
 import { stripe } from '@/lib/stripe';
 import { createServerFileRoute } from '@tanstack/react-start/server';
 import * as queries from '@/database/queries';
-import { CustomerId, UserId } from '@/database/types';
+import { CustomerId, OrganizationId } from '@/database/types';
 import { env } from '@/lib/env';
 
-export const ServerRoute = createServerFileRoute('/api/checkout').methods({
+export const ServerRoute = createServerFileRoute('/api/checkout/organization').methods({
     GET: async ({ request }) => {
         const url = new URL(request.url);
         const redirectUrl = url.searchParams.get('redirectUrl');
+        const seats = Number(url.searchParams.get('seats') ?? 1);
+
+        if (seats < 2) {
+            return Response.json('seats must be at least 2', {
+                status: 400,
+            });
+        }
 
         const session = await auth.api.getSession({
             headers: request.headers,
@@ -21,24 +28,33 @@ export const ServerRoute = createServerFileRoute('/api/checkout').methods({
             });
         }
 
+        if (!session.session.activeOrganizationId) {
+            return Response.json('no active organization', {
+                status: 400,
+            });
+        }
+
         if (session.user.isAnonymous) {
             return Response.json('anonymous user cannot checkout', {
                 status: 400,
             });
         }
 
-        let customer = await queries.getUserCustomerByUserId(db, UserId(session.user.id));
+        let customer = await queries.getOrganizationCustomerByOrganizationId(
+            db,
+            OrganizationId(session.session.activeOrganizationId)
+        );
 
         if (!customer) {
             const stripeCustomer = await stripe.customers.create({
                 email: session.user.email,
                 metadata: {
-                    userId: session.user.id,
+                    organizationId: session.session.activeOrganizationId,
                 },
             });
 
-            [customer] = await queries.createUserCustomer(db, {
-                userId: UserId(session.user.id),
+            [customer] = await queries.createOrganizationCustomer(db, {
+                organizationId: OrganizationId(session.session.activeOrganizationId),
                 customerId: CustomerId(stripeCustomer.id),
             });
         }
@@ -55,7 +71,7 @@ export const ServerRoute = createServerFileRoute('/api/checkout').methods({
             line_items: [
                 {
                     price: env.PRO_MONTHLY_PRICE_ID,
-                    quantity: 1,
+                    quantity: seats,
                 },
             ],
             success_url: successUrl.toString(),
