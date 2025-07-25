@@ -3,7 +3,6 @@ import { Section } from '@/components/ui/section';
 import { LogoutDialog, NotAnonymous, RevokeSessionDialog } from '@/components/app/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { authClient } from '@/lib/auth-client';
 import { getUsername } from '@/lib/usernames';
@@ -11,6 +10,9 @@ import { createFileRoute } from '@tanstack/react-router';
 import { Clock, Globe, Laptop, MapPin, Monitor, Smartphone, Tablet } from 'lucide-react';
 import { UAParser } from 'ua-parser-js';
 import { useQuery } from '@rocicorp/zero/react';
+
+import { toast } from 'sonner';
+import { SingleFieldForm } from '@/components/app/single-field-form';
 
 export const Route = createFileRoute('/_account/account/')({
     component: RouteComponent,
@@ -66,19 +68,22 @@ function RouteComponent() {
         <div className="flex flex-col gap-8 w-full">
             <title>Account | Zeron</title>
             <Section title="Profile" description="Update your account details">
-                <div className="flex flex-col gap-8">
-                    <div className="flex flex-col gap-2">
-                        <Label htmlFor="username">Username</Label>
-                        <Input
-                            id="username"
-                            className="bg-muted/50 backdrop-blur-md border border-foreground/15"
-                            placeholder={getUsername(session?.user)}
-                        />
-                        <p className="text-xs text-muted-foreground">
-                            What do you want to be called?
-                        </p>
-                    </div>
-                </div>
+                <SingleFieldForm
+                    label="Username"
+                    description="What do you want to be called?"
+                    footerMessage="Please use 32 characters or less."
+                    defaultValue={getUsername(session?.user)}
+                    renderInput={({ onChange, value }) => (
+                        <Input value={value} onChange={e => onChange(e.target.value)} />
+                    )}
+                    onSubmit={async value => {
+                        if (!session?.user) return;
+                        await authClient.updateUser({
+                            name: value,
+                        });
+                        toast.success('Username updated');
+                    }}
+                />
             </Section>
             <Separator />
             <Section title="Sessions" description="Manage your sessions">
