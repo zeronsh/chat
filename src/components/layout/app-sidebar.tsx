@@ -30,7 +30,6 @@ import { useState } from 'react';
 import { Fragment } from 'react/jsx-runtime';
 import { useForm } from '@tanstack/react-form';
 import z from 'zod';
-import { OrganizationSelector } from '@/components/app/organization-selector';
 import { Label } from '@/components/ui/label';
 
 export function AppSidebar() {
@@ -55,8 +54,8 @@ export function AppSidebar() {
 
 function AppSidebarHeader() {
     return (
-        <SidebarHeader className="border-b border-foreground/10 p-3">
-            <OrganizationSelector />
+        <SidebarHeader className="p-3">
+            <div className="h-9" />
         </SidebarHeader>
     );
 }
@@ -70,7 +69,7 @@ function AppSidebarActions() {
                         <SidebarMenuButton asChild>
                             <Link to="/">
                                 <PlusIcon />
-                                <span className="flex-1">New Chat</span>
+                                <span className="flex-1">New Thread</span>
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
@@ -121,6 +120,9 @@ function AppSidebarThreads({
                 setThreadToEdit={setThreadToEdit}
                 setThreadToDelete={setThreadToDelete}
             />
+            <p className="text-sm text-muted-foreground/50 p-4">
+                You've reached the end of your threads.
+            </p>
         </Fragment>
     );
 }

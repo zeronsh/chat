@@ -5,78 +5,22 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1752091560922,
-      "tag": "0000_purple_warstar",
+      "when": 1753473542533,
+      "tag": "0000_careless_thanos",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1752091564812,
-      "tag": "0001_seed-models",
+      "when": 1753473906926,
+      "tag": "0001_chief_toad",
       "breakpoints": true
     },
     {
       "idx": 2,
       "version": "7",
-      "when": 1752120652167,
-      "tag": "0002_nappy_stryfe",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1752120662291,
-      "tag": "0003_seed-models-2",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1752178961668,
-      "tag": "0004_seed-models-3",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1752435140845,
-      "tag": "0005_seed-models-4",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1753299954877,
-      "tag": "0006_thin_johnny_storm",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "7",
-      "when": 1753302914946,
-      "tag": "0007_easy_kid_colt",
-      "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "7",
-      "when": 1753303767613,
-      "tag": "0008_thankful_beast",
-      "breakpoints": true
-    },
-    {
-      "idx": 9,
-      "version": "7",
-      "when": 1753305655201,
-      "tag": "0009_dusty_felicia_hardy",
-      "breakpoints": true
-    },
-    {
-      "idx": 10,
-      "version": "7",
-      "when": 1753327946194,
-      "tag": "0010_watery_tiger_shark",
+      "when": 1753474432079,
+      "tag": "0002_seed-models",
       "breakpoints": true
     }
   ]

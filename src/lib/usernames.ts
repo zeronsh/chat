@@ -1,3 +1,4 @@
+import { seededRandom } from '@/lib/utils';
 import { nanoid } from 'nanoid';
 
 export function getUsername(user: { name?: string; id: string } = { id: nanoid() }): string {
@@ -216,16 +217,4 @@ export function getUsername(user: { name?: string; id: string } = { id: nanoid()
     const number = Math.floor(rng() * 1000);
 
     return `${adjectives[adjectiveIndex]}${nouns[nounIndex]}${number}`;
-}
-
-function seededRandom(seed: number): () => number {
-    let state = seed;
-    return (): number => {
-        // Constants for the LCG (these values are commonly used)
-        const a = 1664525; // Multiplier
-        const c = 1013904223; // Increment
-        const m = 2 ** 32; // Modulus (2^32)
-        state = (a * state + c) % m;
-        return state / m; // Normalize to [0, 1)
-    };
 }

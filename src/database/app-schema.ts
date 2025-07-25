@@ -1,5 +1,5 @@
 import { relations } from 'drizzle-orm';
-import { index, jsonb, pgEnum, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import { index, integer, jsonb, pgEnum, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 import type { Capability, ThreadMessage } from '@/ai/types';
 import { member, organization, user } from '@/database/auth-schema';
 import { CustomerId, OrganizationId, SubscriptionData, UserId } from '@/database/types';
@@ -78,6 +78,17 @@ export const setting = pgTable('setting', {
     biography: text('biography'),
     instructions: text('instructions'),
     modelId: text('model_id').notNull().default('gpt-4o-mini'),
+});
+
+export const usage = pgTable('usage', {
+    id: text('id').primaryKey(),
+    userId: text('user_id')
+        .notNull()
+        .references(() => user.id, { onDelete: 'cascade' })
+        .$type<UserId>(),
+    credits: integer('credits').notNull().default(0),
+    search: integer('search').notNull().default(0),
+    research: integer('research').notNull().default(0),
 });
 
 export const userCustomer = pgTable('user_customer', {

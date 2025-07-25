@@ -1,12 +1,10 @@
 import { db, schema } from '@/database';
+import { UserId } from '@/database/types';
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { anonymous, jwt, magicLink, organization } from 'better-auth/plugins';
 import { eq } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
-import { stripe } from '@better-auth/stripe';
-import { stripeClient } from '@/lib/stripe';
-import { env } from '@/lib/env';
 
 export const auth = betterAuth({
     database: drizzleAdapter(db, {
@@ -17,12 +15,21 @@ export const auth = betterAuth({
         user: {
             create: {
                 after: async user => {
-                    await db.insert(schema.setting).values({
-                        id: nanoid(),
-                        userId: user.id,
-                        mode: 'dark',
-                        theme: 'default',
-                        modelId: 'gpt-4o-mini',
+                    await db.transaction(async tx => {
+                        await tx.insert(schema.setting).values({
+                            id: nanoid(),
+                            userId: UserId(user.id),
+                            mode: 'dark',
+                            theme: 'default',
+                            modelId: 'kimi-k2',
+                        });
+                        await tx.insert(schema.usage).values({
+                            id: nanoid(),
+                            userId: UserId(user.id),
+                            credits: 0,
+                            search: 0,
+                            research: 0,
+                        });
                     });
                 },
             },

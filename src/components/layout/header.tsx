@@ -5,7 +5,6 @@ import { SidebarTrigger } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
 import { useParamsThreadId } from '@/hooks/use-params-thread-id';
 import { useThreadSelector } from '@/context/thread';
-import { OrganizationSelector } from '@/components/app/organization-selector';
 
 export function Header() {
     const threadId = useParamsThreadId();

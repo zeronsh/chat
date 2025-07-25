@@ -93,6 +93,13 @@ export default drizzleZeroConfig(schema, {
             data: true,
             userId: true,
         },
+        usage: {
+            id: true,
+            userId: true,
+            credits: true,
+            search: true,
+            research: true,
+        },
         organizationSubscription: {
             id: true,
             customerId: true,

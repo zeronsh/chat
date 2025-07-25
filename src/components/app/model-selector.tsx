@@ -15,6 +15,8 @@ import ModelIcon, { type ModelType } from '@/components/thread/model-icon';
 import { ChevronsUpDown } from 'lucide-react';
 import { useDatabase } from '@/context/database';
 import { useQuery } from '@rocicorp/zero/react';
+import { getGradientClass } from '@/lib/gradient';
+import { cn } from '@/lib/utils';
 
 export function ModelSelector() {
     const [open, setOpen] = useState(false);
@@ -25,12 +27,8 @@ export function ModelSelector() {
     return (
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
-                <Button
-                    variant="outline"
-                    aria-expanded={open}
-                    className="md:w-[200px] justify-between"
-                >
-                    <div className="flex items-center gap-2 flex-1 md:w-0">
+                <Button variant="ghost" aria-expanded={open}>
+                    <div className="flex items-center gap-2 flex-1 ">
                         {settings?.model && (
                             <ModelIcon
                                 className="fill-primary"
@@ -42,15 +40,12 @@ export function ModelSelector() {
                     <ChevronsUpDown className="opacity-50" />
                 </Button>
             </PopoverTrigger>
-            <PopoverContent
-                className="p-0 bg-background/50 border-foreground/10 backdrop-blur-md overflow-hidden"
-                align="start"
-            >
+            <PopoverContent className="p-0 overflow-hidden" align="start">
                 <Command>
-                    <CommandInput placeholder="Search model..." className="h-9" />
+                    <CommandInput placeholder="Find Model..." className="h-9" />
                     <CommandList>
                         <CommandEmpty>No model found.</CommandEmpty>
-                        <CommandGroup>
+                        <CommandGroup heading="Models">
                             {models?.map(model => (
                                 <CommandItem
                                     key={model.id}
@@ -74,11 +69,6 @@ export function ModelSelector() {
                                         )}
                                         <span className="truncate">{model.name}</span>
                                         <div className="flex-1" />
-                                        {model.id === settings?.model?.id && (
-                                            <span className="text-xs text-muted-foreground">
-                                                Selected
-                                            </span>
-                                        )}
                                     </span>
                                 </CommandItem>
                             ))}

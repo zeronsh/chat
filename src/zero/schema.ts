@@ -656,6 +656,58 @@ export const schema = {
       },
       primaryKey: ["id"],
     },
+    usage: {
+      name: "usage",
+      columns: {
+        id: {
+          type: "string",
+          optional: false,
+          customType: null as unknown as ZeroCustomType<
+            typeof zeroSchema,
+            "usage",
+            "id"
+          >,
+        },
+        userId: {
+          type: "string",
+          optional: false,
+          customType: null as unknown as ZeroCustomType<
+            typeof zeroSchema,
+            "usage",
+            "userId"
+          >,
+          serverName: "user_id",
+        },
+        credits: {
+          type: "number",
+          optional: true,
+          customType: null as unknown as ZeroCustomType<
+            typeof zeroSchema,
+            "usage",
+            "credits"
+          >,
+        },
+        search: {
+          type: "number",
+          optional: true,
+          customType: null as unknown as ZeroCustomType<
+            typeof zeroSchema,
+            "usage",
+            "search"
+          >,
+        },
+        research: {
+          type: "number",
+          optional: true,
+          customType: null as unknown as ZeroCustomType<
+            typeof zeroSchema,
+            "usage",
+            "research"
+          >,
+        },
+      },
+      primaryKey: ["id"],
+    },
     userCustomer: {
       name: "userCustomer",
       columns: {

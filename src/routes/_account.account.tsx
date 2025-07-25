@@ -1,8 +1,9 @@
 import { Anonymous } from '@/components/app/auth';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { Section } from '@/components/ui/section';
+import { Separator } from '@/components/ui/separator';
 import { Link, Outlet, createFileRoute } from '@tanstack/react-router';
-import { PaintbrushIcon, SettingsIcon, UserIcon } from 'lucide-react';
+import { CreditCardIcon, PaintbrushIcon, SettingsIcon, UserIcon } from 'lucide-react';
 
 export const Route = createFileRoute('/_account/account')({
     component: RouteComponent,
@@ -13,6 +14,11 @@ const pages = [
         title: 'Account',
         url: '/account',
         icon: <UserIcon />,
+    },
+    {
+        title: 'Subscription',
+        url: '/account/subscription',
+        icon: <CreditCardIcon />,
     },
     {
         title: 'Preferences',
@@ -59,17 +65,27 @@ function RouteComponent() {
                 </div>
                 <div className="flex-1">
                     <Anonymous>
-                        <Alert className="bg-background/10 border border-primary/20 backdrop-blur-md mb-8">
-                            <AlertTitle>Not logged in</AlertTitle>
-                            <AlertDescription>
-                                You are currently an anonymous user. Your chats, messages and
-                                preferences may be deleted in the future. To save your data, create
-                                an account or login.
-                                <Button variant="default" size="sm" className="mt-4" asChild>
-                                    <Link to="/login">Login</Link>
-                                </Button>
-                            </AlertDescription>
-                        </Alert>
+                        <Section
+                            title="Anonymous"
+                            description="As an anonymous user, your data may be deleted or lost at any time. Login to keep your data safe."
+                        >
+                            <div className="border backdrop-blur-md mb-8 p-0 rounded-lg bg-card overflow-hidden text-sm text-muted-foreground flex flex-col">
+                                <div className="p-4 flex flex-col gap-2">
+                                    <h3>Not logged in</h3>
+                                    <p>
+                                        You are currently an anonymous user. Your chats, messages
+                                        and preferences may be deleted in the future. To save your
+                                        data, create an account or login.
+                                    </p>
+                                </div>
+                                <div className="flex px-4 py-3 bg-sidebar w-full justify-end border-t">
+                                    <Button variant="default" size="sm" asChild>
+                                        <Link to="/login">Login</Link>
+                                    </Button>
+                                </div>
+                            </div>
+                        </Section>
+                        <Separator className="mb-8" />
                     </Anonymous>
                     <Outlet />
                 </div>

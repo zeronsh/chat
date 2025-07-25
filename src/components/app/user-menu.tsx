@@ -11,13 +11,13 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { authClient } from '@/lib/auth-client';
 import { getUsername } from '@/lib/usernames';
-import { Link } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
 import { LogInIcon, LogOutIcon, PaintbrushIcon, SettingsIcon, UserIcon } from 'lucide-react';
 import { GithubIcon } from 'lucide-react';
 
 export function UserMenu() {
     const { data: session } = authClient.useSession();
-
+    const navigate = useNavigate();
     return (
         <DropdownMenu>
             <DropdownMenuTrigger className="outline-none cursor-pointer" asChild>
@@ -73,12 +73,15 @@ export function UserMenu() {
                 </DropdownMenuItem>
                 <NotAnonymous>
                     <DropdownMenuSeparator />
-                    <LogoutDialog>
-                        <DropdownMenuItem>
-                            <LogOutIcon className="size-4" />
-                            Log out
-                        </DropdownMenuItem>
-                    </LogoutDialog>
+                    <DropdownMenuItem
+                        onClick={async () => {
+                            await authClient.signOut();
+                            navigate({ to: '/logged-out' });
+                        }}
+                    >
+                        <LogOutIcon className="size-4" />
+                        Log out
+                    </DropdownMenuItem>
                 </NotAnonymous>
                 <Anonymous>
                     <DropdownMenuSeparator />

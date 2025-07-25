@@ -46,7 +46,7 @@ export function SingleFieldForm(props: {
                 {field => (
                     <Fragment>
                         <div className="flex flex-col gap-4 p-4">
-                            <Label htmlFor="username" className="text-lg">
+                            <Label htmlFor="username" className="text-lg font-semibold">
                                 {props.label}
                             </Label>
                             <p className="text-sm text-muted-foreground">{props.description}</p>

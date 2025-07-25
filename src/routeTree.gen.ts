@@ -21,15 +21,15 @@ import { Route as AccountLoggedOutRouteImport } from './routes/_account.logged-o
 import { Route as AccountAccountRouteImport } from './routes/_account.account'
 import { Route as AccountLoginIndexRouteImport } from './routes/_account.login.index'
 import { Route as AccountAccountIndexRouteImport } from './routes/_account.account.index'
-import { Route as TeamTeamCreateRouteImport } from './routes/_team.team.create'
+import { Route as AccountAccountSubscriptionRouteImport } from './routes/_account.account.subscription'
 import { Route as AccountAccountPreferencesRouteImport } from './routes/_account.account.preferences'
 import { Route as AccountAccountAppearanceRouteImport } from './routes/_account.account.appearance'
 import { ServerRoute as ApiUploadthingServerRouteImport } from './routes/api.uploadthing'
 import { ServerRoute as ApiThreadServerRouteImport } from './routes/api.thread'
+import { ServerRoute as ApiCustomerPortalServerRouteImport } from './routes/api.customer-portal'
 import { ServerRoute as ApiCheckoutServerRouteImport } from './routes/api.checkout'
 import { ServerRoute as ApiWebhookStripeServerRouteImport } from './routes/api.webhook.stripe'
 import { ServerRoute as ApiCheckoutSuccessServerRouteImport } from './routes/api.checkout.success'
-import { ServerRoute as ApiCheckoutOrganizationServerRouteImport } from './routes/api.checkout.organization'
 import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api.auth.$'
 import { ServerRoute as ApiThreadThreadIdStreamServerRouteImport } from './routes/api.thread.$threadId.stream'
 
@@ -82,11 +82,12 @@ const AccountAccountIndexRoute = AccountAccountIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AccountAccountRoute,
 } as any)
-const TeamTeamCreateRoute = TeamTeamCreateRouteImport.update({
-  id: '/team/create',
-  path: '/team/create',
-  getParentRoute: () => TeamRoute,
-} as any)
+const AccountAccountSubscriptionRoute =
+  AccountAccountSubscriptionRouteImport.update({
+    id: '/subscription',
+    path: '/subscription',
+    getParentRoute: () => AccountAccountRoute,
+  } as any)
 const AccountAccountPreferencesRoute =
   AccountAccountPreferencesRouteImport.update({
     id: '/preferences',
@@ -109,6 +110,11 @@ const ApiThreadServerRoute = ApiThreadServerRouteImport.update({
   path: '/api/thread',
   getParentRoute: () => rootServerRouteImport,
 } as any)
+const ApiCustomerPortalServerRoute = ApiCustomerPortalServerRouteImport.update({
+  id: '/api/customer-portal',
+  path: '/api/customer-portal',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
 const ApiCheckoutServerRoute = ApiCheckoutServerRouteImport.update({
   id: '/api/checkout',
   path: '/api/checkout',
@@ -123,12 +129,6 @@ const ApiCheckoutSuccessServerRoute =
   ApiCheckoutSuccessServerRouteImport.update({
     id: '/success',
     path: '/success',
-    getParentRoute: () => ApiCheckoutServerRoute,
-  } as any)
-const ApiCheckoutOrganizationServerRoute =
-  ApiCheckoutOrganizationServerRouteImport.update({
-    id: '/organization',
-    path: '/organization',
     getParentRoute: () => ApiCheckoutServerRoute,
   } as any)
 const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
@@ -151,7 +151,7 @@ export interface FileRoutesByFullPath {
   '/': typeof ThreadIndexRoute
   '/account/appearance': typeof AccountAccountAppearanceRoute
   '/account/preferences': typeof AccountAccountPreferencesRoute
-  '/team/create': typeof TeamTeamCreateRoute
+  '/account/subscription': typeof AccountAccountSubscriptionRoute
   '/account/': typeof AccountAccountIndexRoute
   '/login': typeof AccountLoginIndexRoute
 }
@@ -162,14 +162,14 @@ export interface FileRoutesByTo {
   '/': typeof ThreadIndexRoute
   '/account/appearance': typeof AccountAccountAppearanceRoute
   '/account/preferences': typeof AccountAccountPreferencesRoute
-  '/team/create': typeof TeamTeamCreateRoute
+  '/account/subscription': typeof AccountAccountSubscriptionRoute
   '/account': typeof AccountAccountIndexRoute
   '/login': typeof AccountLoginIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_account': typeof AccountRouteWithChildren
-  '/_team': typeof TeamRouteWithChildren
+  '/_team': typeof TeamRoute
   '/_thread': typeof ThreadRouteWithChildren
   '/_account/account': typeof AccountAccountRouteWithChildren
   '/_account/logged-out': typeof AccountLoggedOutRoute
@@ -178,7 +178,7 @@ export interface FileRoutesById {
   '/_thread/': typeof ThreadIndexRoute
   '/_account/account/appearance': typeof AccountAccountAppearanceRoute
   '/_account/account/preferences': typeof AccountAccountPreferencesRoute
-  '/_team/team/create': typeof TeamTeamCreateRoute
+  '/_account/account/subscription': typeof AccountAccountSubscriptionRoute
   '/_account/account/': typeof AccountAccountIndexRoute
   '/_account/login/': typeof AccountLoginIndexRoute
 }
@@ -192,7 +192,7 @@ export interface FileRouteTypes {
     | '/'
     | '/account/appearance'
     | '/account/preferences'
-    | '/team/create'
+    | '/account/subscription'
     | '/account/'
     | '/login'
   fileRoutesByTo: FileRoutesByTo
@@ -203,7 +203,7 @@ export interface FileRouteTypes {
     | '/'
     | '/account/appearance'
     | '/account/preferences'
-    | '/team/create'
+    | '/account/subscription'
     | '/account'
     | '/login'
   id:
@@ -218,32 +218,32 @@ export interface FileRouteTypes {
     | '/_thread/'
     | '/_account/account/appearance'
     | '/_account/account/preferences'
-    | '/_team/team/create'
+    | '/_account/account/subscription'
     | '/_account/account/'
     | '/_account/login/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AccountRoute: typeof AccountRouteWithChildren
-  TeamRoute: typeof TeamRouteWithChildren
+  TeamRoute: typeof TeamRoute
   ThreadRoute: typeof ThreadRouteWithChildren
 }
 export interface FileServerRoutesByFullPath {
   '/api/checkout': typeof ApiCheckoutServerRouteWithChildren
+  '/api/customer-portal': typeof ApiCustomerPortalServerRoute
   '/api/thread': typeof ApiThreadServerRouteWithChildren
   '/api/uploadthing': typeof ApiUploadthingServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
-  '/api/checkout/organization': typeof ApiCheckoutOrganizationServerRoute
   '/api/checkout/success': typeof ApiCheckoutSuccessServerRoute
   '/api/webhook/stripe': typeof ApiWebhookStripeServerRoute
   '/api/thread/$threadId/stream': typeof ApiThreadThreadIdStreamServerRoute
 }
 export interface FileServerRoutesByTo {
   '/api/checkout': typeof ApiCheckoutServerRouteWithChildren
+  '/api/customer-portal': typeof ApiCustomerPortalServerRoute
   '/api/thread': typeof ApiThreadServerRouteWithChildren
   '/api/uploadthing': typeof ApiUploadthingServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
-  '/api/checkout/organization': typeof ApiCheckoutOrganizationServerRoute
   '/api/checkout/success': typeof ApiCheckoutSuccessServerRoute
   '/api/webhook/stripe': typeof ApiWebhookStripeServerRoute
   '/api/thread/$threadId/stream': typeof ApiThreadThreadIdStreamServerRoute
@@ -251,10 +251,10 @@ export interface FileServerRoutesByTo {
 export interface FileServerRoutesById {
   __root__: typeof rootServerRouteImport
   '/api/checkout': typeof ApiCheckoutServerRouteWithChildren
+  '/api/customer-portal': typeof ApiCustomerPortalServerRoute
   '/api/thread': typeof ApiThreadServerRouteWithChildren
   '/api/uploadthing': typeof ApiUploadthingServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
-  '/api/checkout/organization': typeof ApiCheckoutOrganizationServerRoute
   '/api/checkout/success': typeof ApiCheckoutSuccessServerRoute
   '/api/webhook/stripe': typeof ApiWebhookStripeServerRoute
   '/api/thread/$threadId/stream': typeof ApiThreadThreadIdStreamServerRoute
@@ -263,30 +263,30 @@ export interface FileServerRouteTypes {
   fileServerRoutesByFullPath: FileServerRoutesByFullPath
   fullPaths:
     | '/api/checkout'
+    | '/api/customer-portal'
     | '/api/thread'
     | '/api/uploadthing'
     | '/api/auth/$'
-    | '/api/checkout/organization'
     | '/api/checkout/success'
     | '/api/webhook/stripe'
     | '/api/thread/$threadId/stream'
   fileServerRoutesByTo: FileServerRoutesByTo
   to:
     | '/api/checkout'
+    | '/api/customer-portal'
     | '/api/thread'
     | '/api/uploadthing'
     | '/api/auth/$'
-    | '/api/checkout/organization'
     | '/api/checkout/success'
     | '/api/webhook/stripe'
     | '/api/thread/$threadId/stream'
   id:
     | '__root__'
     | '/api/checkout'
+    | '/api/customer-portal'
     | '/api/thread'
     | '/api/uploadthing'
     | '/api/auth/$'
-    | '/api/checkout/organization'
     | '/api/checkout/success'
     | '/api/webhook/stripe'
     | '/api/thread/$threadId/stream'
@@ -294,6 +294,7 @@ export interface FileServerRouteTypes {
 }
 export interface RootServerRouteChildren {
   ApiCheckoutServerRoute: typeof ApiCheckoutServerRouteWithChildren
+  ApiCustomerPortalServerRoute: typeof ApiCustomerPortalServerRoute
   ApiThreadServerRoute: typeof ApiThreadServerRouteWithChildren
   ApiUploadthingServerRoute: typeof ApiUploadthingServerRoute
   ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute
@@ -372,12 +373,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountAccountIndexRouteImport
       parentRoute: typeof AccountAccountRoute
     }
-    '/_team/team/create': {
-      id: '/_team/team/create'
-      path: '/team/create'
-      fullPath: '/team/create'
-      preLoaderRoute: typeof TeamTeamCreateRouteImport
-      parentRoute: typeof TeamRoute
+    '/_account/account/subscription': {
+      id: '/_account/account/subscription'
+      path: '/subscription'
+      fullPath: '/account/subscription'
+      preLoaderRoute: typeof AccountAccountSubscriptionRouteImport
+      parentRoute: typeof AccountAccountRoute
     }
     '/_account/account/preferences': {
       id: '/_account/account/preferences'
@@ -411,6 +412,13 @@ declare module '@tanstack/react-start/server' {
       preLoaderRoute: typeof ApiThreadServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
+    '/api/customer-portal': {
+      id: '/api/customer-portal'
+      path: '/api/customer-portal'
+      fullPath: '/api/customer-portal'
+      preLoaderRoute: typeof ApiCustomerPortalServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
     '/api/checkout': {
       id: '/api/checkout'
       path: '/api/checkout'
@@ -430,13 +438,6 @@ declare module '@tanstack/react-start/server' {
       path: '/success'
       fullPath: '/api/checkout/success'
       preLoaderRoute: typeof ApiCheckoutSuccessServerRouteImport
-      parentRoute: typeof ApiCheckoutServerRoute
-    }
-    '/api/checkout/organization': {
-      id: '/api/checkout/organization'
-      path: '/organization'
-      fullPath: '/api/checkout/organization'
-      preLoaderRoute: typeof ApiCheckoutOrganizationServerRouteImport
       parentRoute: typeof ApiCheckoutServerRoute
     }
     '/api/auth/$': {
@@ -459,12 +460,14 @@ declare module '@tanstack/react-start/server' {
 interface AccountAccountRouteChildren {
   AccountAccountAppearanceRoute: typeof AccountAccountAppearanceRoute
   AccountAccountPreferencesRoute: typeof AccountAccountPreferencesRoute
+  AccountAccountSubscriptionRoute: typeof AccountAccountSubscriptionRoute
   AccountAccountIndexRoute: typeof AccountAccountIndexRoute
 }
 
 const AccountAccountRouteChildren: AccountAccountRouteChildren = {
   AccountAccountAppearanceRoute: AccountAccountAppearanceRoute,
   AccountAccountPreferencesRoute: AccountAccountPreferencesRoute,
+  AccountAccountSubscriptionRoute: AccountAccountSubscriptionRoute,
   AccountAccountIndexRoute: AccountAccountIndexRoute,
 }
 
@@ -489,16 +492,6 @@ const AccountRouteChildren: AccountRouteChildren = {
 const AccountRouteWithChildren =
   AccountRoute._addFileChildren(AccountRouteChildren)
 
-interface TeamRouteChildren {
-  TeamTeamCreateRoute: typeof TeamTeamCreateRoute
-}
-
-const TeamRouteChildren: TeamRouteChildren = {
-  TeamTeamCreateRoute: TeamTeamCreateRoute,
-}
-
-const TeamRouteWithChildren = TeamRoute._addFileChildren(TeamRouteChildren)
-
 interface ThreadRouteChildren {
   ThreadThreadIdRoute: typeof ThreadThreadIdRoute
   ThreadIndexRoute: typeof ThreadIndexRoute
@@ -513,12 +506,10 @@ const ThreadRouteWithChildren =
   ThreadRoute._addFileChildren(ThreadRouteChildren)
 
 interface ApiCheckoutServerRouteChildren {
-  ApiCheckoutOrganizationServerRoute: typeof ApiCheckoutOrganizationServerRoute
   ApiCheckoutSuccessServerRoute: typeof ApiCheckoutSuccessServerRoute
 }
 
 const ApiCheckoutServerRouteChildren: ApiCheckoutServerRouteChildren = {
-  ApiCheckoutOrganizationServerRoute: ApiCheckoutOrganizationServerRoute,
   ApiCheckoutSuccessServerRoute: ApiCheckoutSuccessServerRoute,
 }
 
@@ -539,7 +530,7 @@ const ApiThreadServerRouteWithChildren = ApiThreadServerRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   AccountRoute: AccountRouteWithChildren,
-  TeamRoute: TeamRouteWithChildren,
+  TeamRoute: TeamRoute,
   ThreadRoute: ThreadRouteWithChildren,
 }
 export const routeTree = rootRouteImport
@@ -547,6 +538,7 @@ export const routeTree = rootRouteImport
   ._addFileTypes<FileRouteTypes>()
 const rootServerRouteChildren: RootServerRouteChildren = {
   ApiCheckoutServerRoute: ApiCheckoutServerRouteWithChildren,
+  ApiCustomerPortalServerRoute: ApiCustomerPortalServerRoute,
   ApiThreadServerRoute: ApiThreadServerRouteWithChildren,
   ApiUploadthingServerRoute: ApiUploadthingServerRoute,
   ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,
