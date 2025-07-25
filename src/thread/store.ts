@@ -9,6 +9,13 @@ export type ToolSidebar = {
     toolCallId: string;
 };
 
+export type FileAttachment = {
+    type: 'file';
+    url: string;
+    filename: string;
+    mediaType: string;
+};
+
 export interface ThreadStoreImpl<UI_MESSAGE extends UIMessage> {
     id?: string;
     messageMap: Record<string, UI_MESSAGE>;
@@ -19,6 +26,12 @@ export interface ThreadStoreImpl<UI_MESSAGE extends UIMessage> {
 
     toolSidebar: ToolSidebar | undefined;
     setToolSidebar: (toolSidebar: ToolSidebar | undefined) => void;
+
+    input: string;
+    setInput: (input: string) => void;
+
+    attachments: FileAttachment[];
+    setAttachments: (attachments: FileAttachment[]) => void;
 
     setMessages: (messages: UI_MESSAGE[]) => void;
     setStatus: (status: ChatStatus) => void;
@@ -43,6 +56,11 @@ export function createThreadStore<UI_MESSAGE extends UIMessage>(init: {
                     status: 'ready',
                     error: undefined,
                     toolSidebar: undefined,
+                    input: '',
+                    setInput: (input: string) => set({ input }, false, 'thread/setInput'),
+                    attachments: [],
+                    setAttachments: (attachments: FileAttachment[]) =>
+                        set({ attachments }, false, 'thread/setAttachments'),
                     setToolSidebar: (toolSidebar: ToolSidebar | undefined) =>
                         set({ toolSidebar }, false, 'thread/setToolSidebar'),
                     setStatus: (status: ChatStatus) => set({ status }, false, 'thread/setStatus'),

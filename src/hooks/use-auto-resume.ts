@@ -8,7 +8,6 @@ export function useAutoResume() {
     const id = useThreadSelector(state => state.id);
     const status = useThreadSelector(state => state.status);
     const db = useDatabase();
-
     const [thread] = useQuery(
         db.query.thread
             .where('id', '=', id ?? '')

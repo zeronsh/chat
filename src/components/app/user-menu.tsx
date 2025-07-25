@@ -12,7 +12,14 @@ import {
 import { authClient } from '@/lib/auth-client';
 import { getUsername } from '@/lib/usernames';
 import { Link, useNavigate } from '@tanstack/react-router';
-import { LogInIcon, LogOutIcon, PaintbrushIcon, SettingsIcon, UserIcon } from 'lucide-react';
+import {
+    CreditCardIcon,
+    LogInIcon,
+    LogOutIcon,
+    PaintbrushIcon,
+    SettingsIcon,
+    UserIcon,
+} from 'lucide-react';
 import { GithubIcon } from 'lucide-react';
 
 export function UserMenu() {
@@ -50,6 +57,12 @@ export function UserMenu() {
                     <Link to="/account">
                         <UserIcon className="size-4" />
                         Account
+                    </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                    <Link to="/account/subscription">
+                        <CreditCardIcon className="size-4" />
+                        Subscription
                     </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
