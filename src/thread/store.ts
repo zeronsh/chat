@@ -27,9 +27,12 @@ export interface ThreadStoreImpl<UI_MESSAGE extends UIMessage> {
     toolSidebar: ToolSidebar | undefined;
     setToolSidebar: (toolSidebar: ToolSidebar | undefined) => void;
 
+    tool: ToolKeys | '';
+    setTool: (tool: ToolKeys | '') => void;
     input: string;
     setInput: (input: string) => void;
-
+    pendingFileCount: number;
+    setPendingFileCount: (pendingFileCount: number | ((prev: number) => number)) => void;
     attachments: FileAttachment[];
     setAttachments: (attachments: FileAttachment[]) => void;
 
@@ -57,7 +60,25 @@ export function createThreadStore<UI_MESSAGE extends UIMessage>(init: {
                     error: undefined,
                     toolSidebar: undefined,
                     input: '',
+                    tool: '',
+                    pendingFileCount: 0,
+                    setTool: (tool: ToolKeys | '') => set({ tool }, false, 'thread/setTool'),
                     setInput: (input: string) => set({ input }, false, 'thread/setInput'),
+                    setPendingFileCount: (
+                        pendingFileCount: number | ((prev: number) => number)
+                    ) => {
+                        set(
+                            {
+                                pendingFileCount:
+                                    typeof pendingFileCount === 'function'
+                                        ? pendingFileCount(get().pendingFileCount)
+                                        : pendingFileCount,
+                            },
+                            false,
+                            'thread/setPendingFileCount'
+                        );
+                    },
+
                     attachments: [],
                     setAttachments: (attachments: FileAttachment[]) =>
                         set({ attachments }, false, 'thread/setAttachments'),

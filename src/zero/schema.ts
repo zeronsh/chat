@@ -436,6 +436,15 @@ export const schema = {
             "icon"
           >,
         },
+        credits: {
+          type: "number",
+          optional: true,
+          customType: null as unknown as ZeroCustomType<
+            typeof zeroSchema,
+            "model",
+            "credits"
+          >,
+        },
         access: {
           type: "string",
           optional: true,

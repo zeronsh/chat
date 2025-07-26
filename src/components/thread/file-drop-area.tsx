@@ -37,15 +37,10 @@ export function FileDropArea({
     });
 
     return (
-        <div
-            {...getRootProps()}
-            className={cn('relative', className)}
-            style={{ pointerEvents: isDragActive ? 'auto' : 'none' }}
-        >
+        <div {...getRootProps()} className={cn('relative flex flex-col flex-1', className)}>
             <input {...getInputProps()} />
 
-            {/* Children content */}
-            <div style={{ pointerEvents: 'auto' }}>{children}</div>
+            {children}
 
             {isDragActive && (
                 <div className="absolute inset-0 flex size-full items-center justify-center border-none bg-background/50 p-0 backdrop-blur transition-opacity duration-200 ease-out z-10 rounded-3xl">

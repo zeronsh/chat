@@ -9,7 +9,7 @@ import {
     type TextStreamPart,
     type ToolSet,
 } from 'ai';
-import { Data, Duration, Effect, Schedule } from 'effect';
+import { Data, Duration, Effect, Logger, Runtime, Schedule } from 'effect';
 import { type ResumableStreamContext } from 'resumable-stream';
 
 export type StreamTextOptions = Omit<Parameters<typeof streamText>[0], 'onError' | 'onFinish'>;
@@ -272,20 +272,23 @@ export function createUIMessageStreamResponse<Message extends UIMessage>() {
 
         return effect.pipe(
             Effect.catchTag('InternalError', error => {
-                console.log(error);
-                return Effect.succeed(
-                    Response.json(
-                        {
-                            error: {
-                                code: error.code,
-                                message: error.message,
-                                metadata: error.metadata,
-                            },
-                        },
-                        { status: error.status }
+                return Effect.succeed({
+                    status: error.status,
+                    error: {
+                        code: error.code,
+                        message: error.message,
+                        metadata: error.metadata,
+                    },
+                }).pipe(
+                    Effect.tap(ctx => Effect.logError(ctx.error)),
+                    Effect.map(ctx =>
+                        Response.json(ctx.error, {
+                            status: ctx.status,
+                        })
                     )
                 );
             }),
+            Effect.provide(Logger.pretty),
             Effect.runPromise
         );
     };

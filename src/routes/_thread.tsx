@@ -11,6 +11,7 @@ import { Title } from '@/components/meta/title';
 import { ThreadProvider } from '@/context/thread';
 import { MessageList } from '@/components/thread/message/message-list';
 import { ToolSidebar } from '@/components/layout/tool-sidebar';
+import { ThreadContainer } from '@/components/thread/thread-container';
 
 export const Route = createFileRoute('/_thread')({
     component: RouteComponent,
@@ -59,10 +60,10 @@ function RouteComponent() {
                     })
                 }
             >
-                <main className="relative flex flex-col flex-1">
+                <ThreadContainer>
                     <Header />
                     <MessageList />
-                </main>
+                </ThreadContainer>
                 <ToolSidebar />
             </ThreadProvider>
         </SidebarProvider>

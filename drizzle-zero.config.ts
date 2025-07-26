@@ -28,6 +28,7 @@ export default drizzleZeroConfig(schema, {
             capabilities: true,
             icon: true,
             access: true,
+            credits: true,
             createdAt: true,
             updatedAt: true,
         },

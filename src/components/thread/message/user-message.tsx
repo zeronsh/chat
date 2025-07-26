@@ -77,7 +77,15 @@ export const UserMessage = memo(function PureUserMessage({
                     </MessageActions>
                 </Message>
             </MessageContainer>
-            {!hasNextMessage && <PendingMessage />}
+            {!hasNextMessage && (
+                <MessageContainer
+                    className="justify-end"
+                    hasPreviousMessage={true}
+                    hasNextMessage={false}
+                >
+                    <PendingMessage />
+                </MessageContainer>
+            )}
         </Fragment>
     );
 });

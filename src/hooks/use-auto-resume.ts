@@ -16,8 +16,14 @@ export function useAutoResume() {
     );
 
     useEffect(() => {
-        if (thread?.streamId && status === 'ready') {
+        if (
+            thread?.streamId &&
+            // Remote status is streaming or submitted
+            (thread?.status === 'streaming' || thread?.status === 'submitted') &&
+            // Local status is ready
+            status === 'ready'
+        ) {
             resumeStream();
         }
-    }, [thread?.streamId, status]);
+    }, [thread?.streamId, thread?.status]);
 }

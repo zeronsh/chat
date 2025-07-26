@@ -5,22 +5,15 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1753473542533,
-      "tag": "0000_careless_thanos",
+      "when": 1753484529332,
+      "tag": "0000_violet_wolverine",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1753473906926,
-      "tag": "0001_chief_toad",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1753474432079,
-      "tag": "0002_seed-models",
+      "when": 1753484536104,
+      "tag": "0001_seed-models",
       "breakpoints": true
     }
   ]

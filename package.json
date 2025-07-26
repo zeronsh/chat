@@ -7,6 +7,7 @@
         "dev": "dotenvx run -- vite",
         "build": "dotenvx run -f .env.production -- vite build",
         "serve": "dotenvx run -f .env.production -- vite preview",
+        "scan": "npx react-scan@latest localhost:5173",
         "auth:generate": "dotenvx run -- npx @better-auth/cli generate --output ./src/database/auth-schema.ts",
         "database:push": "dotenvx run -- npx drizzle-kit push",
         "database:generate": "dotenvx run -- npx drizzle-kit generate",

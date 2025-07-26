@@ -23,7 +23,15 @@ export const AssistantMessage = memo(function PureAssistantMessage({
     const length = useThreadSelector(state => state.messageMap[id].parts.length);
 
     if (length === 0) {
-        return <PendingMessage />;
+        return (
+            <MessageContainer
+                className="justify-start"
+                hasPreviousMessage={true}
+                hasNextMessage={false}
+            >
+                <PendingMessage />
+            </MessageContainer>
+        );
     }
 
     return (
@@ -34,7 +42,7 @@ export const AssistantMessage = memo(function PureAssistantMessage({
         >
             <Message className="flex flex-col items-start w-full">
                 <UIMessage id={id} />
-                {status !== 'streaming' && status !== 'submitted' ? (
+                {(status !== 'streaming' && status !== 'submitted') || hasNextMessage ? (
                     <Fragment>
                         <ToolResultPills id={id} />
                         <Actions id={id} />

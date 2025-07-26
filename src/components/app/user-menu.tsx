@@ -1,4 +1,4 @@
-import { Anonymous, LogoutDialog, NotAnonymous } from '@/components/app/auth';
+import { Anonymous, NotAnonymous } from '@/components/app/auth';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -9,6 +9,8 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useAccess } from '@/hooks/use-access';
+import { useUser } from '@/hooks/use-user';
 import { authClient } from '@/lib/auth-client';
 import { getUsername } from '@/lib/usernames';
 import { Link, useNavigate } from '@tanstack/react-router';
@@ -23,19 +25,17 @@ import {
 import { GithubIcon } from 'lucide-react';
 
 export function UserMenu() {
-    const { data: session } = authClient.useSession();
+    const user = useUser();
+    const { isPro } = useAccess();
     const navigate = useNavigate();
     return (
         <DropdownMenu>
             <DropdownMenuTrigger className="outline-none cursor-pointer" asChild>
                 <Button size="icon" variant="ghost" asChild>
                     <Avatar className="rounded-md overflow-hidden">
-                        <AvatarImage
-                            className="rounded-none"
-                            src={session?.user.image ?? undefined}
-                        />
+                        <AvatarImage className="rounded-none" src={user?.image ?? undefined} />
                         <AvatarFallback className="rounded-none">
-                            {getUsername(session?.user).charAt(0)}
+                            {getUsername(user).charAt(0)}
                         </AvatarFallback>
                     </Avatar>
                 </Button>
@@ -46,9 +46,9 @@ export function UserMenu() {
             >
                 <DropdownMenuLabel className="flex items-center gap-2">
                     <div className="flex flex-col overflow-hidden">
-                        <div className="text-sm truncate">{getUsername(session?.user)}</div>
+                        <div className="text-sm truncate">{getUsername(user)}</div>
                         <div className="text-xs text-muted-foreground truncate">
-                            {session?.user.email ?? 'No email'}
+                            {isPro ? 'Pro' : 'Free'}
                         </div>
                     </div>
                 </DropdownMenuLabel>

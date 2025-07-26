@@ -60,6 +60,7 @@ export const model = pgTable('model', {
     description: text('description').notNull(),
     capabilities: jsonb('capabilities').$type<Capability[]>().notNull().default([]),
     icon: modelIconEnum('icon').notNull(),
+    credits: integer('credits').notNull().default(0),
     access: modelAccessEnum('access').notNull().default('public'),
     createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at').notNull().defaultNow(),

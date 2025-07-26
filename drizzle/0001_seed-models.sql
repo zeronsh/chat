@@ -7,6 +7,7 @@ INSERT INTO "model" (
     "capabilities", 
     "icon", 
     "access", 
+    "credits",
     "created_at", 
     "updated_at"
 ) 
@@ -16,9 +17,10 @@ VALUES
     'GPT 4o', -- name
     'openai/gpt-4o', -- model
     'GPT-4o from OpenAI has broad general knowledge and domain expertise allowing it to follow complex instructions in natural language and solve difficult problems accurately. It matches GPT-4 Turbo performance with a faster and cheaper API.', -- description
-    '["tools", "vision"]', -- capabilities
+    '["tools", "vision", "documents"]', -- capabilities
     'openai', -- icon
-    'public', -- access
+    'account_required', -- access
+    2, -- credits
     NOW(), -- created_at
     NOW() -- updated_at
 ), 
@@ -27,9 +29,10 @@ VALUES
     'GPT 4o Mini', -- name
     'openai/gpt-4o-mini', -- model
     'GPT-4o mini from OpenAI is their most advanced and cost-efficient small model. It is multi-modal (accepting text or image inputs and outputting text) and has higher intelligence than gpt-3.5-turbo but is just as fast.', -- description
-    '["tools", "vision"]', -- capabilities
+    '["tools", "vision", "documents"]', -- capabilities
     'openai', -- icon
     'public', -- access
+    1, -- credits
     NOW(), -- created_at
     NOW() -- updated_at
 ),
@@ -38,9 +41,10 @@ VALUES
     'Gemini 2.0 Flash', -- name
     'google/gemini-2.0-flash', -- model
     'Gemini 2.0 Flash delivers next-gen features and improved capabilities, including superior speed, built-in tool use, multimodal generation, and a 1M token context window.', -- description
-    '["vision", "tools"]', -- capabilities
+    '["vision", "tools", "documents"]', -- capabilities
     'gemini', -- icon
     'public', -- access
+    1, -- credits
     NOW(), -- created_at
     NOW() -- updated_at
 ),
@@ -52,6 +56,7 @@ VALUES
     '["vision", "tools", "reasoning"]', -- capabilities
     'gemini', -- icon
     'public', -- access
+    1, -- credits
     NOW(), -- created_at
     NOW() -- updated_at
 ),
@@ -60,9 +65,10 @@ VALUES
     'Gemini 2.5 Pro', -- name
     'google/gemini-2.5-pro', -- model
     'Gemini 2.5 Pro is our most advanced reasoning Gemini model, capable of solving complex problems. It features a 2M token context window and supports multimodal inputs including text, images, audio, video, and PDF documents.', -- description
-    '["vision", "tools", "reasoning"]', -- capabilities
+    '["vision", "tools", "reasoning", "documents"]', -- capabilities
     'gemini', -- icon
-    'account_required', -- access
+    'premium_required', -- access
+    5, -- credits
     NOW(), -- created_at
     NOW() -- updated_at
 ),
@@ -74,6 +80,7 @@ VALUES
     '["reasoning", "tools"]', -- capabilities
     'xai', -- icon
     'premium_required', -- access
+    5, -- credits
     NOW(), -- created_at
     NOW() -- updated_at
 ),
@@ -85,6 +92,7 @@ VALUES
     '["tools"]', -- capabilities
     'xai', -- icon
     'premium_required', -- access
+    5, -- credits
     NOW(), -- created_at
     NOW() -- updated_at
 ),
@@ -95,7 +103,8 @@ VALUES
     'xAI''s lightweight model that thinks before responding. Great for simple or logic-based tasks that do not require deep domain knowledge. The raw thinking traces are accessible.', -- description
     '["tools", "reasoning"]', -- capabilities
     'xai', -- icon
-    'premium_required', -- access
+    'account_required', -- access
+    1, -- credits
     NOW(), -- created_at
     NOW() -- updated_at
 ),
@@ -106,7 +115,8 @@ VALUES
     'Kimi K2 is a model with a context length of 128k, featuring powerful code and Agent capabilities based on MoE architecture. It has 1T total parameters with 32B activated parameters. In benchmark performance tests across major categories including general knowledge reasoning, programming, mathematics, and Agent capabilities, the K2 model outperforms other mainstream open-source models.', -- description
     '["tools"]', -- capabilities
     'openrouter', -- icon
-    'premium_required', -- access
+    'account_required', -- access
+    1, -- credits
     NOW(), -- created_at
     NOW() -- updated_at
 )

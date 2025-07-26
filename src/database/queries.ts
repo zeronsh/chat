@@ -199,3 +199,15 @@ export async function updateOrganizationCustomerSubscription(
         .set({ subscription: args.subscription })
         .where(eq(schema.organizationCustomer.id, args.customerId));
 }
+
+export async function getUsageByUserId(db: Database, userId: UserId) {
+    return db.query.usage.findFirst({
+        where: (usage, { eq }) => eq(usage.userId, userId),
+    });
+}
+
+export async function getUserById(db: Database, userId: UserId) {
+    return db.query.user.findFirst({
+        where: (user, { eq }) => eq(user.id, userId),
+    });
+}

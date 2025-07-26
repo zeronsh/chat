@@ -15,8 +15,6 @@ import ModelIcon, { type ModelType } from '@/components/thread/model-icon';
 import { ChevronsUpDown } from 'lucide-react';
 import { useDatabase } from '@/context/database';
 import { useQuery } from '@rocicorp/zero/react';
-import { getGradientClass } from '@/lib/gradient';
-import { cn } from '@/lib/utils';
 
 export function ModelSelector() {
     const [open, setOpen] = useState(false);

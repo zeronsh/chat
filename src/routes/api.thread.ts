@@ -37,11 +37,13 @@ export const ServerRoute = createServerFileRoute('/api/thread').methods({
                 const streamId = nanoid();
 
                 const { history, thread, message, model, settings } = await prepareThread({
+                    isAnonymous: session.user.isAnonymous ?? false,
                     streamId,
                     modelId: body.modelId,
                     userId: session.user.id,
                     threadId: body.id,
                     message: body.message,
+                    tool: body.tool,
                 });
 
                 return {

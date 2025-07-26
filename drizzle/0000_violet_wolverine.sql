@@ -103,6 +103,7 @@ CREATE TABLE "model" (
 	"description" text NOT NULL,
 	"capabilities" jsonb DEFAULT '[]'::jsonb NOT NULL,
 	"icon" "icon" NOT NULL,
+	"credits" integer DEFAULT 0 NOT NULL,
 	"access" "access" DEFAULT 'public' NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
@@ -137,6 +138,14 @@ CREATE TABLE "thread" (
 	"user_id" text NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "usage" (
+	"id" text PRIMARY KEY NOT NULL,
+	"user_id" text NOT NULL,
+	"credits" integer DEFAULT 0 NOT NULL,
+	"search" integer DEFAULT 0 NOT NULL,
+	"research" integer DEFAULT 0 NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "user_customer" (
 	"id" text PRIMARY KEY NOT NULL,
 	"user_id" text NOT NULL,
@@ -156,5 +165,6 @@ ALTER TABLE "message" ADD CONSTRAINT "message_user_id_user_id_fk" FOREIGN KEY ("
 ALTER TABLE "organization_customer" ADD CONSTRAINT "organization_customer_organization_id_organization_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organization"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "setting" ADD CONSTRAINT "setting_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "thread" ADD CONSTRAINT "thread_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "usage" ADD CONSTRAINT "usage_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "user_customer" ADD CONSTRAINT "user_customer_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX "stream_id_index" ON "thread" USING btree ("stream_id");

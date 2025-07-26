@@ -53,25 +53,40 @@ export const auth = betterAuth({
                 const existingSettings = await db
                     .select()
                     .from(schema.setting)
-                    .where(eq(schema.setting.userId, newUser.user.id))
+                    .where(eq(schema.setting.userId, UserId(newUser.user.id)))
                     .limit(1);
 
                 if (existingSettings.length === 0) {
                     await db
                         .update(schema.setting)
-                        .set({ userId: newUser.user.id })
-                        .where(eq(schema.setting.userId, anonymousUser.user.id));
+                        .set({ userId: UserId(newUser.user.id) })
+                        .where(eq(schema.setting.userId, UserId(anonymousUser.user.id)));
+                }
+
+                const existingUsage = await db
+                    .select()
+                    .from(schema.usage)
+                    .where(eq(schema.usage.userId, UserId(anonymousUser.user.id)))
+                    .limit(1);
+
+                if (existingUsage.length === 0) {
+                    await db
+                        .update(schema.usage)
+                        .set({
+                            userId: UserId(newUser.user.id),
+                        })
+                        .where(eq(schema.usage.userId, UserId(anonymousUser.user.id)));
                 }
 
                 await db
                     .update(schema.thread)
-                    .set({ userId: newUser.user.id })
-                    .where(eq(schema.thread.userId, anonymousUser.user.id));
+                    .set({ userId: UserId(newUser.user.id) })
+                    .where(eq(schema.thread.userId, UserId(anonymousUser.user.id)));
 
                 await db
                     .update(schema.message)
-                    .set({ userId: newUser.user.id })
-                    .where(eq(schema.message.userId, anonymousUser.user.id));
+                    .set({ userId: UserId(newUser.user.id) })
+                    .where(eq(schema.message.userId, UserId(anonymousUser.user.id)));
             },
         }),
     ],

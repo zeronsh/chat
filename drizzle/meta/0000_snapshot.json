@@ -1,5 +1,5 @@
 {
-  "id": "4ded6343-7739-4db6-a83f-1123414212c9",
+  "id": "e13b2f12-8e0f-4809-b912-ca5476461f82",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -684,6 +684,13 @@
           "primaryKey": false,
           "notNull": true
         },
+        "credits": {
+          "name": "credits",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
         "access": {
           "name": "access",
           "type": "access",
@@ -925,6 +932,66 @@
         "thread_user_id_user_id_fk": {
           "name": "thread_user_id_user_id_fk",
           "tableFrom": "thread",
+          "tableTo": "user",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.usage": {
+      "name": "usage",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "credits": {
+          "name": "credits",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "search": {
+          "name": "search",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "research": {
+          "name": "research",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "usage_user_id_user_id_fk": {
+          "name": "usage_user_id_user_id_fk",
+          "tableFrom": "usage",
           "tableTo": "user",
           "columnsFrom": [
             "user_id"
