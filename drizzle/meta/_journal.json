@@ -15,6 +15,13 @@
       "when": 1753484536104,
       "tag": "0001_seed-models",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1753493394519,
+      "tag": "0002_boring_owl",
+      "breakpoints": true
     }
   ]
 }

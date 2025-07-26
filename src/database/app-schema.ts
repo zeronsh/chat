@@ -51,6 +51,7 @@ export const modelIconEnum = pgEnum('icon', [
     'openrouter',
     'x',
     'xai',
+    'moonshot',
 ]);
 
 export const model = pgTable('model', {
