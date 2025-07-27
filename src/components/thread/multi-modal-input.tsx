@@ -236,9 +236,9 @@ export function MultiModalInput() {
                             .with({ canSearch: true }, () => 'Search the web')
                             .with(
                                 {
-                                    remainingSearches: 0,
+                                    remainingSearches: P.number.lte(0),
                                 },
-                                () => 'You have reached your search limit.'
+                                () => 'You have reached your search limit'
                             )
                             .otherwise(() => 'Search is not available')}
                     >
@@ -252,6 +252,9 @@ export function MultiModalInput() {
                                     'text-primary hover:text-primary border-primary!'
                             )}
                             onClick={() => setTool(tool === 'search' ? '' : 'search')}
+                            disabled={matcher
+                                .with({ canSearch: false }, () => true)
+                                .otherwise(() => false)}
                         >
                             <GlobeIcon className="size-5" />
                             <span className="text-sm">Search</span>
@@ -263,9 +266,9 @@ export function MultiModalInput() {
                             .with(
                                 {
                                     isPro: true,
-                                    remainingResearches: 0,
+                                    remainingResearches: P.number.lte(0),
                                 },
-                                () => 'You have reached your research limit.'
+                                () => 'You have reached your research limit'
                             )
                             .with(
                                 { isPro: false },
@@ -316,10 +319,25 @@ export function MultiModalInput() {
                     </PromptInputAction>
                     <PromptInputAction
                         tooltip={matcher
-                            .with({ input: P.string.maxLength(0) }, () => 'Message cannot be empty')
+                            .with(
+                                {
+                                    input: P.string.maxLength(0),
+                                    remainingCredits: P.number.gt(0),
+                                    status: 'ready',
+                                },
+                                () => 'Message cannot be empty'
+                            )
+                            .with(
+                                {
+                                    remainingCredits: 0,
+                                    status: 'ready',
+                                },
+                                () => 'You have reached your message limit.'
+                            )
                             .with(
                                 {
                                     pendingFileCount: P.number.gt(0),
+                                    status: 'ready',
                                 },
                                 () => 'Waiting for files to upload'
                             )
@@ -333,7 +351,20 @@ export function MultiModalInput() {
                             size="icon"
                             className="h-8 w-8 rounded-full"
                             disabled={matcher
-                                .with({ input: P.string.maxLength(0) }, () => true)
+                                .with(
+                                    {
+                                        input: P.string.maxLength(0),
+                                        remainingCredits: P.number.gt(0),
+                                        status: 'ready',
+                                    },
+                                    () => true
+                                )
+                                .with(
+                                    {
+                                        remainingCredits: 0,
+                                    },
+                                    () => true
+                                )
                                 .with(
                                     {
                                         pendingFileCount: P.number.gt(0),

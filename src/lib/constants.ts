@@ -4,6 +4,12 @@ export type Limits = {
     CREDITS: number;
 };
 
+export const AnonymousLimits: Limits = {
+    SEARCH: 5,
+    RESEARCH: 0,
+    CREDITS: 10,
+};
+
 export const FreeLimits: Limits = {
     SEARCH: 5,
     RESEARCH: 0,

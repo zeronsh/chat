@@ -2,9 +2,15 @@ import { getResearchTool } from '@/ai/tools/research-tool';
 import { getSearchTool } from '@/ai/tools/search-tool';
 import { ThreadMessage } from '@/ai/types';
 import { Tool, UIMessageStreamWriter } from 'ai';
+import { schema } from '@/database/schema';
+import { UserId } from '@/database/types';
+import { Limits } from '@/lib/constants';
 
 export type ToolContext = {
     writer: UIMessageStreamWriter<ThreadMessage>;
+    usage: typeof schema.usage.$inferSelect;
+    userId: UserId;
+    limits: Limits;
 };
 
 function getAvailableTools(ctx: ToolContext) {

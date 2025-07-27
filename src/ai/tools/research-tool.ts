@@ -4,6 +4,7 @@ import { generateObject, generateText, NoSuchToolError, stepCountIs, tool } from
 import z from 'zod';
 import { search, readSite } from '@/lib/exa';
 import { DataParts } from '@/ai/types';
+import { incrementUsage, decrementUsage } from '@/ai/service';
 
 export function getResearchTool(ctx: ToolContext) {
     return tool({
@@ -21,117 +22,135 @@ export function getResearchTool(ctx: ToolContext) {
                 ),
         }),
         execute: async ({ thoughts, prompt }, { toolCallId }) => {
-            const actions: (DataParts['research-read'] | DataParts['research-search'])[] = [];
+            try {
+                if (ctx.limits.RESEARCH - (ctx.usage.research || 0) <= 0) {
+                    throw new Error('LIMIT_REACHED');
+                }
+                await incrementUsage(ctx.userId, 'research', 1);
 
-            ctx.writer.write({
-                type: 'data-research-start',
-                data: {
-                    toolCallId,
-                    thoughts,
-                },
-            });
+                const actions: (DataParts['research-read'] | DataParts['research-search'])[] = [];
 
-            const { text: summary } = await generateText({
-                model: 'moonshotai/kimi-k2',
-                prompt: getResearchPrompt(prompt),
-                stopWhen: stepCountIs(50),
-                tools: {
-                    search: tool({
-                        description: 'Search the web for information',
-                        inputSchema: z.object({
-                            thoughts: z
-                                .string()
-                                .describe(
-                                    'Your thoughts on what you are currently doing in 20-50 words.'
-                                ),
-                            query: z.string(),
-                        }),
-                        execute: async ({ query, thoughts }) => {
-                            ctx.writer.write({
-                                type: 'data-research-search',
-                                data: {
+                ctx.writer.write({
+                    type: 'data-research-start',
+                    data: {
+                        toolCallId,
+                        thoughts,
+                    },
+                });
+
+                const { text: summary } = await generateText({
+                    model: 'moonshotai/kimi-k2',
+                    prompt: getResearchPrompt(prompt),
+                    stopWhen: stepCountIs(50),
+                    tools: {
+                        search: tool({
+                            description: 'Search the web for information',
+                            inputSchema: z.object({
+                                thoughts: z
+                                    .string()
+                                    .describe(
+                                        'Your thoughts on what you are currently doing in 20-50 words.'
+                                    ),
+                                query: z.string(),
+                            }),
+                            execute: async ({ query, thoughts }) => {
+                                ctx.writer.write({
+                                    type: 'data-research-search',
+                                    data: {
+                                        toolCallId,
+                                        thoughts,
+                                        query,
+                                    },
+                                });
+
+                                actions.push({
                                     toolCallId,
                                     thoughts,
                                     query,
-                                },
-                            });
+                                });
 
-                            actions.push({
-                                toolCallId,
-                                thoughts,
-                                query,
-                            });
-
-                            return search(query);
-                        },
-                    }),
-                    read_site: tool({
-                        description: 'Read the contents of a URL',
-                        inputSchema: z.object({
-                            thoughts: z
-                                .string()
-                                .describe(
-                                    'Your thoughts on what you are currently doing in 20-50 words.'
-                                ),
-                            url: z.string(),
+                                return search(query);
+                            },
                         }),
-                        execute: async ({ url, thoughts }) => {
-                            ctx.writer.write({
-                                type: 'data-research-read',
-                                data: { toolCallId, thoughts, url },
-                            });
+                        read_site: tool({
+                            description: 'Read the contents of a URL',
+                            inputSchema: z.object({
+                                thoughts: z
+                                    .string()
+                                    .describe(
+                                        'Your thoughts on what you are currently doing in 20-50 words.'
+                                    ),
+                                url: z.string(),
+                            }),
+                            execute: async ({ url, thoughts }) => {
+                                ctx.writer.write({
+                                    type: 'data-research-read',
+                                    data: { toolCallId, thoughts, url },
+                                });
 
-                            actions.push({
-                                toolCallId,
-                                thoughts,
-                                url,
-                            });
+                                actions.push({
+                                    toolCallId,
+                                    thoughts,
+                                    url,
+                                });
 
-                            return readSite(url);
-                        },
-                    }),
-                },
-                // @ts-expect-error
-                experimental_repairToolCall: async ({ error, toolCall, tools, inputSchema }) => {
-                    if (NoSuchToolError.isInstance(error)) {
-                        return null;
-                    }
+                                return readSite(url);
+                            },
+                        }),
+                    },
+                    // @ts-expect-error
+                    experimental_repairToolCall: async ({
+                        error,
+                        toolCall,
+                        tools,
+                        inputSchema,
+                    }) => {
+                        if (NoSuchToolError.isInstance(error)) {
+                            return null;
+                        }
 
-                    const tool = tools[toolCall.toolName as keyof typeof tools];
+                        const tool = tools[toolCall.toolName as keyof typeof tools];
 
-                    const { object: input } = await generateObject({
-                        model: 'openai/gpt-4.1',
-                        schema: tool.inputSchema,
-                        prompt: [
-                            `The model tried to call the tool "${toolCall.toolName}" with the following arguments:`,
-                            JSON.stringify(toolCall.input),
-                            `The tool accepts the following schema:`,
-                            JSON.stringify(inputSchema(toolCall)),
-                            'Please fix the arguments.',
-                            `Today's date is ${new Date().toLocaleDateString('en-US', {
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric',
-                            })}`,
-                        ].join('\n'),
-                    });
+                        const { object: input } = await generateObject({
+                            model: 'openai/gpt-4.1',
+                            schema: tool.inputSchema,
+                            prompt: [
+                                `The model tried to call the tool "${toolCall.toolName}" with the following arguments:`,
+                                JSON.stringify(toolCall.input),
+                                `The tool accepts the following schema:`,
+                                JSON.stringify(inputSchema(toolCall)),
+                                'Please fix the arguments.',
+                                `Today's date is ${new Date().toLocaleDateString('en-US', {
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric',
+                                })}`,
+                            ].join('\n'),
+                        });
 
-                    return {
-                        ...toolCall,
-                        input,
-                    };
-                },
-            });
+                        return {
+                            ...toolCall,
+                            input,
+                        };
+                    },
+                });
 
-            ctx.writer.write({
-                type: 'data-research-complete',
-                data: { toolCallId },
-            });
+                ctx.writer.write({
+                    type: 'data-research-complete',
+                    data: { toolCallId },
+                });
 
-            return {
-                summary,
-                actions,
-            };
+                return {
+                    summary,
+                    actions,
+                };
+            } catch (error) {
+                if (Error.isError(error) && error.message === 'LIMIT_REACHED') {
+                    throw error;
+                }
+                await decrementUsage(ctx.userId, 'research', 1);
+                throw error;
+            }
         },
     });
 }

@@ -75,6 +75,19 @@ function ToolSidebarHeader() {
 
 function ToolSidebarContent() {
     const tool = useThreadSelector(state => state.toolSidebar?.tool);
+    const messageId = useThreadSelector(state => state.toolSidebar?.messageId);
+    const setToolSidebar = useThreadSelector(state => state.setToolSidebar);
+    const messageExists = useThreadSelector(state => messageId && !!state.messageMap[messageId]);
+
+    useEffect(() => {
+        if (!messageExists) {
+            setToolSidebar(undefined);
+        }
+    }, [messageExists, setToolSidebar]);
+
+    if (!messageExists) {
+        return null;
+    }
 
     switch (tool) {
         case 'search':

@@ -1,6 +1,6 @@
 import { type db, schema } from '@/database';
 import { ThreadMessage } from '@/ai/types';
-import { and, eq, gt, not } from 'drizzle-orm';
+import { and, eq, gt, not, sql } from 'drizzle-orm';
 import { CustomerId, OrganizationId, SubscriptionData, UserId } from '@/database/types';
 
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
@@ -210,4 +210,30 @@ export async function getUserById(db: Database, userId: UserId) {
     return db.query.user.findFirst({
         where: (user, { eq }) => eq(user.id, userId),
     });
+}
+
+export async function incrementUsage(
+    db: Database,
+    args: { userId: UserId; type: 'search' | 'research' | 'credits' },
+    amount: number
+) {
+    return db
+        .update(schema.usage)
+        .set({
+            [args.type]: sql`${schema.usage[args.type]} + ${amount}`,
+        })
+        .where(eq(schema.usage.userId, args.userId));
+}
+
+export async function decrementUsage(
+    db: Database,
+    args: { userId: UserId; type: 'search' | 'research' | 'credits' },
+    amount: number
+) {
+    return db
+        .update(schema.usage)
+        .set({
+            [args.type]: sql`${schema.usage[args.type]} - ${amount}`,
+        })
+        .where(eq(schema.usage.userId, args.userId));
 }
