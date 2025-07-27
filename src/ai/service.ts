@@ -20,7 +20,6 @@ export async function prepareThread(args: {
     streamId: string;
     modelId: string;
     message: ThreadMessage;
-    tool?: string;
 }) {
     return db.transaction(async tx => {
         let [thread, message, model, settings, usage, customer] = await Promise.all([

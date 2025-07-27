@@ -26,7 +26,8 @@ export interface ThreadStoreImpl<UI_MESSAGE extends UIMessage> {
 
     toolSidebar: ToolSidebar | undefined;
     setToolSidebar: (toolSidebar: ToolSidebar | undefined) => void;
-
+    editingMessageId: string | undefined;
+    setEditingMessageId: (editingMessageId: string | undefined) => void;
     tool: ToolKeys | '';
     setTool: (tool: ToolKeys | '') => void;
     input: string;
@@ -36,7 +37,7 @@ export interface ThreadStoreImpl<UI_MESSAGE extends UIMessage> {
     attachments: FileAttachment[];
     setAttachments: (attachments: FileAttachment[]) => void;
 
-    setMessages: (messages: UI_MESSAGE[]) => void;
+    setMessages: (messages: UI_MESSAGE[] | ((prev: UI_MESSAGE[]) => UI_MESSAGE[])) => void;
     setStatus: (status: ChatStatus) => void;
     setError: (error: Error | undefined) => void;
     pushMessage: (message: UI_MESSAGE) => void;
@@ -62,6 +63,9 @@ export function createThreadStore<UI_MESSAGE extends UIMessage>(init: {
                     input: '',
                     tool: '',
                     pendingFileCount: 0,
+                    editingMessageId: undefined,
+                    setEditingMessageId: (editingMessageId: string | undefined) =>
+                        set({ editingMessageId }, false, 'thread/setEditingMessageId'),
                     setTool: (tool: ToolKeys | '') => set({ tool }, false, 'thread/setTool'),
                     setInput: (input: string) => set({ input }, false, 'thread/setInput'),
                     setPendingFileCount: (
@@ -100,8 +104,15 @@ export function createThreadStore<UI_MESSAGE extends UIMessage>(init: {
                             ...get().messages.slice(index + 1),
                         ]);
                     },
-                    setMessages: (messages: UI_MESSAGE[]) => {
+                    setMessages: (
+                        messagesOrUpdater: UI_MESSAGE[] | ((prev: UI_MESSAGE[]) => UI_MESSAGE[])
+                    ) => {
                         const { messageIds: oldMessageIds } = get();
+
+                        const messages =
+                            typeof messagesOrUpdater === 'function'
+                                ? messagesOrUpdater(get().messages)
+                                : messagesOrUpdater;
 
                         const lastMessageId = messages[messages.length - 1]?.id;
                         const lastOldMessageId = oldMessageIds[oldMessageIds.length - 1];

@@ -12,6 +12,8 @@ import {
     Paperclip,
     LoaderIcon,
     TelescopeIcon,
+    EditIcon,
+    XIcon,
 } from 'lucide-react';
 import { useNavigate } from '@tanstack/react-router';
 import { useParamsThreadId } from '@/hooks/use-params-thread-id';
@@ -36,6 +38,9 @@ export function MultiModalInput() {
     const setAttachments = useThreadSelector(state => state.setAttachments);
     const setInput = useThreadSelector(state => state.setInput);
     const setTool = useThreadSelector(state => state.setTool);
+    const setEditingMessageId = useThreadSelector(state => state.setEditingMessageId);
+    const editingMessageId = useThreadSelector(state => state.editingMessageId);
+    const setMessages = useThreadSelector(state => state.setMessages);
     const { sendMessage, stop } = useThreadContext();
 
     const { startUpload } = useUploadThing('fileUploader', {
@@ -82,8 +87,18 @@ export function MultiModalInput() {
             replace: Boolean(threadId),
         });
 
+        if (editingMessageId) {
+            setMessages(prev =>
+                prev.slice(
+                    0,
+                    prev.findIndex(message => message.id === editingMessageId)
+                )
+            );
+        }
+
         sendMessage(
             {
+                id: editingMessageId,
                 role: 'user',
                 parts: [
                     ...attachments,
@@ -104,6 +119,7 @@ export function MultiModalInput() {
         setInput('');
         setAttachments([]);
         setTool('');
+        setEditingMessageId(undefined);
     };
 
     const {
@@ -162,12 +178,35 @@ export function MultiModalInput() {
             }}
         >
             <PromptInput
-                className="max-w-3xl mx-auto p-3 bg-muted/50 backdrop-blur-md w-full border-foreground/10"
+                className="max-w-3xl mx-auto p-0 bg-muted/50 backdrop-blur-md w-full border-foreground/10 overflow-hidden"
                 value={input}
                 onValueChange={setInput}
                 onSubmit={handleSubmit}
             >
-                <div className="flex gap-2">
+                {match({ editingMessageId })
+                    .with({ editingMessageId: P.string }, () => (
+                        <div className="flex justify-between items-center px-3 py-3 bg-sidebar/30 backdrop-blur-md text-sm text-muted-foreground border-b border-foreground/10">
+                            <div className="flex items-center gap-2">
+                                <EditIcon className="size-4" />
+                                <p>Editing message</p>
+                            </div>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="size-6"
+                                onClick={() => {
+                                    setEditingMessageId(undefined);
+                                    setInput('');
+                                    setAttachments([]);
+                                    setTool('');
+                                }}
+                            >
+                                <XIcon className="size-4" />
+                            </Button>
+                        </div>
+                    ))
+                    .otherwise(() => null)}
+                <div className="flex gap-2 px-3 pt-3">
                     {attachments.map(attachment => (
                         <FileAttachment
                             key={attachment.url}
@@ -190,8 +229,8 @@ export function MultiModalInput() {
                         </div>
                     ))}
                 </div>
-                <PromptInputTextarea placeholder="Ask me anything..." />
-                <PromptInputActions className="flex items-center">
+                <PromptInputTextarea className="px-6" placeholder="Ask me anything..." />
+                <PromptInputActions className="flex items-center px-3 pb-3">
                     <PromptInputAction
                         tooltip={matcher
                             .with({ canSearch: true }, () => 'Search the web')
@@ -277,15 +316,10 @@ export function MultiModalInput() {
                     </PromptInputAction>
                     <PromptInputAction
                         tooltip={matcher
-                            .with(
-                                { input: P.when(input => input.trim().length === 0) },
-                                () => 'Message cannot be empty'
-                            )
+                            .with({ input: P.string.maxLength(0) }, () => 'Message cannot be empty')
                             .with(
                                 {
-                                    pendingFileCount: P.when(
-                                        pendingFileCount => pendingFileCount > 0
-                                    ),
+                                    pendingFileCount: P.number.gt(0),
                                 },
                                 () => 'Waiting for files to upload'
                             )
@@ -299,15 +333,10 @@ export function MultiModalInput() {
                             size="icon"
                             className="h-8 w-8 rounded-full"
                             disabled={matcher
-                                .with(
-                                    { input: P.when(input => input.trim().length === 0) },
-                                    () => true
-                                )
+                                .with({ input: P.string.maxLength(0) }, () => true)
                                 .with(
                                     {
-                                        pendingFileCount: P.when(
-                                            pendingFileCount => pendingFileCount > 0
-                                        ),
+                                        pendingFileCount: P.number.gt(0),
                                     },
                                     () => true
                                 )

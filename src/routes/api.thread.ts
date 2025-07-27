@@ -43,7 +43,6 @@ export const ServerRoute = createServerFileRoute('/api/thread').methods({
                     userId: session.user.id,
                     threadId: body.id,
                     message: body.message,
-                    tool: body.tool,
                 });
 
                 return {

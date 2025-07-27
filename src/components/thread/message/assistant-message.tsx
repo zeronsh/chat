@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Message, MessageActions, MessageAction } from '@/components/ui/message';
 import { useThreadContext, useThreadSelector } from '@/context/thread';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 import { CopyIcon, RefreshCcwIcon } from 'lucide-react';
 import { Fragment, memo } from 'react';
 
@@ -146,7 +147,21 @@ const Actions = memo(function PureActions({ id }: { id: string }) {
     return (
         <MessageActions className={cn('gap-1 transition-opacity duration-200 opacity-100')}>
             <MessageAction tooltip="Copy" side="bottom">
-                <Button variant="ghost" size="icon" className="size-8">
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="size-8"
+                    onClick={async () => {
+                        await navigator.clipboard.writeText(
+                            thread.store
+                                .getState()
+                                .messageMap[id].parts.filter(part => part.type === 'text')
+                                .map(part => part.text)
+                                .join('\n')
+                        );
+                        toast.success('Copied to clipboard');
+                    }}
+                >
                     <CopyIcon className="size-3" />
                 </Button>
             </MessageAction>

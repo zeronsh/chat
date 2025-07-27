@@ -7,6 +7,7 @@ import { Message, MessageActions, MessageAction } from '@/components/ui/message'
 import { useThreadSelector } from '@/context/thread';
 import { CopyIcon, EditIcon } from 'lucide-react';
 import { Fragment, memo, useMemo } from 'react';
+import { toast } from 'sonner';
 import { useCopyToClipboard } from 'usehooks-ts';
 
 export const UserMessage = memo(function PureUserMessage({
@@ -20,6 +21,9 @@ export const UserMessage = memo(function PureUserMessage({
 }) {
     const [_, copy] = useCopyToClipboard();
     const message = useThreadSelector(state => state.messageMap[id]);
+    const setEditingMessageId = useThreadSelector(state => state.setEditingMessageId);
+    const setInput = useThreadSelector(state => state.setInput);
+    const setAttachments = useThreadSelector(state => state.setAttachments);
 
     async function handleCopyClick() {
         const text = message.parts
@@ -33,11 +37,30 @@ export const UserMessage = memo(function PureUserMessage({
         }
 
         await copy(text);
+        toast.success('Copied to clipboard');
     }
 
     const fileParts = useMemo(() => {
         return message.parts.filter(part => part.type === 'file');
     }, [message.parts]);
+
+    function handleEditClick() {
+        setEditingMessageId(id);
+        setInput(
+            message.parts
+                .filter(part => part.type === 'text')
+                .map(part => part.text)
+                .join('\n')
+        );
+        setAttachments(
+            fileParts.map(part => ({
+                type: 'file',
+                url: part.url,
+                filename: part.filename || 'untitled',
+                mediaType: part.mediaType,
+            }))
+        );
+    }
 
     return (
         <Fragment>
@@ -70,7 +93,12 @@ export const UserMessage = memo(function PureUserMessage({
                             </Button>
                         </MessageAction>
                         <MessageAction tooltip="Edit" side="bottom">
-                            <Button variant="ghost" size="icon" className="size-8">
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="size-8"
+                                onClick={handleEditClick}
+                            >
                                 <EditIcon className="size-3" />
                             </Button>
                         </MessageAction>
