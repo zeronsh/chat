@@ -17,11 +17,13 @@ import { useNavigate } from '@tanstack/react-router';
 import { useParamsThreadId } from '@/hooks/use-params-thread-id';
 import { cn } from '@/lib/utils';
 import { useUploadThing } from '@/lib/uploadthing';
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { FileAttachment } from './file-attachment';
 import { toast } from 'sonner';
 import { useThreadContext, useThreadSelector } from '@/context/thread';
 import type { FileAttachment as FileAttachmentType } from '@/thread/store';
+import { useAccess } from '@/hooks/use-access';
+import { match, P } from 'ts-pattern';
 
 export function MultiModalInput() {
     const id = useThreadSelector(state => state.id!);
@@ -34,10 +36,9 @@ export function MultiModalInput() {
     const setAttachments = useThreadSelector(state => state.setAttachments);
     const setInput = useThreadSelector(state => state.setInput);
     const setTool = useThreadSelector(state => state.setTool);
-
     const { sendMessage, stop } = useThreadContext();
 
-    const { startUpload, isUploading } = useUploadThing('fileUploader', {
+    const { startUpload } = useUploadThing('fileUploader', {
         onUploadBegin: () => {
             setPendingFileCount(prev => prev + 1);
         },
@@ -105,7 +106,45 @@ export function MultiModalInput() {
         setTool('');
     };
 
-    const canSubmit = input.trim().length > 0;
+    const {
+        isPro,
+        isExpiring,
+        remainingCredits,
+        remainingSearches,
+        remainingResearches,
+        canSearch,
+        canResearch,
+    } = useAccess();
+
+    const matcher = useMemo(() => {
+        return match({
+            isPro,
+            isExpiring,
+            remainingCredits,
+            remainingSearches,
+            remainingResearches,
+            canSearch,
+            canResearch,
+            status,
+            attachments,
+            tool,
+            input,
+            pendingFileCount,
+        });
+    }, [
+        isPro,
+        isExpiring,
+        remainingCredits,
+        remainingSearches,
+        remainingResearches,
+        canSearch,
+        canResearch,
+        status,
+        attachments,
+        tool,
+        input,
+        pendingFileCount,
+    ]);
 
     return (
         <form
@@ -153,7 +192,17 @@ export function MultiModalInput() {
                 </div>
                 <PromptInputTextarea placeholder="Ask me anything..." />
                 <PromptInputActions className="flex items-center">
-                    <PromptInputAction tooltip={'Search the web'}>
+                    <PromptInputAction
+                        tooltip={matcher
+                            .with({ canSearch: true }, () => 'Search the web')
+                            .with(
+                                {
+                                    remainingSearches: 0,
+                                },
+                                () => 'You have reached your search limit.'
+                            )
+                            .otherwise(() => 'Search is not available')}
+                    >
                         <Button
                             variant="outline"
                             size="sm"
@@ -169,7 +218,22 @@ export function MultiModalInput() {
                             <span className="text-sm">Search</span>
                         </Button>
                     </PromptInputAction>
-                    <PromptInputAction tooltip={'Deep research'}>
+                    <PromptInputAction
+                        tooltip={matcher
+                            .with({ canResearch: true }, () => 'Deep research')
+                            .with(
+                                {
+                                    isPro: true,
+                                    remainingResearches: 0,
+                                },
+                                () => 'You have reached your research limit.'
+                            )
+                            .with(
+                                { isPro: false },
+                                () => 'Research is only available for Pro users'
+                            )
+                            .otherwise(() => 'Deep research is not available')}
+                    >
                         <Button
                             variant="outline"
                             size="sm"
@@ -180,6 +244,9 @@ export function MultiModalInput() {
                                     'text-primary hover:text-primary border-primary!'
                             )}
                             onClick={() => setTool(tool === 'research' ? '' : 'research')}
+                            disabled={matcher
+                                .with({ canResearch: false }, () => true)
+                                .otherwise(() => false)}
                         >
                             <TelescopeIcon className="size-5" />
                             <span className="text-sm">Research</span>
@@ -209,18 +276,44 @@ export function MultiModalInput() {
                         </Button>
                     </PromptInputAction>
                     <PromptInputAction
-                        tooltip={
-                            status === 'streaming' || status === 'submitted'
-                                ? 'Stop generation'
-                                : 'Send message'
-                        }
+                        tooltip={matcher
+                            .with(
+                                { input: P.when(input => input.trim().length === 0) },
+                                () => 'Message cannot be empty'
+                            )
+                            .with(
+                                {
+                                    pendingFileCount: P.when(
+                                        pendingFileCount => pendingFileCount > 0
+                                    ),
+                                },
+                                () => 'Waiting for files to upload'
+                            )
+                            .with({ status: 'streaming' }, () => 'Stop generation')
+                            .with({ status: 'submitted' }, () => 'Sending message')
+                            .otherwise(() => 'Send message')}
                     >
                         <Button
                             type="submit"
                             variant="default"
                             size="icon"
                             className="h-8 w-8 rounded-full"
-                            disabled={!canSubmit || isUploading}
+                            disabled={matcher
+                                .with(
+                                    { input: P.when(input => input.trim().length === 0) },
+                                    () => true
+                                )
+                                .with(
+                                    {
+                                        pendingFileCount: P.when(
+                                            pendingFileCount => pendingFileCount > 0
+                                        ),
+                                    },
+                                    () => true
+                                )
+                                .with({ status: 'streaming' }, () => false)
+                                .with({ status: 'submitted' }, () => true)
+                                .otherwise(() => false)}
                         >
                             {status === 'streaming' || status === 'submitted' ? (
                                 <SquareIcon className="size-5 fill-current" />

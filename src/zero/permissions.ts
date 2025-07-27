@@ -13,6 +13,12 @@ export const permissions = definePermissions<AuthData, Schema>(schema, () => {
     const allowIfOwnSetting = (authData: AuthData, builder: ExpressionBuilder<Schema, 'setting'>) =>
         builder.and(allowIfSignedIn(authData, builder), builder.cmp('userId', '=', authData.sub));
 
+    const allowIfOwnUsage = (authData: AuthData, builder: ExpressionBuilder<Schema, 'usage'>) =>
+        builder.and(
+            allowIfSignedIn(authData, builder),
+            builder.cmp('userId', '=', authData.sub as UserId)
+        );
+
     const allowIfSignedIn = (authData: AuthData, builder: ExpressionBuilder<Schema, TableName>) =>
         builder.cmpLit(authData.sub, 'IS NOT', null);
 
@@ -101,7 +107,11 @@ export const permissions = definePermissions<AuthData, Schema>(schema, () => {
                 select: [allowSelectMembersIfInOrganization],
             },
         },
-
+        usage: {
+            row: {
+                select: [allowIfOwnUsage],
+            },
+        },
         setting: {
             row: {
                 select: [allowIfOwnSetting],

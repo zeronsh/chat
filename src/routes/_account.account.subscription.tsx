@@ -1,6 +1,6 @@
 import { Section } from '@/components/ui/section';
 import { Button } from '@/components/ui/button';
-import { useSubscription } from '@/hooks/use-subscription';
+import { useAccess } from '@/hooks/use-access';
 import { createFileRoute } from '@tanstack/react-router';
 import { Badge } from '@/components/ui/badge';
 import { authClient } from '@/lib/auth-client';
@@ -11,9 +11,9 @@ export const Route = createFileRoute('/_account/account/subscription')({
 
 function RouteComponent() {
     const { data: session } = authClient.useSession();
-    const { isActive, isExpiring } = useSubscription();
+    const { isPro, isExpiring } = useAccess();
 
-    console.log(isActive, isExpiring);
+    console.log(isPro, isExpiring);
 
     return (
         <div className="flex flex-col gap-8 w-full">
@@ -46,7 +46,7 @@ function RouteComponent() {
                             <p className="text-sm text-muted-foreground">/month</p>
                         </div>
 
-                        {!isActive && (
+                        {!isPro && (
                             <div>
                                 <Button
                                     variant="outline"
@@ -68,7 +68,7 @@ function RouteComponent() {
                             </div>
                         )}
 
-                        {isActive && (
+                        {isPro && (
                             <div>
                                 <Button
                                     variant="outline"
@@ -90,7 +90,7 @@ function RouteComponent() {
                         )}
                     </div>
                 </div>
-                {isActive && isExpiring && (
+                {isPro && isExpiring && (
                     <div className="border rounded-lg p-4 bg-card">
                         <div className="flex">
                             <div className="flex-shrink-0">
