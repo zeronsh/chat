@@ -38,8 +38,8 @@ export function ThreadProvider({
     });
 
     useEffect(() => {
-        if (init.messages && init.messages.length > 0 && thread.messages.length === 0) {
-            thread.messages = init.messages;
+        if (init.messages && init.messages.length > 0) {
+            thread.store.getState().setMessages(init.messages);
         }
     }, [init.messages]);
 

@@ -4,7 +4,7 @@ import { useQuery } from '@rocicorp/zero/react';
 import { useEffect } from 'react';
 
 export function useAutoResume() {
-    const { resumeStream } = useThreadContext();
+    const { resumeStream, store } = useThreadContext();
     const id = useThreadSelector(state => state.id);
     const status = useThreadSelector(state => state.status);
     const db = useDatabase();
@@ -23,6 +23,7 @@ export function useAutoResume() {
             // Local status is ready
             status === 'ready'
         ) {
+            store.getState().setMessages(thread.messages.map(m => m.message) ?? []);
             resumeStream();
         }
     }, [thread?.streamId, thread?.status]);

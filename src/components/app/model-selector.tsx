@@ -130,18 +130,18 @@ export function ModelSelector() {
                     </Command>
                     <div className="absolute top-0 right-0 translate-x-full pl-2 hidden md:block">
                         {hoveredModel && (
-                            <div className="rounded-md p-2 bg-sidebar/50 backdrop-blur-md flex flex-col gap-4 w-64 border border-foreground/10">
-                                <div className="flex items-center gap-2">
+                            <div className="rounded-md bg-sidebar/50 backdrop-blur-md flex flex-col gap-4 w-64 border border-foreground/10 overflow-hidden">
+                                <div className="flex items-center gap-2 px-2 pt-2">
                                     <ModelIcon
                                         className="size-4 fill-primary"
                                         model={hoveredModel.icon as ModelType}
                                     />
                                     <span className="text-sm">{hoveredModel.name}</span>
                                 </div>
-                                <div className="text-sm text-muted-foreground">
+                                <div className="text-sm text-muted-foreground px-2">
                                     {hoveredModel.description}
                                 </div>
-                                <div className="flex items-center gap-2 text-sm text-muted-foreground justify-between">
+                                <div className="flex items-center gap-2 text-sm text-muted-foreground justify-between px-2 border-t border-foreground/10 pt-4">
                                     <div>Cost</div>
                                     <div>
                                         <span className="font-semibold">
@@ -151,7 +151,7 @@ export function ModelSelector() {
                                         /message
                                     </div>
                                 </div>
-                                <div className="text-sm flex gap-2 flex-wrap">
+                                <div className="text-sm flex gap-2 flex-wrap p-2 border-t border-foreground/10">
                                     {hoveredModel.capabilities
                                         ?.sort((a, b) => a.localeCompare(b))
                                         .map(c => (

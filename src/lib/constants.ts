@@ -19,5 +19,5 @@ export const FreeLimits: Limits = {
 export const ProLimits: Limits = {
     SEARCH: 50,
     RESEARCH: 5,
-    CREDITS: 100,
+    CREDITS: 200,
 };
