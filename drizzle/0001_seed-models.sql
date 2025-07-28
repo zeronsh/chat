@@ -53,7 +53,7 @@ VALUES
     'Gemini 2.5 Flash', -- name
     'google/gemini-2.5-flash', -- model
     'Gemini 2.5 Flash is a thinking model that offers great, well-rounded capabilities. It is designed to offer a balance between price and performance with multimodal support and a 1M token context window.', -- description
-    '["vision", "tools", "reasoning"]', -- capabilities
+    '["vision", "tools", "reasoning", "documents"]', -- capabilities
     'gemini', -- icon
     'public', -- access
     1, -- credits

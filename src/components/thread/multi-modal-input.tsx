@@ -203,7 +203,7 @@ export function MultiModalInput() {
                                 </div>
                                 <Button
                                     variant="link"
-                                    className="h-6 underline font-normal cursor-pointer px-0"
+                                    className="h-6 underline font-normal cursor-pointer px-0 text-xs"
                                     asChild
                                 >
                                     <Link to="/account/subscription">
@@ -230,7 +230,7 @@ export function MultiModalInput() {
                                 </div>
                                 <Button
                                     variant="link"
-                                    className="h-6 underline font-normal cursor-pointer px-0"
+                                    className="h-6 underline font-normal cursor-pointer px-0 text-xs"
                                     asChild
                                 >
                                     <Link to="/account/subscription">

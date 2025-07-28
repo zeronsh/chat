@@ -9,18 +9,28 @@ import {
 } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useSettings } from '@/hooks/use-settings';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import ModelIcon, { type ModelType } from '@/components/thread/model-icon';
-import { ChevronsUpDown } from 'lucide-react';
+import { BrainIcon, ChevronsUpDown, EyeIcon, FileIcon, WrenchIcon } from 'lucide-react';
 import { useDatabase } from '@/context/database';
 import { useQuery } from '@rocicorp/zero/react';
+import { Model } from '@/zero/types';
+import { Badge } from '@/components/ui/badge';
+import { match } from 'ts-pattern';
 
 export function ModelSelector() {
     const [open, setOpen] = useState(false);
+    const [hoveredModel, setHoveredModel] = useState<Model | null>(null);
     const db = useDatabase();
     const [models] = useQuery(db.query.model);
     const settings = useSettings();
+
+    useEffect(() => {
+        if (!open) {
+            setHoveredModel(null);
+        }
+    }, [open]);
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
@@ -38,7 +48,7 @@ export function ModelSelector() {
                     <ChevronsUpDown className="opacity-50" />
                 </Button>
             </PopoverTrigger>
-            <PopoverContent className="p-0 overflow-hidden" align="start">
+            <PopoverContent className="p-0 relative" align="start">
                 <Command>
                     <CommandInput placeholder="Find Model..." className="h-9" />
                     <CommandList>
@@ -48,6 +58,7 @@ export function ModelSelector() {
                                 <CommandItem
                                     key={model.id}
                                     value={model.name}
+                                    onMouseEnter={() => setHoveredModel(model)}
                                     onSelect={() => {
                                         setOpen(false);
                                         if (settings) {
@@ -73,6 +84,61 @@ export function ModelSelector() {
                         </CommandGroup>
                     </CommandList>
                 </Command>
+                <div className="absolute top-0 right-0 translate-x-full pl-2 hidden md:block">
+                    {hoveredModel && (
+                        <div className="rounded-md p-2 bg-sidebar/50 backdrop-blur-md flex flex-col gap-4 w-64 border border-foreground/10">
+                            <div className="flex items-center gap-2">
+                                <ModelIcon
+                                    className="size-4 fill-primary"
+                                    model={hoveredModel.icon as ModelType}
+                                />
+                                <span className="text-sm">{hoveredModel.name}</span>
+                            </div>
+                            <div className="text-sm text-muted-foreground">
+                                {hoveredModel.description}
+                            </div>
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground justify-between">
+                                <div>Cost</div>
+                                <div>
+                                    <span className="font-semibold">
+                                        {hoveredModel.credits} credit
+                                        {Number(hoveredModel.credits ?? 0) > 1 ? 's' : ''}
+                                    </span>
+                                    /message
+                                </div>
+                            </div>
+                            <div className="text-sm flex gap-2 flex-wrap">
+                                {hoveredModel.capabilities
+                                    ?.sort((a, b) => a.localeCompare(b))
+                                    .map(c => (
+                                        <Badge
+                                            key={c}
+                                            variant="outline"
+                                            className="text-xs flex items-center gap-1"
+                                        >
+                                            {match(c)
+                                                .with('reasoning', () => (
+                                                    <BrainIcon className="size-4 text-pink-400" />
+                                                ))
+                                                .with('vision', () => (
+                                                    <EyeIcon className="size-4 text-blue-400" />
+                                                ))
+                                                .with('documents', () => (
+                                                    <FileIcon className="size-4 text-yellow-400" />
+                                                ))
+                                                .with('tools', () => (
+                                                    <WrenchIcon className="size-4 text-green-400" />
+                                                ))
+                                                .exhaustive()}
+                                            <span className="text-xs">
+                                                {c.charAt(0).toUpperCase() + c.slice(1)}
+                                            </span>
+                                        </Badge>
+                                    ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
             </PopoverContent>
         </Popover>
     );

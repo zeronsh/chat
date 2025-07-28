@@ -2,7 +2,7 @@ import { db, schema } from '@/database';
 import { UserId } from '@/database/types';
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
-import { anonymous, jwt, magicLink, organization } from 'better-auth/plugins';
+import { anonymous, emailOTP, jwt, magicLink, organization } from 'better-auth/plugins';
 import { eq } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 
@@ -45,6 +45,15 @@ export const auth = betterAuth({
                     email,
                     token,
                     url,
+                });
+            },
+        }),
+        emailOTP({
+            sendVerificationOTP: async ({ email, otp, type }) => {
+                console.log({
+                    email,
+                    otp,
+                    type,
                 });
             },
         }),

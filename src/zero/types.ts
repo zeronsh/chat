@@ -7,9 +7,9 @@ export type Message = Row<Schema['tables']['message']>;
 export type Session = Row<Schema['tables']['session']>;
 export type Organization = Row<Schema['tables']['organization']>;
 export type Member = Row<Schema['tables']['member']>;
-export type Subscription = Row<Schema['tables']['subscription']>;
 export type OrganizationCustomer = Row<Schema['tables']['organizationCustomer']>;
 export type UserCustomer = Row<Schema['tables']['userCustomer']>;
+export type Model = Row<Schema['tables']['model']>;
 
 export type TableName = keyof Schema['tables'];
 
