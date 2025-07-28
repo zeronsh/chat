@@ -131,6 +131,8 @@ export function MultiModalInput() {
         remainingResearches,
         canSearch,
         canResearch,
+        canUseModel,
+        cannotUseModelReason,
     } = useAccess();
 
     const matcher = useMemo(() => {
@@ -147,6 +149,7 @@ export function MultiModalInput() {
             tool,
             input,
             pendingFileCount,
+            canUseModel,
         });
     }, [
         isPro,
@@ -161,6 +164,7 @@ export function MultiModalInput() {
         tool,
         input,
         pendingFileCount,
+        canUseModel,
     ]);
 
     return (
@@ -185,25 +189,94 @@ export function MultiModalInput() {
                 onSubmit={handleSubmit}
             >
                 {match({ editingMessageId, remainingCredits, isPro })
-                    .with({ remainingCredits: P.number.lt(10), isPro: false }, () => (
-                        <div className="flex justify-between items-center px-3 py-3 bg-sidebar/30 backdrop-blur-md text-sm text-muted-foreground border-b border-foreground/10">
-                            <div className="flex items-center gap-2">
-                                <AlertTriangleIcon className="size-4 " />
-                                <p>You only have {remainingCredits} credits remaining</p>
+                    .with(
+                        {
+                            remainingCredits: P.number.lte(0),
+                            isPro: false,
+                            editingMessageId: P.nullish,
+                        },
+                        () => (
+                            <div className="flex justify-between items-center px-3 py-3 bg-sidebar/30 backdrop-blur-md text-xs text-muted-foreground border-b border-foreground/10">
+                                <div className="flex items-center gap-2">
+                                    <AlertTriangleIcon className="size-4 " />
+                                    <p>You have no credits remaining.</p>
+                                </div>
+                                <Button
+                                    variant="link"
+                                    className="h-6 underline font-normal cursor-pointer px-0"
+                                    asChild
+                                >
+                                    <Link to="/account/subscription">
+                                        Subscribe now to increase your limits
+                                    </Link>
+                                </Button>
                             </div>
-                            <Button
-                                variant="link"
-                                className="h-6 underline font-normal cursor-pointer px-0"
-                                asChild
-                            >
-                                <Link to="/account/subscription">
-                                    Subscribe now to increase your limit
-                                </Link>
-                            </Button>
-                        </div>
-                    ))
+                        )
+                    )
+                    .with(
+                        {
+                            remainingCredits: P.number.lt(10),
+                            isPro: false,
+                            editingMessageId: P.nullish,
+                        },
+                        () => (
+                            <div className="flex justify-between items-center px-3 py-3 bg-sidebar/30 backdrop-blur-md text-xs text-muted-foreground border-b border-foreground/10">
+                                <div className="flex items-center gap-2">
+                                    <AlertTriangleIcon className="size-4 " />
+                                    <p>
+                                        You only have {remainingCredits} credit
+                                        {remainingCredits === 1 ? '' : 's'} remaining.
+                                    </p>
+                                </div>
+                                <Button
+                                    variant="link"
+                                    className="h-6 underline font-normal cursor-pointer px-0"
+                                    asChild
+                                >
+                                    <Link to="/account/subscription">
+                                        Subscribe now to increase your limits
+                                    </Link>
+                                </Button>
+                            </div>
+                        )
+                    )
+                    .with(
+                        {
+                            remainingCredits: P.number.lte(0),
+                            isPro: true,
+                            editingMessageId: P.nullish,
+                        },
+                        () => (
+                            <div className="flex justify-between items-center px-3 py-3 bg-sidebar/30 backdrop-blur-md text-xs text-muted-foreground border-b border-foreground/10">
+                                <div className="flex items-center gap-2">
+                                    <AlertTriangleIcon className="size-4 " />
+                                    <p>You have no credits remaining.</p>
+                                </div>
+                                <p className="text-xs text-primary">Resets daily</p>
+                            </div>
+                        )
+                    )
+                    .with(
+                        {
+                            remainingCredits: P.number.lt(10),
+                            isPro: true,
+                            editingMessageId: P.nullish,
+                        },
+                        () => (
+                            <div className="flex justify-between items-center px-3 py-3 bg-sidebar/30 backdrop-blur-md text-xs text-muted-foreground border-b border-foreground/10">
+                                <div className="flex items-center gap-2">
+                                    <AlertTriangleIcon className="size-4 " />
+                                    <p>
+                                        You only have {remainingCredits} credit
+                                        {remainingCredits === 1 ? '' : 's'} remaining.
+                                    </p>
+                                </div>
+                                <p className="text-xs text-primary">Resets daily</p>
+                            </div>
+                        )
+                    )
                     .with({ editingMessageId: P.string }, () => (
-                        <div className="flex justify-between items-center px-3 py-3 bg-sidebar/30 backdrop-blur-md text-sm text-muted-foreground border-b border-foreground/10">
+                        <div className="flex justify-between items-center px-3 py-3 bg-sidebar/30 backdrop-blur-md text-xs text-muted-foreground border-b border-foreground/10">
                             <div className="flex items-center gap-2">
                                 <EditIcon className="size-4" />
                                 <p>Editing message</p>
@@ -359,6 +432,10 @@ export function MultiModalInput() {
                                 },
                                 () => 'Waiting for files to upload'
                             )
+                            .with(
+                                { canUseModel: false, status: 'ready' },
+                                () => cannotUseModelReason
+                            )
                             .with({ status: 'streaming' }, () => 'Stop generation')
                             .with({ status: 'submitted' }, () => 'Sending message')
                             .otherwise(() => 'Send message')}
@@ -389,6 +466,7 @@ export function MultiModalInput() {
                                     },
                                     () => true
                                 )
+                                .with({ canUseModel: false, status: 'ready' }, () => true)
                                 .with({ status: 'streaming' }, () => false)
                                 .with({ status: 'submitted' }, () => true)
                                 .otherwise(() => false)}
