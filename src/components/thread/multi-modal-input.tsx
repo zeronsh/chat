@@ -14,8 +14,9 @@ import {
     TelescopeIcon,
     EditIcon,
     XIcon,
+    AlertTriangleIcon,
 } from 'lucide-react';
-import { useNavigate } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
 import { useParamsThreadId } from '@/hooks/use-params-thread-id';
 import { cn } from '@/lib/utils';
 import { useUploadThing } from '@/lib/uploadthing';
@@ -183,7 +184,24 @@ export function MultiModalInput() {
                 onValueChange={setInput}
                 onSubmit={handleSubmit}
             >
-                {match({ editingMessageId })
+                {match({ editingMessageId, remainingCredits, isPro })
+                    .with({ remainingCredits: P.number.lt(10), isPro: false }, () => (
+                        <div className="flex justify-between items-center px-3 py-3 bg-sidebar/30 backdrop-blur-md text-sm text-muted-foreground border-b border-foreground/10">
+                            <div className="flex items-center gap-2">
+                                <AlertTriangleIcon className="size-4 " />
+                                <p>You only have {remainingCredits} credits remaining</p>
+                            </div>
+                            <Button
+                                variant="link"
+                                className="h-6 underline font-normal cursor-pointer px-0"
+                                asChild
+                            >
+                                <Link to="/account/subscription">
+                                    Subscribe now to increase your limit
+                                </Link>
+                            </Button>
+                        </div>
+                    ))
                     .with({ editingMessageId: P.string }, () => (
                         <div className="flex justify-between items-center px-3 py-3 bg-sidebar/30 backdrop-blur-md text-sm text-muted-foreground border-b border-foreground/10">
                             <div className="flex items-center gap-2">
