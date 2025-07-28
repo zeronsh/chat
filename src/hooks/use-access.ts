@@ -3,8 +3,10 @@ import { UserId } from '@/database/types';
 import { useUser } from '@/hooks/use-user';
 import { AnonymousLimits, FreeLimits, ProLimits } from '@/lib/constants';
 import { useQuery } from '@rocicorp/zero/react';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useSettings } from './use-settings';
+import { Model } from '@/zero/types';
+import { match, P } from 'ts-pattern';
 
 export function useAccess() {
     const db = useDatabase();
@@ -77,6 +79,80 @@ export function useAccess() {
         if (cost > remainingCredits) return 'Insufficient credits';
     }, [settings?.model, remainingCredits, user?.isAnonymous, isPro]);
 
+    const checkCanUseModel = useCallback(
+        (model: Model) => {
+            if (model.access === 'premium_required' && !isPro) return false;
+            if (model.access === 'account_required' && user?.isAnonymous) return false;
+            const cost = Number(model.credits ?? 0);
+            if (cost > remainingCredits) return false;
+            return true;
+        },
+        [remainingCredits, user?.isAnonymous, isPro]
+    );
+
+    const getCannotUseModelMatcher = useCallback(
+        <T>(
+            model: Model,
+            callbacks: {
+                onPremiumRequired?: () => T;
+                onAccountRequired?: () => T;
+                onInsufficientCreditsAnonymous?: () => T;
+                onInsufficientCreditsPro?: () => T;
+                onInsufficientCreditsNotPro?: () => T;
+            }
+        ) => {
+            return match({
+                remainingCredits,
+                canAffordModel: Number(model.credits ?? 0) <= remainingCredits,
+                isAnonymous: user?.isAnonymous,
+                isPro,
+                modelAccess: model.access,
+            })
+                .with(
+                    {
+                        remainingCredits: P.number.gt(0),
+                        modelAccess: 'premium_required',
+                        isPro: false,
+                    },
+                    () => callbacks.onPremiumRequired?.()
+                )
+                .with(
+                    {
+                        remainingCredits: P.number.gt(0),
+                        modelAccess: 'account_required',
+                        isAnonymous: true,
+                    },
+                    () => callbacks.onAccountRequired?.()
+                )
+                .with(
+                    {
+                        canAffordModel: false,
+                        isAnonymous: false,
+                        isPro: false,
+                    },
+                    () => callbacks.onInsufficientCreditsNotPro?.()
+                )
+                .with(
+                    {
+                        canAffordModel: false,
+                        isAnonymous: false,
+                        isPro: true,
+                    },
+                    () => callbacks.onInsufficientCreditsPro?.()
+                )
+                .with(
+                    {
+                        canAffordModel: false,
+                        isAnonymous: true,
+                        isPro: false,
+                    },
+                    () => callbacks.onInsufficientCreditsAnonymous?.()
+                )
+                .otherwise(() => null);
+        },
+        [remainingCredits, user?.isAnonymous, isPro]
+    );
+
     return {
         isPro,
         limits,
@@ -88,5 +164,7 @@ export function useAccess() {
         canResearch,
         canUseModel,
         cannotUseModelReason,
+        checkCanUseModel,
+        getCannotUseModelMatcher,
     };
 }

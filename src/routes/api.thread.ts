@@ -97,12 +97,16 @@ export const ServerRoute = createServerFileRoute('/api/thread').methods({
                     };
                 }
             },
-            onAfterStream: async ({ context: { threadId, message, streamId, thread }, stream }) => {
+            onAfterStream: async ({
+                context: { threadId, message, streamId, thread, userId, model },
+                stream,
+            }) => {
                 const promises: Promise<any>[] = [];
 
                 if (!thread.title) {
                     promises.push(generateThreadTitle(threadId, message.message));
                 }
+                promises.push(incrementUsage(UserId(userId), 'credits', model.credits));
 
                 promises.push(streamContext.createNewResumableStream(streamId, () => stream));
 
@@ -115,14 +119,12 @@ export const ServerRoute = createServerFileRoute('/api/thread').methods({
                     data: 'Error generating response.',
                 });
             },
-            onFinish: async ({ responseMessage, context: { threadId, userId, model } }) => {
+            onFinish: async ({ responseMessage, context: { threadId, userId } }) => {
                 await saveMessageAndResetThreadStatus({
                     threadId,
                     userId,
                     message: responseMessage,
                 });
-
-                await incrementUsage(UserId(userId), 'credits', model.credits);
             },
         });
     },
