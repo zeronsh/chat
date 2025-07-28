@@ -27,6 +27,7 @@ import { useThreadContext, useThreadSelector } from '@/context/thread';
 import type { FileAttachment as FileAttachmentType } from '@/thread/store';
 import { useAccess } from '@/hooks/use-access';
 import { match, P } from 'ts-pattern';
+import { ScrollToBottomButton } from '@/components/thread/scroll-to-bottom-button';
 
 export function MultiModalInput() {
     const id = useThreadSelector(state => state.id!);
@@ -182,6 +183,7 @@ export function MultiModalInput() {
                 }
             }}
         >
+            <ScrollToBottomButton variant="default" />
             <PromptInput
                 className="max-w-3xl mx-auto p-0 bg-muted/50 backdrop-blur-md w-full border-foreground/10 overflow-hidden"
                 value={input}

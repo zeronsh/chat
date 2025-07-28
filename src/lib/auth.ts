@@ -59,34 +59,6 @@ export const auth = betterAuth({
         }),
         anonymous({
             onLinkAccount: async ({ anonymousUser, newUser }) => {
-                const existingSettings = await db
-                    .select()
-                    .from(schema.setting)
-                    .where(eq(schema.setting.userId, UserId(newUser.user.id)))
-                    .limit(1);
-
-                if (existingSettings.length === 0) {
-                    await db
-                        .update(schema.setting)
-                        .set({ userId: UserId(newUser.user.id) })
-                        .where(eq(schema.setting.userId, UserId(anonymousUser.user.id)));
-                }
-
-                const existingUsage = await db
-                    .select()
-                    .from(schema.usage)
-                    .where(eq(schema.usage.userId, UserId(anonymousUser.user.id)))
-                    .limit(1);
-
-                if (existingUsage.length === 0) {
-                    await db
-                        .update(schema.usage)
-                        .set({
-                            userId: UserId(newUser.user.id),
-                        })
-                        .where(eq(schema.usage.userId, UserId(anonymousUser.user.id)));
-                }
-
                 await db
                     .update(schema.thread)
                     .set({ userId: UserId(newUser.user.id) })
