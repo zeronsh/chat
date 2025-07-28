@@ -26,6 +26,7 @@ import { Route as AccountAccountPreferencesRouteImport } from './routes/_account
 import { Route as AccountAccountAppearanceRouteImport } from './routes/_account.account.appearance'
 import { ServerRoute as ApiUploadthingServerRouteImport } from './routes/api.uploadthing'
 import { ServerRoute as ApiThreadServerRouteImport } from './routes/api.thread'
+import { ServerRoute as ApiResetServerRouteImport } from './routes/api.reset'
 import { ServerRoute as ApiCustomerPortalServerRouteImport } from './routes/api.customer-portal'
 import { ServerRoute as ApiCheckoutServerRouteImport } from './routes/api.checkout'
 import { ServerRoute as ApiWebhookStripeServerRouteImport } from './routes/api.webhook.stripe'
@@ -108,6 +109,11 @@ const ApiUploadthingServerRoute = ApiUploadthingServerRouteImport.update({
 const ApiThreadServerRoute = ApiThreadServerRouteImport.update({
   id: '/api/thread',
   path: '/api/thread',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
+const ApiResetServerRoute = ApiResetServerRouteImport.update({
+  id: '/api/reset',
+  path: '/api/reset',
   getParentRoute: () => rootServerRouteImport,
 } as any)
 const ApiCustomerPortalServerRoute = ApiCustomerPortalServerRouteImport.update({
@@ -231,6 +237,7 @@ export interface RootRouteChildren {
 export interface FileServerRoutesByFullPath {
   '/api/checkout': typeof ApiCheckoutServerRouteWithChildren
   '/api/customer-portal': typeof ApiCustomerPortalServerRoute
+  '/api/reset': typeof ApiResetServerRoute
   '/api/thread': typeof ApiThreadServerRouteWithChildren
   '/api/uploadthing': typeof ApiUploadthingServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
@@ -241,6 +248,7 @@ export interface FileServerRoutesByFullPath {
 export interface FileServerRoutesByTo {
   '/api/checkout': typeof ApiCheckoutServerRouteWithChildren
   '/api/customer-portal': typeof ApiCustomerPortalServerRoute
+  '/api/reset': typeof ApiResetServerRoute
   '/api/thread': typeof ApiThreadServerRouteWithChildren
   '/api/uploadthing': typeof ApiUploadthingServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
@@ -252,6 +260,7 @@ export interface FileServerRoutesById {
   __root__: typeof rootServerRouteImport
   '/api/checkout': typeof ApiCheckoutServerRouteWithChildren
   '/api/customer-portal': typeof ApiCustomerPortalServerRoute
+  '/api/reset': typeof ApiResetServerRoute
   '/api/thread': typeof ApiThreadServerRouteWithChildren
   '/api/uploadthing': typeof ApiUploadthingServerRoute
   '/api/auth/$': typeof ApiAuthSplatServerRoute
@@ -264,6 +273,7 @@ export interface FileServerRouteTypes {
   fullPaths:
     | '/api/checkout'
     | '/api/customer-portal'
+    | '/api/reset'
     | '/api/thread'
     | '/api/uploadthing'
     | '/api/auth/$'
@@ -274,6 +284,7 @@ export interface FileServerRouteTypes {
   to:
     | '/api/checkout'
     | '/api/customer-portal'
+    | '/api/reset'
     | '/api/thread'
     | '/api/uploadthing'
     | '/api/auth/$'
@@ -284,6 +295,7 @@ export interface FileServerRouteTypes {
     | '__root__'
     | '/api/checkout'
     | '/api/customer-portal'
+    | '/api/reset'
     | '/api/thread'
     | '/api/uploadthing'
     | '/api/auth/$'
@@ -295,6 +307,7 @@ export interface FileServerRouteTypes {
 export interface RootServerRouteChildren {
   ApiCheckoutServerRoute: typeof ApiCheckoutServerRouteWithChildren
   ApiCustomerPortalServerRoute: typeof ApiCustomerPortalServerRoute
+  ApiResetServerRoute: typeof ApiResetServerRoute
   ApiThreadServerRoute: typeof ApiThreadServerRouteWithChildren
   ApiUploadthingServerRoute: typeof ApiUploadthingServerRoute
   ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute
@@ -410,6 +423,13 @@ declare module '@tanstack/react-start/server' {
       path: '/api/thread'
       fullPath: '/api/thread'
       preLoaderRoute: typeof ApiThreadServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/api/reset': {
+      id: '/api/reset'
+      path: '/api/reset'
+      fullPath: '/api/reset'
+      preLoaderRoute: typeof ApiResetServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
     '/api/customer-portal': {
@@ -539,6 +559,7 @@ export const routeTree = rootRouteImport
 const rootServerRouteChildren: RootServerRouteChildren = {
   ApiCheckoutServerRoute: ApiCheckoutServerRouteWithChildren,
   ApiCustomerPortalServerRoute: ApiCustomerPortalServerRoute,
+  ApiResetServerRoute: ApiResetServerRoute,
   ApiThreadServerRoute: ApiThreadServerRouteWithChildren,
   ApiUploadthingServerRoute: ApiUploadthingServerRoute,
   ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,
