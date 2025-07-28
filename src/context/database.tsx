@@ -21,6 +21,10 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
     const { data: session, isPending } = authClient.useSession();
 
     const zero = useMemo(() => {
+        if (typeof window === 'undefined') {
+            return undefined;
+        }
+
         if (!session) {
             return undefined;
         }
@@ -42,7 +46,7 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
                 }
             },
             schema,
-            kvStore: 'mem',
+            kvStore: 'idb',
         });
     }, [session]);
 
