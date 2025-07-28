@@ -415,6 +415,7 @@ export function MultiModalInput() {
                                     input: P.string.maxLength(0),
                                     remainingCredits: P.number.gt(0),
                                     status: 'ready',
+                                    canUseModel: true,
                                 },
                                 () => 'Message cannot be empty'
                             )
