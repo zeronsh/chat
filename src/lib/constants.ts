@@ -13,7 +13,7 @@ export const AnonymousLimits: Limits = {
 export const FreeLimits: Limits = {
     SEARCH: 5,
     RESEARCH: 0,
-    CREDITS: 10,
+    CREDITS: 20,
 };
 
 export const ProLimits: Limits = {
