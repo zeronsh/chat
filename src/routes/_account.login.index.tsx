@@ -58,8 +58,8 @@ function RouteComponent() {
             }}
         >
             <Anonymous>
-                <div className="flex flex-col p-8 gap-6 items-center max-w-md  col-span-1 justify-center row-span-3 rounded-2x">
-                    <div className="flex flex-col items-center gap-2 min-w-[350px]">
+                <div className="flex flex-col gap-6 items-center max-w-md col-span-1 justify-center row-span-3 rounded-2x">
+                    <div className="flex flex-col items-center gap-2 min-w-[280px] md:min-w-[350px]">
                         <span className="text-xl font-semibold text-foreground">
                             Login to Zeron
                         </span>
