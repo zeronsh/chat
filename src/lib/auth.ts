@@ -12,7 +12,7 @@ export const auth = betterAuth({
         provider: 'pg',
         schema,
     }),
-    trustedOrigins: [env.VITE_PUBLIC_API_URL],
+    trustedOrigins: ['https://zeron.sh', 'https://www.zeron.sh', 'http://localhost:5173'],
     socialProviders: {
         google: {
             clientId: env.GOOGLE_CLIENT_ID,
