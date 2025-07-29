@@ -216,9 +216,11 @@ export async function generateThreadTitle(threadId: string, message: ThreadMessa
         messages: convertToModelMessages([message]),
     });
 
-    await queries.updateThreadTitle(db, {
-        threadId,
-        title: text,
+    await db.transaction(async tx => {
+        await queries.updateThreadTitle(tx, {
+            threadId,
+            title: text,
+        });
     });
 }
 
