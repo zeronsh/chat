@@ -1,5 +1,6 @@
 import { db, schema } from '@/database';
 import { UserId } from '@/database/types';
+import { env } from '@/lib/env';
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { anonymous, emailOTP, jwt, magicLink, organization } from 'better-auth/plugins';
@@ -11,6 +12,17 @@ export const auth = betterAuth({
         provider: 'pg',
         schema,
     }),
+    trustedOrigins: [env.VITE_PUBLIC_API_URL],
+    socialProviders: {
+        google: {
+            clientId: env.GOOGLE_CLIENT_ID,
+            clientSecret: env.GOOGLE_CLIENT_SECRET,
+        },
+        github: {
+            clientId: env.GITHUB_CLIENT_ID,
+            clientSecret: env.GITHUB_CLIENT_SECRET,
+        },
+    },
     databaseHooks: {
         user: {
             create: {

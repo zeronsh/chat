@@ -10,6 +10,10 @@ export const env = createEnv({
         STRIPE_WEBHOOK_SECRET: z.string().min(1),
         PRO_MONTHLY_PRICE_ID: z.string().min(1),
         CRON_SECRET: z.string().min(1),
+        GOOGLE_CLIENT_ID: z.string().min(1),
+        GOOGLE_CLIENT_SECRET: z.string().min(1),
+        GITHUB_CLIENT_ID: z.string().min(1),
+        GITHUB_CLIENT_SECRET: z.string().min(1),
     },
     clientPrefix: 'VITE_PUBLIC_',
     client: {
