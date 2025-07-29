@@ -126,8 +126,8 @@ export const ServerRoute = createServerFileRoute('/api/thread').methods({
                     data: 'Error generating response.',
                 });
             },
-            onFinish: async ({ responseMessage, context: { threadId, userId, state } }) => {
-                while (!state.ready) {
+            onFinish: async ({ responseMessage, context: { threadId, userId, state, thread } }) => {
+                while (!state.ready && !thread.title) {
                     console.log('waiting for thread title to be generated');
                     await new Promise(resolve => setTimeout(resolve, 100));
                 }
