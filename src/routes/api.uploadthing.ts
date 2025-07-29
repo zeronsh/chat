@@ -23,6 +23,10 @@ const router = {
             maxFileSize: '8MB',
             maxFileCount: 5,
         },
+        text: {
+            maxFileSize: '8MB',
+            maxFileCount: 5,
+        },
     }).onUploadComplete(({ metadata, file }) => {
         return {};
     }),

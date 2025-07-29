@@ -29,6 +29,8 @@ export function FileDropArea({
         onDrop,
         accept: {
             'image/*': [],
+            'application/pdf': [],
+            'text/plain': [],
         },
         onDragEnter: () => setIsDragActive(true),
         onDragLeave: () => setIsDragActive(false),
