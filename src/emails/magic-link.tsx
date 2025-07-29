@@ -32,16 +32,6 @@ export const MagicLinkEmail = ({ url }: MagicLinkEmailProps) => (
                 >
                     If you didn&apos;t try to login, you can safely ignore this email.
                 </Text>
-                <Text
-                    style={{
-                        ...text,
-                        color: '#ababab',
-                        marginTop: '12px',
-                        marginBottom: '38px',
-                    }}
-                >
-                    Hint: You can set a permanent password in Settings & members → My account.
-                </Text>
             </Container>
         </Body>
     </Html>
