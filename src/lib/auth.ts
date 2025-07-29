@@ -1,6 +1,8 @@
 import { db, schema } from '@/database';
 import { UserId } from '@/database/types';
 import { env } from '@/lib/env';
+import MagicLinkEmail from '@/emails/magic-link';
+import { resend } from '@/lib/resend';
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { anonymous, emailOTP, jwt, magicLink, organization } from 'better-auth/plugins';
@@ -52,11 +54,11 @@ export const auth = betterAuth({
         jwt(),
         magicLink({
             sendMagicLink: async ({ email, token, url }) => {
-                // Implement your magic link sending logic here
-                console.log({
-                    email,
-                    token,
-                    url,
+                await resend.emails.send({
+                    from: 'Zeron <no-reply@zeron.sh>',
+                    to: email,
+                    subject: 'Your magic link',
+                    react: MagicLinkEmail({ url }),
                 });
             },
         }),
