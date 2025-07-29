@@ -14,7 +14,7 @@
         "database:migrate": "dotenvx run -- npx drizzle-kit migrate",
         "database:migrate:prod": "dotenvx run -f .env.production -- npx drizzle-kit migrate",
         "database:studio": "dotenvx run -- npx drizzle-kit studio",
-        "zero:deploy": "dotenvx run -f .env.production -- npx zero-deploy-permissions -p ./src/zero/schema.ts",
+        "zero:deploy": "dotenvx run -f .env.production -- npx zero-deploy-permissions -p ./src/zero/index.ts",
         "zero:generate": "dotenvx run -- drizzle-zero generate --format --output ./src/zero/schema.ts",
         "zero:dev": "dotenvx run -- npx zero-cache-dev -p src/zero/index.ts ",
         "stripe:webhook": "stripe listen --forward-to localhost:5173/api/webhook/stripe"
