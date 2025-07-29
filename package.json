@@ -5,7 +5,7 @@
     "type": "module",
     "scripts": {
         "dev": "dotenvx run -- vite",
-        "build": "pnpm run database:migrate:prod && dotenvx run -f .env.production -- vite build",
+        "build": "pnpm run database:migrate:prod && pnpm run zero:deploy && dotenvx run -f .env.production -- vite build",
         "serve": "dotenvx run -f .env.production -- vite preview",
         "scan": "npx react-scan@latest localhost:5173",
         "auth:generate": "dotenvx run -- npx @better-auth/cli generate --output ./src/database/auth-schema.ts",
@@ -14,6 +14,7 @@
         "database:migrate": "dotenvx run -- npx drizzle-kit migrate",
         "database:migrate:prod": "dotenvx run -f .env.production -- npx drizzle-kit migrate",
         "database:studio": "dotenvx run -- npx drizzle-kit studio",
+        "zero:deploy": "dotenvx run -f .env.production -- npx zero-deploy-permissions -p ./src/zero/schema.ts",
         "zero:generate": "dotenvx run -- drizzle-zero generate --format --output ./src/zero/schema.ts",
         "zero:dev": "dotenvx run -- npx zero-cache-dev -p src/zero/index.ts ",
         "stripe:webhook": "stripe listen --forward-to localhost:5173/api/webhook/stripe"

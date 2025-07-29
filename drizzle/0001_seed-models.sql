@@ -114,7 +114,7 @@ VALUES
     'moonshotai/kimi-k2', -- model
     'Kimi K2 is a model with a context length of 128k, featuring powerful code and Agent capabilities based on MoE architecture. It has 1T total parameters with 32B activated parameters. In benchmark performance tests across major categories including general knowledge reasoning, programming, mathematics, and Agent capabilities, the K2 model outperforms other mainstream open-source models.', -- description
     '["tools"]', -- capabilities
-    'moonshot', -- icon
+    'openrouter', -- icon
     'public', -- access
     1, -- credits
     NOW(), -- created_at
