@@ -448,7 +448,8 @@ export async function convertUIMessagesToModelMessages<T extends UIMessage>(
                 message.parts = message.parts.filter(part => {
                     if (part.type === 'file') {
                         if (
-                            part.mediaType.startsWith('application/pdf') &&
+                            (part.mediaType.startsWith('application/pdf') ||
+                                part.mediaType.startsWith('text/plain')) &&
                             !options.supportsDocuments
                         ) {
                             return false;
@@ -462,7 +463,10 @@ export async function convertUIMessagesToModelMessages<T extends UIMessage>(
 
                 for (const part of message.parts) {
                     if (part.type === 'file') {
-                        if (part.mediaType.startsWith('application/pdf')) {
+                        if (
+                            part.mediaType.startsWith('application/pdf') ||
+                            part.mediaType.startsWith('text/plain')
+                        ) {
                             // @ts-expect-error - TODO: fix this
                             part.url = await fetch(part.url)
                                 .then(res => res.blob())
