@@ -106,14 +106,18 @@ export const ServerRoute = createServerFileRoute('/api/thread').methods({
                 const promises: Promise<any>[] = [];
 
                 if (!thread.title) {
-                    promises.push(generateThreadTitle(threadId, message.message));
+                    promises.push(
+                        (async () => {
+                            await generateThreadTitle(threadId, message.message);
+                            state.ready = true;
+                        })()
+                    );
                 }
                 promises.push(incrementUsage(UserId(userId), 'credits', model.credits));
 
                 promises.push(streamContext.createNewResumableStream(streamId, () => stream));
 
                 await Promise.all(promises);
-                state.ready = true;
             },
             onStreamError: ({ error, writer }) => {
                 console.error(error);
