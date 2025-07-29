@@ -205,23 +205,27 @@ export async function prepareResumeThread(args: { threadId: string; userId: stri
 }
 
 export async function generateThreadTitle(threadId: string, message: ThreadMessage) {
-    const { text } = await generateText({
-        model: 'google/gemini-2.0-flash-001',
-        system: `\nc
-        - you will generate a short title based on the first message a user begins a conversation with
-        - ensure it is not more than 80 characters long
-        - the title should be a summary of the user's message
-        - do not use quotes or colons`,
-        temperature: 0.8,
-        messages: convertToModelMessages([message]),
-    });
-
-    await db.transaction(async tx => {
-        await queries.updateThreadTitle(tx, {
-            threadId,
-            title: text,
+    try {
+        const { text } = await generateText({
+            model: 'google/gemini-2.0-flash-001',
+            system: `\nc
+            - you will generate a short title based on the first message a user begins a conversation with
+            - ensure it is not more than 80 characters long
+            - the title should be a summary of the user's message
+            - do not use quotes or colons`,
+            temperature: 0.8,
+            messages: convertToModelMessages([message]),
         });
-    });
+
+        await db.transaction(async tx => {
+            await queries.updateThreadTitle(tx, {
+                threadId,
+                title: text,
+            });
+        });
+    } catch (error) {
+        console.error(error);
+    }
 }
 
 export async function saveMessageAndResetThreadStatus({
