@@ -22,6 +22,20 @@
       "when": 1753493394519,
       "tag": "0002_boring_owl",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1753809895047,
+      "tag": "0003_complex_mesmero",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1753809902590,
+      "tag": "0004_seed-zai-models",
+      "breakpoints": true
     }
   ]
 }

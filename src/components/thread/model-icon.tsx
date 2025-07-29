@@ -12,6 +12,7 @@ import OpenRouterIcon from '@/components/icons/openrouter';
 import XIcon from '@/components/icons/x';
 import XAIIcon from '@/components/icons/xai';
 import MoonshotIcon from '@/components/icons/moonshot';
+import ZaiIcon from '@/components/icons/zai';
 import type { SVGProps } from 'react';
 
 export type ModelType =
@@ -28,6 +29,7 @@ export type ModelType =
     | 'openrouter'
     | 'x'
     | 'xai'
+    | 'zai'
     | 'moonshot'
     | string;
 
@@ -50,6 +52,7 @@ const ModelIcon = ({ model, ...props }: ModelIconProps) => {
         openrouter: OpenRouterIcon,
         x: XIcon,
         xai: XAIIcon,
+        zai: ZaiIcon,
         moonshot: MoonshotIcon,
     };
 

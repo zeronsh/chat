@@ -52,6 +52,7 @@ export const modelIconEnum = pgEnum('icon', [
     'x',
     'xai',
     'moonshot',
+    'zai',
 ]);
 
 export const model = pgTable('model', {
