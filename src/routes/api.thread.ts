@@ -28,6 +28,7 @@ export const ServerRoute = createServerFileRoute('/api/thread').methods({
                 tool: z.string().optional(),
             }),
             onPrepare: async ({ body, request }) => {
+                const state = { ready: false };
                 const session = await auth.api.getSession({
                     headers: request.headers,
                 });
@@ -49,6 +50,7 @@ export const ServerRoute = createServerFileRoute('/api/thread').methods({
                     });
 
                 return {
+                    state,
                     streamId,
                     threadId: thread.id,
                     userId: UserId(session.user.id),
@@ -98,7 +100,7 @@ export const ServerRoute = createServerFileRoute('/api/thread').methods({
                 }
             },
             onAfterStream: async ({
-                context: { threadId, message, streamId, thread, userId, model },
+                context: { threadId, message, streamId, thread, userId, model, state },
                 stream,
             }) => {
                 const promises: Promise<any>[] = [];
@@ -111,6 +113,7 @@ export const ServerRoute = createServerFileRoute('/api/thread').methods({
                 promises.push(streamContext.createNewResumableStream(streamId, () => stream));
 
                 await Promise.all(promises);
+                state.ready = true;
             },
             onStreamError: ({ error, writer }) => {
                 console.error(error);
@@ -119,7 +122,12 @@ export const ServerRoute = createServerFileRoute('/api/thread').methods({
                     data: 'Error generating response.',
                 });
             },
-            onFinish: async ({ responseMessage, context: { threadId, userId } }) => {
+            onFinish: async ({ responseMessage, context: { threadId, userId, state } }) => {
+                while (!state.ready) {
+                    console.log('waiting for thread title to be generated');
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+
                 await saveMessageAndResetThreadStatus({
                     threadId,
                     userId,
