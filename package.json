@@ -5,7 +5,7 @@
     "type": "module",
     "scripts": {
         "dev": "dotenvx run -- vite",
-        "build": "database:migrate:prod && dotenvx run -f .env.production -- vite build",
+        "build": "pnpm run database:migrate:prod && dotenvx run -f .env.production -- vite build",
         "serve": "dotenvx run -f .env.production -- vite preview",
         "scan": "npx react-scan@latest localhost:5173",
         "auth:generate": "dotenvx run -- npx @better-auth/cli generate --output ./src/database/auth-schema.ts",
