@@ -1,7 +1,7 @@
 import { db, Transaction } from '@/database';
-import { getSession } from '@/lib/auth-effects';
+import { Session } from '@/lib/auth-effects';
 import { APIError } from '@/lib/error';
-import { Effect, Runtime } from 'effect';
+import { Effect, Layer, Runtime } from 'effect';
 import { z } from 'zod';
 import * as queries from '@/database/queries';
 import { UserId } from '@/database/types';
@@ -11,44 +11,42 @@ import { FreeLimits, ProLimits } from '@/lib/constants';
 import { nanoid } from 'nanoid';
 import { ThreadMessage } from '@/ai/types';
 import { convertUIMessagesToModelMessages } from '@/ai/stream';
-import { createUIMessageStream, smoothStream, stepCountIs, streamText, tool } from 'ai';
+import {
+    createUIMessageStream,
+    JsonToSseTransformStream,
+    smoothStream,
+    stepCountIs,
+    streamText,
+} from 'ai';
 import { getTools } from '@/ai/tools';
 import { getSystemPrompt } from '@/ai/prompt';
+import {
+    generateThreadTitle,
+    incrementUsage,
+    saveMessageAndResetThreadStatus,
+    streamContext,
+} from '@/ai/service';
 
-const ThreadPostApiSchema = z.object({
-    id: z.string(),
-    modelId: z.string(),
-    message: z.any(),
-    tool: z.string().optional(),
+export const threadPostApi = Effect.gen(function* () {
+    const session = yield* Session;
+    const body = yield* ThreadPostBody;
+
+    return yield* threadPostApiHandler.pipe(
+        Effect.annotateLogs('requestId', nanoid()),
+        Effect.annotateLogs('path', '/api/thread'),
+        Effect.annotateLogs('userId', session.user.id),
+        Effect.annotateLogs('threadId', body.id)
+    );
 });
 
-export const threadPostApi = Effect.fn('threadPostApi')(function* (request: Request) {
+const threadPostApiHandler = Effect.gen(function* () {
     const runtime = yield* Effect.runtime();
     const latch = yield* Effect.makeLatch();
 
-    const session = yield* getSession(request);
+    yield* latch.open;
 
-    const json = yield* Effect.tryPromise({
-        try: () => request.json(),
-        catch: error => {
-            return new APIError({
-                status: 400,
-                message: 'Invalid request body',
-                cause: error,
-            });
-        },
-    });
-
-    const body = yield* Effect.try({
-        try: () => ThreadPostApiSchema.parse(json),
-        catch: error => {
-            return new APIError({
-                status: 400,
-                message: 'Invalid request body',
-                cause: error,
-            });
-        },
-    });
+    const session = yield* Session;
+    const body = yield* ThreadPostBody;
 
     const streamId = nanoid();
 
@@ -96,7 +94,16 @@ export const threadPostApi = Effect.fn('threadPostApi')(function* (request: Requ
     const stream = yield* Effect.try({
         try: () => {
             return createUIMessageStream<ThreadMessage>({
-                onFinish: async ({ messages, isContinuation, responseMessage }) => {},
+                onFinish: async ({ responseMessage }) => {
+                    await Runtime.runPromise(
+                        runtime,
+                        handleFinish({
+                            threadId: body.id,
+                            userId: UserId(session.user.id),
+                            message: responseMessage,
+                        }).pipe(latch.whenOpen)
+                    );
+                },
                 execute: ({ writer }) => {
                     const result = streamText({
                         model: model.model,
@@ -116,7 +123,38 @@ export const threadPostApi = Effect.fn('threadPostApi')(function* (request: Requ
                                 order: ['groq'],
                             },
                         },
+                        onError: error => {
+                            Runtime.runSync(
+                                runtime,
+                                Effect.logError('Error in stream', {
+                                    error,
+                                })
+                            );
+
+                            writer.write({
+                                type: 'data-error',
+                                data: 'Error generating response',
+                            });
+                        },
                     });
+
+                    result.consumeStream();
+                    writer.merge(
+                        result.toUIMessageStream({
+                            sendReasoning: true,
+                            messageMetadata: ({ part }) => {
+                                if (part.type === 'start') {
+                                    return {
+                                        model: {
+                                            id: model.id,
+                                            name: model.name,
+                                            icon: model.icon,
+                                        },
+                                    };
+                                }
+                            },
+                        })
+                    );
                 },
             });
         },
@@ -127,7 +165,38 @@ export const threadPostApi = Effect.fn('threadPostApi')(function* (request: Requ
                 cause: error,
             });
         },
+    }).pipe(Effect.map(stream => stream.pipeThrough(new JsonToSseTransformStream())));
+
+    const resumableStream = yield* Effect.tryPromise({
+        try: () => {
+            return streamContext.createNewResumableStream(streamId, () => stream);
+        },
+        catch: error => {
+            return new APIError({
+                status: 500,
+                message: 'Failed to create resumable stream',
+                cause: error,
+            });
+        },
     });
+
+    yield* Effect.gen(function* () {
+        if (!thread.title) {
+            yield* latch.close;
+            yield* Effect.logInfo('Generating thread title');
+            yield* Effect.tryPromise(() => generateThreadTitle(body.id, message.message)).pipe(
+                Effect.catchAll(() => Effect.succeed(null))
+            );
+            yield* latch.open;
+        }
+    }).pipe(Effect.forkDaemon);
+
+    yield* Effect.logInfo('Incrementing usage');
+    yield* Effect.tryPromise(async () => {
+        return incrementUsage(UserId(session.user.id), 'credits', model.credits);
+    }).pipe(Effect.forkDaemon);
+
+    return new Response(resumableStream);
 });
 
 const prepareThread = Effect.fn('prepareThread')(function* (
@@ -141,6 +210,7 @@ const prepareThread = Effect.fn('prepareThread')(function* (
         message: ThreadMessage;
     }
 ) {
+    yield* Effect.logInfo('Preparing thread');
     let [thread, message, model, settings, usage, customer] = yield* Effect.tryPromise({
         try: () => {
             return Promise.all([
@@ -192,6 +262,7 @@ const prepareThread = Effect.fn('prepareThread')(function* (
     }
 
     if (!thread) {
+        yield* Effect.logInfo('Creating thread');
         [thread] = yield* Effect.tryPromise({
             try: () => {
                 return queries.createThread(tx, {
@@ -257,6 +328,7 @@ const prepareThread = Effect.fn('prepareThread')(function* (
         });
     }
 
+    yield* Effect.logInfo('Update thread status to streaming');
     yield* Effect.tryPromise({
         try: () => {
             return queries.updateThread(tx, {
@@ -276,6 +348,7 @@ const prepareThread = Effect.fn('prepareThread')(function* (
     });
 
     if (!message) {
+        yield* Effect.logInfo('Creating message');
         [message] = yield* Effect.tryPromise({
             try: () => {
                 return queries.createMessage(tx, {
@@ -295,6 +368,7 @@ const prepareThread = Effect.fn('prepareThread')(function* (
     }
 
     if (message) {
+        yield* Effect.logInfo('Message exists - updating message and deleting trailing messages');
         let tmp = message;
         [[message]] = yield* Effect.tryPromise({
             try: () => {
@@ -344,3 +418,69 @@ const prepareThread = Effect.fn('prepareThread')(function* (
         limits,
     };
 });
+
+const handleFinish = Effect.fn('handleFinish')(function* (args: {
+    threadId: string;
+    userId: UserId;
+    message: ThreadMessage;
+}) {
+    const { threadId, userId, message } = args;
+
+    yield* Effect.logInfo('Saving message and resetting thread status');
+    yield* Effect.tryPromise({
+        try: () => {
+            return saveMessageAndResetThreadStatus({
+                threadId,
+                userId,
+                message,
+            });
+        },
+        catch: error => {
+            return new APIError({
+                status: 500,
+                message: 'Failed to save message and reset thread status',
+                cause: error,
+            });
+        },
+    });
+});
+
+const ThreadPostApiSchema = z.object({
+    id: z.string(),
+    modelId: z.string(),
+    message: z.any(),
+    tool: z.string().optional(),
+});
+
+export class ThreadPostBody extends Effect.Tag('ThreadPostBody')<
+    ThreadPostBody,
+    z.infer<typeof ThreadPostApiSchema>
+>() {}
+
+export const ThreadPostBodyLive = (request: Request) =>
+    Layer.scoped(
+        ThreadPostBody,
+        Effect.gen(function* () {
+            const json = yield* Effect.tryPromise({
+                try: () => request.json(),
+                catch: error => {
+                    return new APIError({
+                        status: 400,
+                        message: 'Invalid request body',
+                        cause: error,
+                    });
+                },
+            });
+
+            return yield* Effect.try({
+                try: () => ThreadPostApiSchema.parse(json),
+                catch: error => {
+                    return new APIError({
+                        status: 400,
+                        message: 'Invalid request body',
+                        cause: error,
+                    });
+                },
+            });
+        })
+    );

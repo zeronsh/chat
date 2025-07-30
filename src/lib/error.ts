@@ -6,6 +6,12 @@ export class APIError extends Data.TaggedError('APIError')<{
     metadata?: Record<string, unknown>;
     cause?: unknown;
 }> {
+    private log = Effect.logError('API Error', {
+        message: this.message,
+        metadata: this.metadata,
+        cause: this.cause,
+    });
+
     get response() {
         const response = Response.json(
             {
@@ -15,6 +21,12 @@ export class APIError extends Data.TaggedError('APIError')<{
             { status: this.status }
         );
 
-        return Effect.succeed(response);
+        const thisError = this;
+
+        return Effect.gen(function* () {
+            yield* thisError.log;
+
+            return response;
+        });
     }
 }
