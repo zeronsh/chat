@@ -33,7 +33,6 @@ export const threadPostApi = Effect.gen(function* () {
 
     return yield* threadPostApiHandler.pipe(
         Effect.annotateLogs('requestId', nanoid()),
-        Effect.annotateLogs('path', '/api/thread'),
         Effect.annotateLogs('userId', session.user.id),
         Effect.annotateLogs('threadId', body.id)
     );
