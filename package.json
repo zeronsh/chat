@@ -50,6 +50,7 @@
         "effect": "^3.16.12",
         "exa-js": "^1.8.23",
         "framer-motion": "^12.23.1",
+        "ioredis": "^5.7.0",
         "lucide-react": "^0.525.0",
         "marked": "^16.0.0",
         "motion": "^12.23.1",

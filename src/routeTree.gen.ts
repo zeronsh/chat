@@ -33,6 +33,7 @@ import { ServerRoute as ApiWebhookStripeServerRouteImport } from './routes/api.w
 import { ServerRoute as ApiCheckoutSuccessServerRouteImport } from './routes/api.checkout.success'
 import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api.auth.$'
 import { ServerRoute as ApiThreadThreadIdStreamServerRouteImport } from './routes/api.thread.$threadId.stream'
+import { ServerRoute as ApiThreadThreadIdStopServerRouteImport } from './routes/api.thread.$threadId.stop'
 
 const rootServerRouteImport = createServerRootRoute()
 
@@ -148,6 +149,12 @@ const ApiThreadThreadIdStreamServerRoute =
     path: '/$threadId/stream',
     getParentRoute: () => ApiThreadServerRoute,
   } as any)
+const ApiThreadThreadIdStopServerRoute =
+  ApiThreadThreadIdStopServerRouteImport.update({
+    id: '/$threadId/stop',
+    path: '/$threadId/stop',
+    getParentRoute: () => ApiThreadServerRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/account': typeof AccountAccountRouteWithChildren
@@ -243,6 +250,7 @@ export interface FileServerRoutesByFullPath {
   '/api/auth/$': typeof ApiAuthSplatServerRoute
   '/api/checkout/success': typeof ApiCheckoutSuccessServerRoute
   '/api/webhook/stripe': typeof ApiWebhookStripeServerRoute
+  '/api/thread/$threadId/stop': typeof ApiThreadThreadIdStopServerRoute
   '/api/thread/$threadId/stream': typeof ApiThreadThreadIdStreamServerRoute
 }
 export interface FileServerRoutesByTo {
@@ -254,6 +262,7 @@ export interface FileServerRoutesByTo {
   '/api/auth/$': typeof ApiAuthSplatServerRoute
   '/api/checkout/success': typeof ApiCheckoutSuccessServerRoute
   '/api/webhook/stripe': typeof ApiWebhookStripeServerRoute
+  '/api/thread/$threadId/stop': typeof ApiThreadThreadIdStopServerRoute
   '/api/thread/$threadId/stream': typeof ApiThreadThreadIdStreamServerRoute
 }
 export interface FileServerRoutesById {
@@ -266,6 +275,7 @@ export interface FileServerRoutesById {
   '/api/auth/$': typeof ApiAuthSplatServerRoute
   '/api/checkout/success': typeof ApiCheckoutSuccessServerRoute
   '/api/webhook/stripe': typeof ApiWebhookStripeServerRoute
+  '/api/thread/$threadId/stop': typeof ApiThreadThreadIdStopServerRoute
   '/api/thread/$threadId/stream': typeof ApiThreadThreadIdStreamServerRoute
 }
 export interface FileServerRouteTypes {
@@ -279,6 +289,7 @@ export interface FileServerRouteTypes {
     | '/api/auth/$'
     | '/api/checkout/success'
     | '/api/webhook/stripe'
+    | '/api/thread/$threadId/stop'
     | '/api/thread/$threadId/stream'
   fileServerRoutesByTo: FileServerRoutesByTo
   to:
@@ -290,6 +301,7 @@ export interface FileServerRouteTypes {
     | '/api/auth/$'
     | '/api/checkout/success'
     | '/api/webhook/stripe'
+    | '/api/thread/$threadId/stop'
     | '/api/thread/$threadId/stream'
   id:
     | '__root__'
@@ -301,6 +313,7 @@ export interface FileServerRouteTypes {
     | '/api/auth/$'
     | '/api/checkout/success'
     | '/api/webhook/stripe'
+    | '/api/thread/$threadId/stop'
     | '/api/thread/$threadId/stream'
   fileServerRoutesById: FileServerRoutesById
 }
@@ -474,6 +487,13 @@ declare module '@tanstack/react-start/server' {
       preLoaderRoute: typeof ApiThreadThreadIdStreamServerRouteImport
       parentRoute: typeof ApiThreadServerRoute
     }
+    '/api/thread/$threadId/stop': {
+      id: '/api/thread/$threadId/stop'
+      path: '/$threadId/stop'
+      fullPath: '/api/thread/$threadId/stop'
+      preLoaderRoute: typeof ApiThreadThreadIdStopServerRouteImport
+      parentRoute: typeof ApiThreadServerRoute
+    }
   }
 }
 
@@ -537,10 +557,12 @@ const ApiCheckoutServerRouteWithChildren =
   ApiCheckoutServerRoute._addFileChildren(ApiCheckoutServerRouteChildren)
 
 interface ApiThreadServerRouteChildren {
+  ApiThreadThreadIdStopServerRoute: typeof ApiThreadThreadIdStopServerRoute
   ApiThreadThreadIdStreamServerRoute: typeof ApiThreadThreadIdStreamServerRoute
 }
 
 const ApiThreadServerRouteChildren: ApiThreadServerRouteChildren = {
+  ApiThreadThreadIdStopServerRoute: ApiThreadThreadIdStopServerRoute,
   ApiThreadThreadIdStreamServerRoute: ApiThreadThreadIdStreamServerRoute,
 }
 

@@ -43,7 +43,7 @@ export function MultiModalInput() {
     const setEditingMessageId = useThreadSelector(state => state.setEditingMessageId);
     const editingMessageId = useThreadSelector(state => state.editingMessageId);
     const setMessages = useThreadSelector(state => state.setMessages);
-    const { sendMessage, stop } = useThreadContext();
+    const { sendMessage } = useThreadContext();
 
     const { startUpload } = useUploadThing('fileUploader', {
         onUploadBegin: () => {
@@ -174,12 +174,15 @@ export function MultiModalInput() {
                 'absolute px-4 pt-4 flex flex-col gap-4': true,
                 'bottom-0 left-0 right-0': true,
             })}
-            onSubmit={e => {
+            onSubmit={async e => {
                 e.preventDefault();
                 if (status === 'streaming' || status === 'submitted') {
-                    stop();
+                    await fetch(`/api/thread/${id}/stop`, {
+                        method: 'POST',
+                        credentials: 'include',
+                    });
                 } else {
-                    handleSubmit();
+                    await handleSubmit();
                 }
             }}
         >
