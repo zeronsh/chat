@@ -17,7 +17,7 @@ export const getSearchTool = Effect.gen(function* () {
             const effect = Effect.gen(function* () {
                 if (ctx.limits.SEARCH - (ctx.usage.search || 0) <= 0) {
                     yield* Effect.logWarning('Search limit reached');
-                    return yield* Effect.die('Search limit reached');
+                    return yield* Effect.die(null);
                 }
 
                 yield* Effect.logInfo('Running search for: ' + query);
