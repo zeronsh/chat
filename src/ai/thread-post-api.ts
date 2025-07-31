@@ -115,17 +115,11 @@ const threadPostApiHandler = Effect.gen(function* () {
 
     const resumableStream = yield* createResumableStream(streamId, stream);
 
-    yield* generateThreadTitle({
-        threadId: body.id,
-        message: body.message,
-        latch,
-    }).pipe(Effect.forkDaemon);
+    yield* generateThreadTitle(body.id, body.message, latch).pipe(Effect.forkDaemon);
 
-    yield* incrementUsageV2({
-        userId: UserId(session.user.id),
-        type: 'credits',
-        amount: model.credits,
-    }).pipe(Effect.forkDaemon);
+    yield* incrementUsageV2(UserId(session.user.id), 'credits', model.credits).pipe(
+        Effect.forkDaemon
+    );
 
     return new Response(resumableStream);
 });

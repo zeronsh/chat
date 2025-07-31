@@ -253,13 +253,7 @@ export async function prepareResumeThread(args: { threadId: string; userId: stri
     return thread.streamId;
 }
 
-export function generateThreadTitle(args: {
-    threadId: string;
-    message: ThreadMessage;
-    latch: Effect.Latch;
-}) {
-    const { threadId, message, latch } = args;
-
+export function generateThreadTitle(threadId: string, message: ThreadMessage, latch: Effect.Latch) {
     return Effect.gen(function* () {
         yield* latch.close;
         yield* Effect.logInfo('Generating thread title');
@@ -294,19 +288,19 @@ export function generateThreadTitle(args: {
     });
 }
 
-export function incrementUsageV2(args: {
-    userId: UserId;
-    type: 'search' | 'research' | 'credits';
-    amount: number;
-}) {
+export function incrementUsageV2(
+    userId: UserId,
+    type: 'search' | 'research' | 'credits',
+    amount: number
+) {
     return Effect.gen(function* () {
-        yield* Effect.logInfo('Incrementing usage for ' + args.type + ' by ' + args.amount);
+        yield* Effect.logInfo('Incrementing usage for ' + type + ' by ' + amount);
         yield* queriesV2.incrementUsage(
             {
-                userId: args.userId,
-                type: args.type,
+                userId: userId,
+                type: type,
             },
-            args.amount
+            amount
         );
     });
 }
@@ -374,10 +368,12 @@ export function getLimits(args: {
     customer?: typeof schema.userCustomer.$inferSelect;
     isAnonymous: boolean;
 }) {
+    const currentPeriodEnd = args.customer?.subscription?.currentPeriodEnd ?? 0;
+    const now = new Date().getTime() / 1000;
+    const isPro = Number(currentPeriodEnd) > now;
+
     return match({
-        isPro:
-            Number(args.customer?.subscription?.currentPeriodEnd ?? 0) >
-            new Date().getTime() / 1000,
+        isPro,
         isAnonymous: args.isAnonymous,
     })
         .with(
