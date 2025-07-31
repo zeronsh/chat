@@ -7,10 +7,12 @@ export class Database extends Effect.Tag('Database')<
         readonly instance: DatabaseImpl;
     }
 >() {
-    static transaction = <TReturn, TError>(effect: Effect.Effect<TReturn, TError, Database>) => {
+    static transaction = <TReturn, TError, TService>(
+        effect: Effect.Effect<TReturn, TError, Database | TService>
+    ) => {
         return Effect.gen(function* () {
             const db = yield* Database.instance;
-            const runtime = yield* Effect.runtime();
+            const runtime = yield* Effect.runtime<TService>();
 
             function tranction(instance: Transaction) {
                 return Runtime.runPromise(
