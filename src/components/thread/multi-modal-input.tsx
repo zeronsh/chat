@@ -439,8 +439,10 @@ export function MultiModalInput() {
                                 { canUseModel: false, status: 'ready' },
                                 () => cannotUseModelReason
                             )
-                            .with({ status: 'streaming' }, () => 'Stop generation')
-                            .with({ status: 'submitted' }, () => 'Sending message')
+                            .with(
+                                { status: P.union('streaming', 'submitted') },
+                                () => 'Stop generation'
+                            )
                             .otherwise(() => 'Send message')}
                     >
                         <Button
@@ -470,8 +472,7 @@ export function MultiModalInput() {
                                     () => true
                                 )
                                 .with({ canUseModel: false, status: 'ready' }, () => true)
-                                .with({ status: 'streaming' }, () => false)
-                                .with({ status: 'submitted' }, () => true)
+                                .with({ status: P.union('streaming', 'submitted') }, () => false)
                                 .otherwise(() => false)}
                         >
                             {status === 'streaming' || status === 'submitted' ? (

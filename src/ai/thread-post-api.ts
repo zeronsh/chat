@@ -346,26 +346,6 @@ const prepareThread = Effect.fn('prepareThread')(function* (
         },
     });
 
-    if (!message) {
-        yield* Effect.logInfo('Creating message');
-        [message] = yield* Effect.tryPromise({
-            try: () => {
-                return queries.createMessage(tx, {
-                    threadId: args.threadId,
-                    userId: args.userId,
-                    message: args.message,
-                });
-            },
-            catch: error => {
-                return new APIError({
-                    status: 500,
-                    message: 'Failed to create message',
-                    cause: error,
-                });
-            },
-        });
-    }
-
     if (message) {
         yield* Effect.logInfo('Message exists - updating message and deleting trailing messages');
         let tmp = message;
@@ -388,6 +368,26 @@ const prepareThread = Effect.fn('prepareThread')(function* (
                 return new APIError({
                     status: 500,
                     message: 'Failed to update message',
+                    cause: error,
+                });
+            },
+        });
+    }
+
+    if (!message) {
+        yield* Effect.logInfo('Creating message');
+        [message] = yield* Effect.tryPromise({
+            try: () => {
+                return queries.createMessage(tx, {
+                    threadId: args.threadId,
+                    userId: args.userId,
+                    message: args.message,
+                });
+            },
+            catch: error => {
+                return new APIError({
+                    status: 500,
+                    message: 'Failed to create message',
                     cause: error,
                 });
             },
