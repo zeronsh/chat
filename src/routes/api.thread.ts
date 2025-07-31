@@ -1,6 +1,6 @@
 import { createServerFileRoute } from '@tanstack/react-start/server';
 import { threadPostApi, ThreadPostBodyLive } from '@/ai/thread-post-api';
-import { Effect, Logger } from 'effect';
+import { Effect } from 'effect';
 import { SessionLive } from '@/lib/auth-effects';
 
 export const ServerRoute = createServerFileRoute('/api/thread').methods({
@@ -10,7 +10,6 @@ export const ServerRoute = createServerFileRoute('/api/thread').methods({
             Effect.catchAll(e => e.response),
             Effect.provide(SessionLive(request)),
             Effect.provide(ThreadPostBodyLive(request)),
-            Effect.provide(Logger.pretty),
             Effect.runPromise
         );
     },

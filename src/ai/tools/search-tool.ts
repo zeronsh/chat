@@ -1,30 +1,49 @@
 import { tool } from 'ai';
-import { ToolContext } from '.';
 import z from 'zod';
 import { search } from '@/lib/exa';
 import { decrementUsage, incrementUsage } from '@/ai/service';
+import { Effect, Runtime } from 'effect';
+import { ToolContext } from '@/ai/tools';
 
-export function getSearchTool(ctx: ToolContext) {
+export const getSearchTool = Effect.gen(function* () {
+    const ctx = yield* ToolContext;
+
     return tool({
         description: 'Search the web for information',
         inputSchema: z.object({
             query: z.string(),
         }),
         execute: async ({ query }) => {
-            try {
+            const effect = Effect.gen(function* () {
                 if (ctx.limits.SEARCH - (ctx.usage.search || 0) <= 0) {
-                    throw new Error('LIMIT_REACHED');
+                    yield* Effect.logWarning('Search limit reached');
+                    return yield* Effect.die('Search limit reached');
                 }
 
-                await incrementUsage(ctx.userId, 'search', 1);
-                return search(query);
-            } catch (error) {
-                if (Error.isError(error) && error.message === 'LIMIT_REACHED') {
-                    throw error;
-                }
-                await decrementUsage(ctx.userId, 'search', 1);
-                throw error;
-            }
+                yield* Effect.logInfo('Running search for: ' + query);
+                yield* Effect.tryPromise(() => incrementUsage(ctx.userId, 'search', 1)).pipe(
+                    Effect.tapError(() => {
+                        return Effect.logError('Error incrementing usage');
+                    }),
+                    Effect.catchAll(e => Effect.die(e))
+                );
+
+                const results = yield* Effect.tryPromise(() => search(query)).pipe(
+                    Effect.tapError(() => {
+                        return Effect.logError('Error running search');
+                    }),
+                    Effect.tapError(() => {
+                        return Effect.tryPromise(() => decrementUsage(ctx.userId, 'search', 1));
+                    }),
+                    Effect.catchAll(e => Effect.die(e))
+                );
+
+                yield* Effect.logInfo('Search completed for: ' + query);
+
+                return results;
+            });
+
+            return Runtime.runPromise(ctx.runtime, effect);
         },
     });
-}
+});

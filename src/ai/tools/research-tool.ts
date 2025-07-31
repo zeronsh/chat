@@ -5,8 +5,11 @@ import z from 'zod';
 import { search, readSite } from '@/lib/exa';
 import { DataParts } from '@/ai/types';
 import { incrementUsage, decrementUsage } from '@/ai/service';
+import { Effect } from 'effect';
 
-export function getResearchTool(ctx: ToolContext) {
+export const getResearchTool = Effect.gen(function* () {
+    const ctx = yield* ToolContext;
+
     return tool({
         description: 'Perfect deep research on given topic.',
         inputSchema: z.object({
@@ -153,4 +156,4 @@ export function getResearchTool(ctx: ToolContext) {
             }
         },
     });
-}
+});

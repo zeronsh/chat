@@ -18,7 +18,7 @@ import {
     stepCountIs,
     streamText,
 } from 'ai';
-import { getTools } from '@/ai/tools';
+import { getTools, ToolContext } from '@/ai/tools';
 import { getSystemPrompt } from '@/ai/prompt';
 import {
     generateThreadTitle,
@@ -104,16 +104,32 @@ const threadPostApiHandler = Effect.gen(function* () {
                     );
                 },
                 execute: ({ writer }) => {
+                    const tools = Runtime.runSync(
+                        runtime,
+                        getTools.pipe(
+                            Effect.provide(
+                                Layer.scoped(
+                                    ToolContext,
+                                    Effect.succeed({
+                                        writer,
+                                        usage,
+                                        userId: UserId(session.user.id),
+                                        limits,
+                                        runtime,
+                                        tools: body.tool ? [body.tool] : [],
+                                    })
+                                )
+                            )
+                        )
+                    );
+
                     const result = streamText({
                         model: model.model,
                         messages,
                         temperature: 0.8,
                         stopWhen: stepCountIs(3),
                         system: getSystemPrompt(settings, body.tool ? [body.tool] : []),
-                        tools: getTools(
-                            { writer, usage, userId: UserId(session.user.id), limits },
-                            body.tool ? [body.tool] : []
-                        ),
+                        tools,
                         experimental_transform: smoothStream({
                             chunking: 'word',
                         }),

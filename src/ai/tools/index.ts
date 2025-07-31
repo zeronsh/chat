@@ -1,35 +1,42 @@
-import { getResearchTool } from '@/ai/tools/research-tool';
 import { getSearchTool } from '@/ai/tools/search-tool';
 import { ThreadMessage } from '@/ai/types';
 import { Tool, UIMessageStreamWriter } from 'ai';
 import { schema } from '@/database/schema';
 import { UserId } from '@/database/types';
 import { Limits } from '@/lib/constants';
+import { Effect, Runtime } from 'effect';
+import { getResearchTool } from '@/ai/tools/research-tool';
 
-export type ToolContext = {
+const tools = {
+    search: getSearchTool,
+    research: getResearchTool,
+} as const;
+
+type ExtractTool<T> = T extends Effect.Effect<infer U, any, any> ? U : never;
+
+export type AvailableTools = {
+    [K in keyof typeof tools]: ExtractTool<(typeof tools)[K]>;
+};
+
+export type ToolContextImpl = {
     writer: UIMessageStreamWriter<ThreadMessage>;
     usage: typeof schema.usage.$inferSelect;
     userId: UserId;
     limits: Limits;
+    runtime: Runtime.Runtime<never>;
+    tools: string[];
 };
 
-function getAvailableTools(ctx: ToolContext) {
-    return {
-        search: getSearchTool(ctx),
-        research: getResearchTool(ctx),
-    } as const;
-}
+export class ToolContext extends Effect.Tag('ToolContext')<ToolContext, ToolContextImpl>() {}
 
-export type AvailableTools = ReturnType<typeof getAvailableTools>;
+export const getTools = Effect.gen(function* () {
+    const ctx = yield* ToolContext;
 
-export function getTools(ctx: ToolContext, tools: string[]) {
-    const availableTools = getAvailableTools(ctx);
+    const activeTools: Record<string, Tool> = {};
 
-    return tools.reduce((acc, tool) => {
-        if (availableTools[tool as keyof typeof availableTools]) {
-            acc[tool as keyof typeof availableTools] =
-                availableTools[tool as keyof typeof availableTools];
-        }
-        return acc;
-    }, {} as Record<string, Tool>);
-}
+    for (const tool of ctx.tools) {
+        activeTools[tool] = yield* tools[tool as keyof typeof tools];
+    }
+
+    return activeTools;
+});

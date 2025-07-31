@@ -3,7 +3,17 @@ import { env } from '@/lib/env';
 
 export const exa = new Exa(env.EXA_API_KEY);
 
-export async function search(query: string) {
+export type SearchResults = {
+    query: string;
+    results: {
+        title: string | null;
+        url: string;
+        description: string;
+        image: string | undefined;
+    }[];
+};
+
+export async function search(query: string): Promise<SearchResults> {
     try {
         const response = await exa.searchAndContents(query, {
             summary: true,
