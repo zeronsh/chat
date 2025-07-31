@@ -1,3 +1,4 @@
+import { ThreadMessage } from '@/ai/types';
 import {
     createUIMessageStream,
     streamText,
@@ -5,11 +6,19 @@ import {
     convertToModelMessages,
     type UIMessage,
     type ToolSet,
+    StopCondition,
+    ModelMessage,
+    TextStreamPart,
+    UIMessageStreamWriter,
+    InferUIMessageChunk,
 } from 'ai';
-import { Data, Duration, Effect, Schedule } from 'effect';
+import { Data, Duration, Effect, Layer, Runtime, Schedule } from 'effect';
 import { type ResumableStreamContext } from 'resumable-stream';
 
-export type StreamTextOptions = Omit<Parameters<typeof streamText>[0], 'onError' | 'onFinish'>;
+export type StreamTextOptions = Omit<
+    Parameters<typeof streamText>[0],
+    'onError' | 'onFinish' | 'tools'
+>;
 
 export type InferMessageToolSet<Message extends UIMessage> = Message extends UIMessage<
     infer _,
@@ -167,51 +176,144 @@ class InternalError extends Data.TaggedError('InternalError')<{
     cause?: unknown;
 }> {}
 
-export async function convertUIMessagesToModelMessages<T extends UIMessage>(
-    messages: T[],
-    options: {
-        supportsImages?: boolean;
-        supportsDocuments?: boolean;
-    } = {
-        supportsImages: false,
-        supportsDocuments: false,
+const createStreamSSEResponse = Effect.gen(function* () {
+    const runtime = yield* Effect.runtime();
+    const options = yield* CreateStreamSSEResponseOptions;
+    const { onFinishCallback } = yield* CreateStreamSSEResponseOnFinish;
+    const { onErrorCallback } = yield* CreateStreamSSEResponseOnError;
+    const { onMessageMetadataCallback } = yield* CreateStreamSSEResponseOnMessageMetadata;
+    const { getToolsCallback } = yield* CreateStreamSSEResponseGetTools;
+
+    return createUIMessageStream<ThreadMessage>({
+        onFinish: ({ responseMessage }) => {
+            // @ts-expect-error - TODO: fix this
+            return Runtime.runPromise(runtime, onFinishCallback({ responseMessage }));
+        },
+        execute: ({ writer }) => {
+            // @ts-expect-error - TODO: fix this
+            const tools = Runtime.runSync(runtime, getToolsCallback({ writer }));
+
+            const result = streamText({
+                ...options,
+                tools,
+                onError: error => {
+                    // @ts-expect-error - TODO: fix this
+                    return Runtime.runPromise(runtime, onErrorCallback({ error, writer }));
+                },
+            });
+
+            result.consumeStream();
+            writer.merge(
+                result.toUIMessageStream({
+                    sendReasoning: true,
+                    // @ts-expect-error - TODO: fix this
+                    messageMetadata: onMessageMetadataCallback,
+                })
+            );
+        },
+    });
+});
+
+export type OnFinishCallback<A = void, E = never, R = never> = (options: {
+    responseMessage: ThreadMessage;
+}) => Effect.Effect<A, E, R>;
+
+export class CreateStreamSSEResponseOnFinish extends Effect.Tag('CreateStreamSSEResponseOnFinish')<
+    CreateStreamSSEResponseOnFinish,
+    {
+        readonly onFinishCallback: OnFinishCallback<any, any, any>;
     }
-) {
-    return convertToModelMessages(
-        await Promise.all(
-            messages.map(async message => {
-                message.parts = message.parts.filter(part => {
-                    if (part.type === 'file') {
-                        if (
-                            (part.mediaType.startsWith('application/pdf') ||
-                                part.mediaType.startsWith('text/plain')) &&
-                            !options.supportsDocuments
-                        ) {
-                            return false;
-                        }
-                        if (part.mediaType.startsWith('image/') && !options.supportsImages) {
-                            return false;
-                        }
-                    }
-                    return true;
-                });
+>() {}
 
-                for (const part of message.parts) {
-                    if (part.type === 'file') {
-                        if (
-                            part.mediaType.startsWith('application/pdf') ||
-                            part.mediaType.startsWith('text/plain')
-                        ) {
-                            // @ts-expect-error - TODO: fix this
-                            part.url = await fetch(part.url)
-                                .then(res => res.blob())
-                                .then(blob => blob.arrayBuffer());
-                        }
-                    }
-                }
+export type OnErrorCallback<A = void, E = never, R = never> = (options: {
+    error: unknown;
+    writer: UIMessageStreamWriter<ThreadMessage>;
+}) => Effect.Effect<A, E, R>;
 
-                return message;
-            })
-        )
-    );
+export class CreateStreamSSEResponseOnError extends Effect.Tag('CreateStreamSSEResponseOnError')<
+    CreateStreamSSEResponseOnError,
+    {
+        readonly onErrorCallback: OnErrorCallback<any, any, any>;
+    }
+>() {}
+
+export type OnMessageMetadataCallback<A = void, E = never, R = never> = (options: {
+    part: TextStreamPart<InferMessageToolSet<ThreadMessage>>;
+}) => Effect.Effect<A, E, R>;
+
+export class CreateStreamSSEResponseOnMessageMetadata extends Effect.Tag(
+    'CreateStreamSSEResponseOnMessageMetadata'
+)<
+    CreateStreamSSEResponseOnMessageMetadata,
+    {
+        readonly onMessageMetadataCallback: OnMessageMetadataCallback<any, any, any>;
+    }
+>() {}
+
+export class CreateStreamSSEResponseOptions extends Effect.Tag('CreateStreamSSEResponseOptions')<
+    CreateStreamSSEResponseOptions,
+    StreamTextOptions
+>() {}
+
+export type GetToolsCallback<E = never, R = never> = (options: {
+    writer: UIMessageStreamWriter<ThreadMessage>;
+}) => Effect.Effect<ToolSet, E, R>;
+
+export class CreateStreamSSEResponseGetTools extends Effect.Tag('CreateStreamSSEResponseGetTools')<
+    CreateStreamSSEResponseGetTools,
+    {
+        readonly getToolsCallback: GetToolsCallback<any, any>;
+    }
+>() {}
+
+export class Stream {
+    static create = createStreamSSEResponse;
+
+    static onFinish<A = void, E = never, R = never>(callback: OnFinishCallback<A, E, R>) {
+        return Effect.provide(
+            Layer.scoped(
+                CreateStreamSSEResponseOnFinish,
+                Effect.succeed({ onFinishCallback: callback })
+            )
+        );
+    }
+
+    static onError<A = void, E = never, R = never>(callback: OnErrorCallback<A, E, R>) {
+        return Effect.provide(
+            Layer.scoped(
+                CreateStreamSSEResponseOnError,
+                Effect.succeed({ onErrorCallback: callback })
+            )
+        );
+    }
+
+    static onMessageMetadata<A = void, E = never, R = never>(
+        callback: OnMessageMetadataCallback<A, E, R>
+    ) {
+        return Effect.provide(
+            Layer.scoped(
+                CreateStreamSSEResponseOnMessageMetadata,
+                Effect.succeed({ onMessageMetadataCallback: callback })
+            )
+        );
+    }
+
+    static getTools<E = never, R = never>(callback: GetToolsCallback<E, R>) {
+        return Effect.provide(
+            Layer.scoped(
+                CreateStreamSSEResponseGetTools,
+                Effect.succeed({ getToolsCallback: callback })
+            )
+        );
+    }
+
+    static options(options: StreamTextOptions) {
+        return Effect.provide(
+            Layer.scoped(CreateStreamSSEResponseOptions, Effect.succeed(options))
+        );
+    }
+
+    static build = Effect.map((stream: ReadableStream<InferUIMessageChunk<ThreadMessage>>) => {
+        return stream.pipeThrough(new JsonToSseTransformStream());
+    });
 }

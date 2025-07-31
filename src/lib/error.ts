@@ -6,6 +6,29 @@ export class APIError extends Data.TaggedError('APIError')<{
     metadata?: Record<string, unknown>;
     cause?: unknown;
 }> {
+    public static map({
+        status,
+        message,
+        metadata,
+    }: {
+        status: number;
+        message?: string;
+        metadata?: Record<string, unknown>;
+    }) {
+        return Effect.mapError(cause => {
+            if (cause instanceof APIError) {
+                return cause;
+            }
+
+            return new APIError({
+                status,
+                message,
+                metadata,
+                cause,
+            });
+        });
+    }
+
     private log = Effect.logError('API Error', {
         message: this.message,
         metadata: this.metadata,
