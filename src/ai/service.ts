@@ -139,8 +139,6 @@ export function prepareThreadContext(args: {
 
         return {
             model,
-            thread,
-            message,
             history,
             settings,
             usage,
@@ -211,6 +209,7 @@ export function createResumableStream(streamId: string, stream: ReadableStream<s
     return Effect.tryPromise(async () => {
         return streamContext.createNewResumableStream(streamId, () => stream);
     }).pipe(
+        Effect.tapError(error => Effect.logError('Error creating resumable stream', error)),
         Effect.retry(
             Schedule.exponential(Duration.millis(200)).pipe(Schedule.compose(Schedule.recurs(3)))
         )
@@ -253,28 +252,62 @@ export async function prepareResumeThread(args: { threadId: string; userId: stri
     return thread.streamId;
 }
 
-export async function generateThreadTitle(threadId: string, message: ThreadMessage) {
-    try {
-        const { text } = await generateText({
-            model: 'google/gemini-2.0-flash-001',
-            system: `\nc
+export function generateThreadTitle(args: {
+    threadId: string;
+    message: ThreadMessage;
+    latch: Effect.Latch;
+}) {
+    const { threadId, message, latch } = args;
+
+    return Effect.gen(function* () {
+        yield* latch.close;
+        yield* Effect.logInfo('Generating thread title');
+
+        const { text } = yield* Effect.tryPromise(() =>
+            generateText({
+                model: 'google/gemini-2.0-flash-001',
+                system: `\nc
             - you will generate a short title based on the first message a user begins a conversation with
             - ensure it is not more than 80 characters long
             - the title should be a summary of the user's message
             - do not use quotes or colons`,
-            temperature: 0.8,
-            messages: convertToModelMessages([message]),
-        });
+                temperature: 0.8,
+                messages: convertToModelMessages([message]),
+            })
+        ).pipe(
+            Effect.tapError(error => Effect.logError('Error generating thread title', error)),
+            Effect.catchAll(() => Effect.succeed({ text: '' }))
+        );
 
-        await db.transaction(async tx => {
-            await queries.updateThreadTitle(tx, {
+        yield* queriesV2
+            .updateThreadTitle({
                 threadId,
                 title: text,
-            });
-        });
-    } catch (error) {
-        console.error(error);
-    }
+            })
+            .pipe(
+                Effect.tapError(error => Effect.logError('Error updating thread title', error)),
+                Effect.catchAll(() => Effect.succeed(null))
+            );
+
+        yield* latch.open;
+    });
+}
+
+export function incrementUsageV2(args: {
+    userId: UserId;
+    type: 'search' | 'research' | 'credits';
+    amount: number;
+}) {
+    return Effect.gen(function* () {
+        yield* Effect.logInfo('Incrementing usage for ' + args.type + ' by ' + args.amount);
+        yield* queriesV2.incrementUsage(
+            {
+                userId: args.userId,
+                type: args.type,
+            },
+            args.amount
+        );
+    });
 }
 
 export function saveMessageAndResetThreadStatus(args: {

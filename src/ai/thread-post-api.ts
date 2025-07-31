@@ -4,7 +4,6 @@ import { Effect, Layer } from 'effect';
 import { z } from 'zod';
 import { UserId } from '@/database/types';
 import { nanoid } from 'nanoid';
-import { ThreadMessage } from '@/ai/types';
 import { smoothStream, stepCountIs } from 'ai';
 import { getTools, ToolContext } from '@/ai/tools';
 import { getSystemPrompt } from '@/ai/prompt';
@@ -12,7 +11,7 @@ import {
     convertUIMessagesToModelMessages,
     createResumableStream,
     generateThreadTitle,
-    incrementUsage,
+    incrementUsageV2,
     prepareThreadContext,
     saveMessageAndResetThreadStatus,
 } from '@/ai/service';
@@ -49,7 +48,7 @@ const threadPostApiHandler = Effect.gen(function* () {
         message: body.message,
     });
 
-    const { history, thread, message, model, settings, usage, limits } = context;
+    const { history, model, settings, usage, limits } = context;
 
     const messages = yield* convertUIMessagesToModelMessages(history, {
         supportsImages: model.capabilities.includes('vision'),
@@ -116,20 +115,16 @@ const threadPostApiHandler = Effect.gen(function* () {
 
     const resumableStream = yield* createResumableStream(streamId, stream);
 
-    yield* Effect.gen(function* () {
-        if (!thread.title) {
-            yield* latch.close;
-            yield* Effect.logInfo('Generating thread title');
-            yield* Effect.tryPromise(() => generateThreadTitle(body.id, message.message)).pipe(
-                Effect.catchAll(() => Effect.succeed(null))
-            );
-            yield* latch.open;
-        }
+    yield* generateThreadTitle({
+        threadId: body.id,
+        message: body.message,
+        latch,
     }).pipe(Effect.forkDaemon);
 
-    yield* Effect.logInfo('Incrementing usage');
-    yield* Effect.tryPromise(async () => {
-        return incrementUsage(UserId(session.user.id), 'credits', model.credits);
+    yield* incrementUsageV2({
+        userId: UserId(session.user.id),
+        type: 'credits',
+        amount: model.credits,
     }).pipe(Effect.forkDaemon);
 
     return new Response(resumableStream);
