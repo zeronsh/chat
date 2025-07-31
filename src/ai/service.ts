@@ -213,7 +213,8 @@ export function createResumableStream(streamId: string, stream: ReadableStream<s
     }).pipe(
         Effect.retry(
             Schedule.exponential(Duration.millis(200)).pipe(Schedule.compose(Schedule.recurs(3)))
-        )
+        ),
+        Effect.catchAll(e => Effect.succeed(stream))
     );
 }
 
