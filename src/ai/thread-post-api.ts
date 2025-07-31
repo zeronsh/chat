@@ -55,16 +55,15 @@ const threadPostApiHandler = Effect.gen(function* () {
         supportsDocuments: model.capabilities.includes('documents'),
     });
 
+    const activeTools = [body.tool].filter(tool => tool !== undefined);
+
     const stream = yield* Stream.create.pipe(
         Stream.options({
             model: model.model,
             messages,
             temperature: 0.8,
             stopWhen: stepCountIs(3),
-            system: getSystemPrompt(
-                settings,
-                [body.tool].filter(tool => tool !== undefined)
-            ),
+            system: getSystemPrompt(settings, activeTools),
             experimental_transform: smoothStream({
                 chunking: 'word',
             }),
@@ -76,7 +75,7 @@ const threadPostApiHandler = Effect.gen(function* () {
                 userId: UserId(session.user.id),
                 limits,
                 runtime,
-                tools: [body.tool].filter(tool => tool !== undefined),
+                tools: activeTools,
             });
 
             return getTools.pipe(Effect.provide(Layer.scoped(ToolContext, context)));
@@ -86,7 +85,12 @@ const threadPostApiHandler = Effect.gen(function* () {
                 threadId: body.id,
                 userId: UserId(session.user.id),
                 message: responseMessage,
-            }).pipe(latch.whenOpen);
+            }).pipe(
+                Effect.tapError(error =>
+                    Effect.logError('Error saving message and resetting thread status', error)
+                ),
+                latch.whenOpen
+            );
         }),
         Stream.onMessageMetadata(({ part }) => {
             return Effect.gen(function* () {
