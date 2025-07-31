@@ -7,7 +7,7 @@ import { convertToModelMessages, generateText } from 'ai';
 import { createResumableStreamContext } from 'resumable-stream';
 import { UserId } from '@/database/types';
 import { Database } from '@/database/effect';
-import { Effect } from 'effect';
+import { Duration, Effect, Schedule } from 'effect';
 import { APIError } from '@/lib/error';
 import { AnonymousLimits, FreeLimits, ProLimits } from '@/lib/constants';
 import { match } from 'ts-pattern';
@@ -210,7 +210,11 @@ export function convertUIMessagesToModelMessages(
 export function createResumableStream(streamId: string, stream: ReadableStream<string>) {
     return Effect.tryPromise(async () => {
         return streamContext.createNewResumableStream(streamId, () => stream);
-    });
+    }).pipe(
+        Effect.retry(
+            Schedule.exponential(Duration.millis(200)).pipe(Schedule.compose(Schedule.recurs(3)))
+        )
+    );
 }
 
 export async function prepareResumeThread(args: { threadId: string; userId: string }) {
