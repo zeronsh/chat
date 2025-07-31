@@ -212,7 +212,8 @@ export function createResumableStream(streamId: string, stream: ReadableStream<s
         Effect.tapError(error => Effect.logError('Error creating resumable stream', error)),
         Effect.retry(
             Schedule.exponential(Duration.millis(200)).pipe(Schedule.compose(Schedule.recurs(3)))
-        )
+        ),
+        Effect.catchAll(e => Effect.succeed(stream))
     );
 }
 
