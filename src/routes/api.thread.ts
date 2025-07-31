@@ -19,7 +19,7 @@ import {
     saveMessageAndResetThreadStatus,
 } from '@/ai/service';
 import { Stream } from '@/ai/stream';
-import { disconnect, listen, subscribe, unsubscribe } from '@/lib/redis';
+import { listen, subscribe, unsubscribe } from '@/lib/redis';
 
 export const ServerRoute = createServerFileRoute('/api/thread').methods({
     async POST({ request }) {
@@ -84,6 +84,7 @@ const threadPostApiHandler = Effect.gen(function* () {
     yield* listen((channel, message) => {
         return Effect.gen(function* () {
             if (channel === `abort:${body.id}` && message === 'abort') {
+                yield* Effect.log('Aborting stream');
                 controller.abort();
             }
         });
