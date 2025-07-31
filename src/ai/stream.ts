@@ -206,8 +206,10 @@ const createStreamSSEResponse = Effect.gen(function* () {
             writer.merge(
                 result.toUIMessageStream({
                     sendReasoning: true,
-                    // @ts-expect-error - TODO: fix this
-                    messageMetadata: onMessageMetadataCallback,
+                    messageMetadata: ({ part }) => {
+                        // @ts-expect-error - TODO: fix this
+                        return Runtime.runSync(runtime, onMessageMetadataCallback({ part }));
+                    },
                 })
             );
         },
