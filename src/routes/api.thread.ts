@@ -14,12 +14,13 @@ import {
     convertUIMessagesToModelMessages,
     createResumableStream,
     generateThreadTitle,
-    incrementUsageV2,
+    incrementUsage,
     prepareThreadContext,
     saveMessageAndResetThreadStatus,
 } from '@/ai/service';
 import { Stream } from '@/ai/stream';
 import { listen, subscribe, unsubscribe } from '@/lib/redis';
+import { Database } from '@/database/effect';
 
 export const ServerRoute = createServerFileRoute('/api/thread').methods({
     async POST({ request }) {
@@ -50,7 +51,7 @@ const threadPostApi = Effect.gen(function* () {
 });
 
 const threadPostApiHandler = Effect.gen(function* () {
-    const runtime = yield* Effect.runtime();
+    const runtime = yield* Effect.runtime<Database>();
     const latch = yield* Effect.makeLatch();
 
     yield* latch.open;
@@ -165,7 +166,7 @@ const threadPostApiHandler = Effect.gen(function* () {
         yield* generateThreadTitle(body.id, body.message, latch).pipe(Effect.forkDaemon);
     }
 
-    yield* incrementUsageV2(UserId(session.user.id), 'credits', model.credits).pipe(
+    yield* incrementUsage(UserId(session.user.id), 'credits', model.credits).pipe(
         Effect.forkDaemon
     );
 

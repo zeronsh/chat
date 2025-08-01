@@ -6,6 +6,7 @@ import { UserId } from '@/database/types';
 import { Limits } from '@/lib/constants';
 import { Effect, Runtime } from 'effect';
 import { getResearchTool } from '@/ai/tools/research-tool';
+import { Database } from '@/database/effect';
 
 const tools = {
     search: getSearchTool,
@@ -23,7 +24,7 @@ export type ToolContextImpl = {
     usage: typeof schema.usage.$inferSelect;
     userId: UserId;
     limits: Limits;
-    runtime: Runtime.Runtime<never>;
+    runtime: Runtime.Runtime<Database>;
     tools: string[];
 };
 

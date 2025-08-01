@@ -314,7 +314,7 @@ export function generateThreadTitle(threadId: string, message: ThreadMessage, la
     });
 }
 
-export function incrementUsageV2(
+export function incrementUsage(
     userId: UserId,
     type: 'search' | 'research' | 'credits',
     amount: number
@@ -331,7 +331,7 @@ export function incrementUsageV2(
     });
 }
 
-export function decrementUsageV2(
+export function decrementUsage(
     userId: UserId,
     type: 'search' | 'research' | 'credits',
     amount: number
@@ -374,36 +374,6 @@ export function saveMessageAndResetThreadStatus(args: {
                 }
             );
         })
-    );
-}
-
-export async function incrementUsage(
-    userId: UserId,
-    type: 'search' | 'research' | 'credits',
-    amount: number
-) {
-    await queries.incrementUsage(
-        db,
-        {
-            userId,
-            type,
-        },
-        amount
-    );
-}
-
-export async function decrementUsage(
-    userId: UserId,
-    type: 'search' | 'research' | 'credits',
-    amount: number
-) {
-    await queries.decrementUsage(
-        db,
-        {
-            userId,
-            type,
-        },
-        amount
     );
 }
 
