@@ -69,7 +69,7 @@ const threadPostApiHandler = Effect.gen(function* () {
         message: body.message,
     });
 
-    const { history, model, settings, usage, limits } = context;
+    const { history, model, settings, usage, limits, thread } = context;
 
     const messages = yield* convertUIMessagesToModelMessages(history, {
         supportsImages: model.capabilities.includes('vision'),
@@ -103,16 +103,21 @@ const threadPostApiHandler = Effect.gen(function* () {
             abortSignal: controller.signal,
         }),
         Stream.getTools(({ writer }) => {
-            const context = Effect.succeed({
-                writer,
-                usage,
-                userId: UserId(session.user.id),
-                limits,
-                runtime,
-                tools: activeTools,
-            });
-
-            return getTools.pipe(Effect.provide(Layer.scoped(ToolContext, context)));
+            return getTools.pipe(
+                Effect.provide(
+                    Layer.scoped(
+                        ToolContext,
+                        Effect.succeed({
+                            writer,
+                            usage,
+                            userId: UserId(session.user.id),
+                            limits,
+                            runtime,
+                            tools: activeTools,
+                        })
+                    )
+                )
+            );
         }),
         Stream.onFinish(({ responseMessage }) => {
             return Effect.gen(function* () {
@@ -156,7 +161,9 @@ const threadPostApiHandler = Effect.gen(function* () {
 
     const resumableStream = yield* createResumableStream(streamId, stream);
 
-    yield* generateThreadTitle(body.id, body.message, latch).pipe(Effect.forkDaemon);
+    if (!thread.title) {
+        yield* generateThreadTitle(body.id, body.message, latch).pipe(Effect.forkDaemon);
+    }
 
     yield* incrementUsageV2(UserId(session.user.id), 'credits', model.credits).pipe(
         Effect.forkDaemon
