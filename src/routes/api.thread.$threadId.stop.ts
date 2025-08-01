@@ -81,7 +81,7 @@ const ThreadStopPostParamsLive = (params: z.infer<typeof ThreadStopPostApiSchema
                 catch: error => {
                     return new APIError({
                         status: 400,
-                        message: 'Invalid request body',
+                        message: 'Invalid request params',
                         cause: error,
                     });
                 },

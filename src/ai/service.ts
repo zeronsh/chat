@@ -3,7 +3,12 @@ import { ThreadMessage } from '@/ai/types';
 import * as queries from '@/database/queries';
 import * as queriesV2 from '@/database/queries.v2';
 import { ThreadError } from '@/ai/error';
-import { convertToModelMessages, generateText } from 'ai';
+import {
+    convertToModelMessages,
+    createUIMessageStream,
+    generateText,
+    JsonToSseTransformStream,
+} from 'ai';
 import { createResumableStreamContext } from 'resumable-stream';
 import { UserId } from '@/database/types';
 import { Database } from '@/database/effect';
@@ -217,40 +222,61 @@ export function createResumableStream(streamId: string, stream: ReadableStream<s
     );
 }
 
-export async function prepareResumeThread(args: { threadId: string; userId: string }) {
-    const thread = await queries.getThreadById(db, args.threadId);
-
-    if (!thread) {
-        throw new ThreadError('ThreadNotFound', {
-            status: 404,
-            metadata: {
-                threadId: args.threadId,
-                userId: args.userId,
-            },
+export function getResumableStream(streamId: string) {
+    return Effect.gen(function* () {
+        const emptyDataStream = createUIMessageStream({
+            execute: () => {},
         });
-    }
+        return yield* Effect.tryPromise(async () => {
+            return streamContext.resumableStream(streamId, () =>
+                emptyDataStream.pipeThrough(new JsonToSseTransformStream())
+            );
+        }).pipe(
+            Effect.tapError(error => Effect.logError('Error getting resumable stream', error)),
+            Effect.retry(
+                Schedule.exponential(Duration.millis(200)).pipe(
+                    Schedule.compose(Schedule.recurs(3))
+                )
+            ),
+            Effect.catchAll(() => Effect.succeed(null))
+        );
+    });
+}
 
-    if (thread.userId !== args.userId) {
-        throw new ThreadError('NotAuthorized', {
-            status: 403,
-            metadata: {
-                threadId: args.threadId,
-                userId: args.userId,
-            },
-        });
-    }
+export function prepareResumeThreadContext(args: { threadId: string; userId: string }) {
+    return Effect.gen(function* () {
+        const thread = yield* queriesV2.getThreadById(args.threadId);
 
-    if (!thread.streamId) {
-        throw new ThreadError('StreamNotFound', {
-            status: 404,
-            metadata: {
-                threadId: args.threadId,
-                userId: args.userId,
-            },
-        });
-    }
+        if (!thread) {
+            return yield* new APIError({
+                status: 404,
+                message: 'Thread not found',
+            });
+        }
 
-    return thread.streamId;
+        if (thread.userId !== args.userId) {
+            return yield* new APIError({
+                status: 403,
+                message: 'User is not the owner of the thread',
+            });
+        }
+
+        if (thread.status !== 'streaming') {
+            return yield* new APIError({
+                status: 400,
+                message: 'Thread is not streaming',
+            });
+        }
+
+        if (!thread.streamId) {
+            return yield* new APIError({
+                status: 404,
+                message: 'Thread is not streaming',
+            });
+        }
+
+        return thread.streamId;
+    });
 }
 
 export function generateThreadTitle(threadId: string, message: ThreadMessage, latch: Effect.Latch) {
@@ -296,6 +322,23 @@ export function incrementUsageV2(
     return Effect.gen(function* () {
         yield* Effect.logInfo('Incrementing usage for ' + type + ' by ' + amount);
         yield* queriesV2.incrementUsage(
+            {
+                userId: userId,
+                type: type,
+            },
+            amount
+        );
+    });
+}
+
+export function decrementUsageV2(
+    userId: UserId,
+    type: 'search' | 'research' | 'credits',
+    amount: number
+) {
+    return Effect.gen(function* () {
+        yield* Effect.logInfo('Decrementing usage for ' + type + ' by ' + amount);
+        yield* queriesV2.decrementUsage(
             {
                 userId: userId,
                 type: type,
