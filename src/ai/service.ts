@@ -1,6 +1,5 @@
 import { db, schema } from '@/database';
 import { ThreadMessage } from '@/ai/types';
-import * as queries from '@/database/queries';
 import * as queriesV2 from '@/database/queries.v2';
 import {
     convertToModelMessages,

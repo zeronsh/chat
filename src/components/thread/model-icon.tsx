@@ -13,6 +13,7 @@ import XIcon from '@/components/icons/x';
 import XAIIcon from '@/components/icons/xai';
 import MoonshotIcon from '@/components/icons/moonshot';
 import ZaiIcon from '@/components/icons/zai';
+import QwenIcon from '@/components/icons/qwen';
 import type { SVGProps } from 'react';
 
 export type ModelType =
@@ -31,6 +32,7 @@ export type ModelType =
     | 'xai'
     | 'zai'
     | 'moonshot'
+    | 'qwen'
     | string;
 
 interface ModelIconProps extends SVGProps<SVGSVGElement> {
@@ -54,6 +56,7 @@ const ModelIcon = ({ model, ...props }: ModelIconProps) => {
         xai: XAIIcon,
         zai: ZaiIcon,
         moonshot: MoonshotIcon,
+        qwen: QwenIcon,
     };
 
     const Icon = icons[model];

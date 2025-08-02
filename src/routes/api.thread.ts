@@ -131,6 +131,7 @@ const threadPostApiHandler = Effect.gen(function* () {
                     Effect.tapError(error =>
                         Effect.logError('Error saving message and resetting thread status', error)
                     ),
+                    Effect.catchAll(() => Effect.succeed(null)),
                     latch.whenOpen
                 );
             });
