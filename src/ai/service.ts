@@ -1,6 +1,6 @@
 import { db, schema } from '@/database';
 import { ThreadMessage } from '@/ai/types';
-import * as queriesV2 from '@/database/queries.v2';
+import * as queries from '@/database/queries';
 import {
     convertToModelMessages,
     createUIMessageStream,
@@ -29,12 +29,12 @@ export function prepareThreadContext(args: {
 }) {
     const effects = Effect.all(
         [
-            queriesV2.getThreadById(args.threadId),
-            queriesV2.getMessageById(args.message.id),
-            queriesV2.getModelById(args.modelId),
-            queriesV2.getSettingsByUserId(args.userId),
-            queriesV2.getUsageByUserId(args.userId),
-            queriesV2.getUserCustomerByUserId(args.userId),
+            queries.getThreadById(args.threadId),
+            queries.getMessageById(args.message.id),
+            queries.getModelById(args.modelId),
+            queries.getSettingsByUserId(args.userId),
+            queries.getUsageByUserId(args.userId),
+            queries.getUserCustomerByUserId(args.userId),
         ],
         {
             concurrency: 'unbounded',
@@ -68,7 +68,7 @@ export function prepareThreadContext(args: {
 
         if (!thread) {
             yield* Effect.logInfo('Creating thread');
-            [thread] = yield* queriesV2.createThread({
+            [thread] = yield* queries.createThread({
                 id: args.threadId,
                 userId: args.userId,
             });
@@ -101,7 +101,7 @@ export function prepareThreadContext(args: {
         }
 
         yield* Effect.logInfo('Update thread status to streaming');
-        yield* queriesV2.updateThread({
+        yield* queries.updateThread({
             threadId: args.threadId,
             status: 'streaming',
             streamId: args.streamId,
@@ -112,12 +112,12 @@ export function prepareThreadContext(args: {
             yield* Effect.logInfo('Updating message and deleting trailing messages');
             [[message]] = yield* Effect.all(
                 [
-                    queriesV2.updateMessage({
+                    queries.updateMessage({
                         messageId: args.message.id,
                         message: args.message,
                         updatedAt: new Date(),
                     }),
-                    queriesV2.deleteTrailingMessages({
+                    queries.deleteTrailingMessages({
                         threadId: args.threadId,
                         messageId: args.message.id,
                         messageCreatedAt: message.createdAt,
@@ -131,14 +131,14 @@ export function prepareThreadContext(args: {
 
         if (!message) {
             yield* Effect.logInfo('Creating message');
-            [message] = yield* queriesV2.createMessage({
+            [message] = yield* queries.createMessage({
                 threadId: args.threadId,
                 userId: args.userId,
                 message: args.message,
             });
         }
 
-        const history = yield* queriesV2.getThreadMessageHistory(args.threadId);
+        const history = yield* queries.getThreadMessageHistory(args.threadId);
 
         return {
             model,
@@ -244,7 +244,7 @@ export function getResumableStream(streamId: string) {
 
 export function prepareResumeThreadContext(args: { threadId: string; userId: string }) {
     return Effect.gen(function* () {
-        const thread = yield* queriesV2.getThreadById(args.threadId);
+        const thread = yield* queries.getThreadById(args.threadId);
 
         if (!thread) {
             return yield* new APIError({
@@ -299,7 +299,7 @@ export function generateThreadTitle(threadId: string, message: ThreadMessage, la
             Effect.catchAll(() => Effect.succeed({ text: '' }))
         );
 
-        yield* queriesV2
+        yield* queries
             .updateThreadTitle({
                 threadId,
                 title: text,
@@ -320,7 +320,7 @@ export function incrementUsage(
 ) {
     return Effect.gen(function* () {
         yield* Effect.logInfo('Incrementing usage for ' + type + ' by ' + amount);
-        yield* queriesV2.incrementUsage(
+        yield* queries.incrementUsage(
             {
                 userId: userId,
                 type: type,
@@ -337,7 +337,7 @@ export function decrementUsage(
 ) {
     return Effect.gen(function* () {
         yield* Effect.logInfo('Decrementing usage for ' + type + ' by ' + amount);
-        yield* queriesV2.decrementUsage(
+        yield* queries.decrementUsage(
             {
                 userId: userId,
                 type: type,
@@ -357,12 +357,12 @@ export function saveMessageAndResetThreadStatus(args: {
             yield* Effect.logInfo('Saving message and resetting thread status');
             yield* Effect.all(
                 [
-                    queriesV2.createMessage({
+                    queries.createMessage({
                         threadId: args.threadId,
                         userId: args.userId,
                         message: args.message,
                     }),
-                    queriesV2.updateThread({
+                    queries.updateThread({
                         threadId: args.threadId,
                         status: 'ready',
                         streamId: null,

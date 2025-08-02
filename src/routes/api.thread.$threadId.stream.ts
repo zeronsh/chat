@@ -1,7 +1,7 @@
 import { createServerFileRoute } from '@tanstack/react-start/server';
 import { getResumableStream, prepareResumeThreadContext } from '@/ai/service';
 import { Effect, Layer } from 'effect';
-import { Session, SessionLive } from '@/lib/auth-effects';
+import { Session, SessionLive } from '@/lib/auth';
 import z from 'zod';
 import { APIError } from '@/lib/error';
 import { nanoid } from '@/lib/utils';

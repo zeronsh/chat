@@ -1,8 +1,7 @@
 import { createServerFileRoute } from '@tanstack/react-start/server';
 import { Effect, Layer } from 'effect';
-import { SessionLive } from '@/lib/auth-effects';
+import { SessionLive, Session } from '@/lib/auth';
 import { DatabaseLive } from '@/database/effect';
-import { Session } from '@/lib/auth-effects';
 import { APIError } from '@/lib/error';
 import { z } from 'zod';
 import { UserId } from '@/database/types';

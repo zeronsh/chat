@@ -1,13 +1,12 @@
 import { createServerFileRoute } from '@tanstack/react-start/server';
 import { Effect, Layer } from 'effect';
-import { SessionLive } from '@/lib/auth-effects';
+import { SessionLive, Session } from '@/lib/auth';
 import { DatabaseLive } from '@/database/effect';
-import { Session } from '@/lib/auth-effects';
 import { APIError } from '@/lib/error';
 import { z } from 'zod';
 import { nanoid } from 'nanoid';
 import { publish } from '@/lib/redis';
-import * as queriesV2 from '@/database/queries.v2';
+import * as queries from '@/database/queries';
 
 export const ServerRoute = createServerFileRoute('/api/thread/$threadId/stop').methods({
     async POST({ request, params }) {
@@ -41,7 +40,7 @@ const threadStopPostApiHandler = Effect.gen(function* () {
     const session = yield* Session;
     const params = yield* ThreadStopPostParams;
 
-    const thread = yield* queriesV2.getThreadById(params.id);
+    const thread = yield* queries.getThreadById(params.id);
 
     if (!thread) {
         console.log('thread not found');

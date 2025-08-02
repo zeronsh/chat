@@ -1,33 +1,60 @@
-import { db } from '@/database';
-import { auth } from '@/lib/auth';
-import { syncStripeDataToDatabase } from '@/lib/stripe';
 import { createServerFileRoute } from '@tanstack/react-start/server';
+import { env } from '@/lib/env';
+import { Effect, Layer } from 'effect';
+import { APIError } from '@/lib/error';
+import { SessionLive, Session } from '@/lib/auth';
+import { DatabaseLive } from '@/database/effect';
 import * as queries from '@/database/queries';
 import { UserId } from '@/database/types';
-import { env } from '@/lib/env';
+import { syncStripeDataToDatabase } from '@/lib/stripe';
+import { nanoid } from '@/lib/utils';
 
 export const ServerRoute = createServerFileRoute('/api/checkout/success').methods({
     GET: async ({ request }) => {
-        const url = new URL(request.url);
-        const redirectUrl = url.searchParams.get('redirectUrl');
-
-        const session = await auth.api.getSession({
-            headers: request.headers,
-        });
-
-        if (!session) {
-            return Response.json('unauthorized', {
-                status: 401,
-            });
-        }
-        const customer = await queries.getUserCustomerByUserId(db, UserId(session.user.id));
-
-        if (!customer) {
-            return Response.redirect(redirectUrl ?? '/', 303);
-        }
-
-        await syncStripeDataToDatabase(customer.id);
-
-        return Response.redirect(redirectUrl ?? env.VITE_PUBLIC_API_URL, 303);
+        return checkoutSuccessApi.pipe(
+            Effect.scoped,
+            APIError.map({
+                status: 500,
+                message: 'Uncaught error',
+            }),
+            Effect.catchAll(e => e.response),
+            Effect.provide(SessionLive(request)),
+            Effect.provide(CheckoutSuccessRequestLive(request)),
+            Effect.provide(DatabaseLive),
+            Effect.annotateLogs('requestId', nanoid()),
+            Effect.runPromise
+        );
     },
 });
+
+const checkoutSuccessApi = Effect.gen(function* () {
+    const session = yield* Session;
+    const checkoutSuccessRequest = yield* CheckoutSuccessRequest;
+
+    const customer = yield* queries.getUserCustomerByUserId(UserId(session.user.id));
+
+    if (!customer) {
+        return Response.redirect(checkoutSuccessRequest.redirectUrl ?? '/', 303);
+    }
+
+    yield* syncStripeDataToDatabase(customer.id);
+
+    return Response.redirect(checkoutSuccessRequest.redirectUrl ?? env.VITE_PUBLIC_API_URL, 303);
+});
+
+interface CheckoutSuccessRequestShape {
+    redirectUrl: string | null;
+}
+
+export class CheckoutSuccessRequest extends Effect.Tag('CheckoutSuccessRequest')<
+    CheckoutSuccessRequest,
+    CheckoutSuccessRequestShape
+>() {}
+
+export const CheckoutSuccessRequestLive = (request: Request) =>
+    Layer.scoped(
+        CheckoutSuccessRequest,
+        Effect.succeed({
+            redirectUrl: new URL(request.url).searchParams.get('redirectUrl'),
+        })
+    );
