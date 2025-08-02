@@ -2,7 +2,6 @@ import { CustomerId, SubscriptionData } from '@/database/types';
 import { env } from '@/lib/env';
 import * as queries from '@/database/queries';
 import Stripe from 'stripe';
-import { db } from '@/database';
 import { Effect } from 'effect';
 import { APIError } from '@/lib/error';
 
