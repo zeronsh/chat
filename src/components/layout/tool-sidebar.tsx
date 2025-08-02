@@ -11,25 +11,45 @@ import { useThreadSelector } from '@/context/thread';
 import { motion } from 'framer-motion';
 import { Brain, CheckIcon, SearchIcon, X } from 'lucide-react';
 import { useEffect, useMemo } from 'react';
+import { useResizable } from '@/hooks/use-resizable';
 import { StickToBottom } from 'use-stick-to-bottom';
 
 export function ToolSidebar() {
+    const { width, isResizing, handleMouseDown } = useResizable({
+        initialWidth: 300,
+        minWidth: 250,
+        maxWidth: 600,
+        storageKey: 'tool-sidebar-width',
+    });
+
     return (
         <SidebarProvider
             className="w-fit"
             defaultOpen={false}
             style={
                 {
-                    '--sidebar-width': '300px',
+                    '--sidebar-width': `${width}px`,
                 } as React.CSSProperties
             }
         >
-            <ToolSidebarBody />
+            <ToolSidebarBody 
+                width={width} 
+                isResizing={isResizing} 
+                onResizeStart={handleMouseDown} 
+            />
         </SidebarProvider>
     );
 }
 
-function ToolSidebarBody() {
+function ToolSidebarBody({ 
+    width, 
+    isResizing, 
+    onResizeStart 
+}: { 
+    width: number; 
+    isResizing: boolean; 
+    onResizeStart: (e: React.MouseEvent) => void; 
+}) {
     const sidebar = useSidebar();
     const toolSidebar = useThreadSelector(state => state.toolSidebar);
 
@@ -45,6 +65,13 @@ function ToolSidebarBody() {
         <Sidebar side="right">
             <ToolSidebarHeader />
             <ToolSidebarContent />
+            <div
+                className="absolute left-0 top-0 h-full w-1 cursor-ew-resize bg-transparent hover:bg-border/50 transition-colors"
+                onMouseDown={onResizeStart}
+                style={{
+                    zIndex: 50,
+                }}
+            />
         </Sidebar>
     );
 }
