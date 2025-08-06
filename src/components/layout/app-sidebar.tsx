@@ -31,6 +31,7 @@ import { Fragment } from 'react/jsx-runtime';
 import { useForm } from '@tanstack/react-form';
 import z from 'zod';
 import { Label } from '@/components/ui/label';
+import ZeronIcon from '../icons/zeron';
 
 export function AppSidebar() {
     const [threadToEdit, setThreadToEdit] = useState<Thread | null>(null);
@@ -55,7 +56,11 @@ export function AppSidebar() {
 function AppSidebarHeader() {
     return (
         <SidebarHeader className="p-3">
-            <div className="h-9" />
+            <Button variant="ghost" size="icon" asChild>
+                <Link to="/">
+                    <ZeronIcon className="size-6" />
+                </Link>
+            </Button>
         </SidebarHeader>
     );
 }
