@@ -101,6 +101,11 @@ const threadPostApiHandler = Effect.gen(function* () {
                 chunking: 'word',
             }),
             abortSignal: controller.signal,
+            providerOptions: {
+                gateway: {
+                    order: ['groq', 'cerebras'],
+                },
+            },
         }),
         Stream.getTools(({ writer }) => {
             return getTools.pipe(
