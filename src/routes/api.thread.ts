@@ -20,6 +20,7 @@ import {
 import { Stream } from '@/ai/stream';
 import { listen, subscribe, unsubscribe } from '@/lib/redis';
 import { Database } from '@/database/effect';
+import { OpenAIResponsesProviderOptions } from '@ai-sdk/openai';
 
 export const ServerRoute = createServerFileRoute('/api/thread').methods({
     async POST({ request }) {
@@ -103,11 +104,16 @@ const threadPostApiHandler = Effect.gen(function* () {
             abortSignal: controller.signal,
             providerOptions: {
                 openai: {
+                    parallelToolCalls: false,
                     include: ['reasoning.encrypted_content'],
-                },
+                    reasoningSummary: 'auto',
+                } satisfies OpenAIResponsesProviderOptions,
                 gateway: {
                     order: ['groq', 'cerebras'],
                 },
+            },
+            onChunk: ({ chunk }) => {
+                console.log(chunk);
             },
         }),
         Stream.getTools(({ writer }) => {
