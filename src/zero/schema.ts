@@ -589,6 +589,16 @@ export const schema = {
           >,
           serverName: "model_id",
         },
+        pinnedModels: {
+          type: "json",
+          optional: true,
+          customType: null as unknown as ZeroCustomType<
+            typeof zeroSchema,
+            "setting",
+            "pinnedModels"
+          >,
+          serverName: "pinned_models",
+        },
       },
       primaryKey: ["id"],
     },

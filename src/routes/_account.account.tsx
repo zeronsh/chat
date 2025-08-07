@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Section } from '@/components/ui/section';
 import { Separator } from '@/components/ui/separator';
 import { Link, Outlet, createFileRoute } from '@tanstack/react-router';
-import { CreditCardIcon, PaintbrushIcon, SettingsIcon, UserIcon } from 'lucide-react';
+import { BotIcon, CreditCardIcon, PaintbrushIcon, SettingsIcon, UserIcon } from 'lucide-react';
 
 export const Route = createFileRoute('/_account/account')({
     component: RouteComponent,
@@ -24,6 +24,11 @@ const pages = [
         title: 'Preferences',
         url: '/account/preferences',
         icon: <SettingsIcon />,
+    },
+    {
+        title: 'Models',
+        url: '/account/models',
+        icon: <BotIcon />,
     },
     {
         title: 'Appearance',

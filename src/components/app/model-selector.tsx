@@ -31,8 +31,9 @@ export function ModelSelector() {
     const [open, setOpen] = useState(false);
     const [hoveredModel, setHoveredModel] = useState<Model | null>(null);
     const db = useDatabase();
-    const [models] = useQuery(db.query.model);
+    const [allModels] = useQuery(db.query.model);
     const settings = useSettings();
+    const models = allModels.filter(model => settings?.pinnedModels?.includes(model.id));
     const access = useAccess();
     const [proDialogOpen, setProDialogOpen] = useState(false);
     const [accountDialogOpen, setAccountDialogOpen] = useState(false);

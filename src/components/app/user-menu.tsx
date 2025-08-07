@@ -15,6 +15,7 @@ import { authClient } from '@/lib/auth-client';
 import { getUsername } from '@/lib/usernames';
 import { Link, useNavigate } from '@tanstack/react-router';
 import {
+    BotIcon,
     CreditCardIcon,
     LogInIcon,
     LogOutIcon,
@@ -69,6 +70,12 @@ export function UserMenu() {
                     <Link to="/account/preferences">
                         <SettingsIcon className="size-4" />
                         Preferences
+                    </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                    <Link to="/account/models">
+                        <BotIcon className="size-4" />
+                        Models
                     </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>

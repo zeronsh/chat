@@ -23,6 +23,7 @@ import { Route as AccountLoginIndexRouteImport } from './routes/_account.login.i
 import { Route as AccountAccountIndexRouteImport } from './routes/_account.account.index'
 import { Route as AccountAccountSubscriptionRouteImport } from './routes/_account.account.subscription'
 import { Route as AccountAccountPreferencesRouteImport } from './routes/_account.account.preferences'
+import { Route as AccountAccountModelsRouteImport } from './routes/_account.account.models'
 import { Route as AccountAccountAppearanceRouteImport } from './routes/_account.account.appearance'
 import { ServerRoute as ApiUploadthingServerRouteImport } from './routes/api.uploadthing'
 import { ServerRoute as ApiThreadServerRouteImport } from './routes/api.thread'
@@ -96,6 +97,11 @@ const AccountAccountPreferencesRoute =
     path: '/preferences',
     getParentRoute: () => AccountAccountRoute,
   } as any)
+const AccountAccountModelsRoute = AccountAccountModelsRouteImport.update({
+  id: '/models',
+  path: '/models',
+  getParentRoute: () => AccountAccountRoute,
+} as any)
 const AccountAccountAppearanceRoute =
   AccountAccountAppearanceRouteImport.update({
     id: '/appearance',
@@ -163,6 +169,7 @@ export interface FileRoutesByFullPath {
   '/$threadId': typeof ThreadThreadIdRoute
   '/': typeof ThreadIndexRoute
   '/account/appearance': typeof AccountAccountAppearanceRoute
+  '/account/models': typeof AccountAccountModelsRoute
   '/account/preferences': typeof AccountAccountPreferencesRoute
   '/account/subscription': typeof AccountAccountSubscriptionRoute
   '/account/': typeof AccountAccountIndexRoute
@@ -174,6 +181,7 @@ export interface FileRoutesByTo {
   '/$threadId': typeof ThreadThreadIdRoute
   '/': typeof ThreadIndexRoute
   '/account/appearance': typeof AccountAccountAppearanceRoute
+  '/account/models': typeof AccountAccountModelsRoute
   '/account/preferences': typeof AccountAccountPreferencesRoute
   '/account/subscription': typeof AccountAccountSubscriptionRoute
   '/account': typeof AccountAccountIndexRoute
@@ -190,6 +198,7 @@ export interface FileRoutesById {
   '/_thread/$threadId': typeof ThreadThreadIdRoute
   '/_thread/': typeof ThreadIndexRoute
   '/_account/account/appearance': typeof AccountAccountAppearanceRoute
+  '/_account/account/models': typeof AccountAccountModelsRoute
   '/_account/account/preferences': typeof AccountAccountPreferencesRoute
   '/_account/account/subscription': typeof AccountAccountSubscriptionRoute
   '/_account/account/': typeof AccountAccountIndexRoute
@@ -204,6 +213,7 @@ export interface FileRouteTypes {
     | '/$threadId'
     | '/'
     | '/account/appearance'
+    | '/account/models'
     | '/account/preferences'
     | '/account/subscription'
     | '/account/'
@@ -215,6 +225,7 @@ export interface FileRouteTypes {
     | '/$threadId'
     | '/'
     | '/account/appearance'
+    | '/account/models'
     | '/account/preferences'
     | '/account/subscription'
     | '/account'
@@ -230,6 +241,7 @@ export interface FileRouteTypes {
     | '/_thread/$threadId'
     | '/_thread/'
     | '/_account/account/appearance'
+    | '/_account/account/models'
     | '/_account/account/preferences'
     | '/_account/account/subscription'
     | '/_account/account/'
@@ -413,6 +425,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountAccountPreferencesRouteImport
       parentRoute: typeof AccountAccountRoute
     }
+    '/_account/account/models': {
+      id: '/_account/account/models'
+      path: '/models'
+      fullPath: '/account/models'
+      preLoaderRoute: typeof AccountAccountModelsRouteImport
+      parentRoute: typeof AccountAccountRoute
+    }
     '/_account/account/appearance': {
       id: '/_account/account/appearance'
       path: '/appearance'
@@ -499,6 +518,7 @@ declare module '@tanstack/react-start/server' {
 
 interface AccountAccountRouteChildren {
   AccountAccountAppearanceRoute: typeof AccountAccountAppearanceRoute
+  AccountAccountModelsRoute: typeof AccountAccountModelsRoute
   AccountAccountPreferencesRoute: typeof AccountAccountPreferencesRoute
   AccountAccountSubscriptionRoute: typeof AccountAccountSubscriptionRoute
   AccountAccountIndexRoute: typeof AccountAccountIndexRoute
@@ -506,6 +526,7 @@ interface AccountAccountRouteChildren {
 
 const AccountAccountRouteChildren: AccountAccountRouteChildren = {
   AccountAccountAppearanceRoute: AccountAccountAppearanceRoute,
+  AccountAccountModelsRoute: AccountAccountModelsRoute,
   AccountAccountPreferencesRoute: AccountAccountPreferencesRoute,
   AccountAccountSubscriptionRoute: AccountAccountSubscriptionRoute,
   AccountAccountIndexRoute: AccountAccountIndexRoute,

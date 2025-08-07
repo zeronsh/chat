@@ -82,6 +82,18 @@ export const setting = pgTable('setting', {
     biography: text('biography'),
     instructions: text('instructions'),
     modelId: text('model_id').notNull().default('gpt-4o-mini'),
+    pinnedModels: jsonb('pinned_models')
+        .$type<string[]>()
+        .notNull()
+        .default([
+            'claude-4-sonnet',
+            'gpt-4o',
+            'gpt-4o-mini',
+            'gemini-2.5-flash',
+            'gemini-2.5-pro',
+            'gemini-2.0-flash',
+            'kimi-k2',
+        ]),
 });
 
 export const usage = pgTable('usage', {

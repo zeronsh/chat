@@ -41,6 +41,7 @@ export default drizzleZeroConfig(schema, {
             biography: true,
             instructions: true,
             modelId: true,
+            pinnedModels: true,
         },
         user: {
             id: true,
