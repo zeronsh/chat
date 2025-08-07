@@ -6,13 +6,23 @@ import {
     CommandInput,
     CommandItem,
     CommandList,
+    CommandSeparator,
+    CommandShortcut,
 } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useSettings } from '@/hooks/use-settings';
 import { Fragment, useEffect, useState } from 'react';
 
 import ModelIcon, { type ModelType } from '@/components/thread/model-icon';
-import { BrainIcon, ChevronsUpDown, EyeIcon, FileIcon, WrenchIcon } from 'lucide-react';
+import {
+    BrainIcon,
+    ChevronsUpDown,
+    EyeIcon,
+    FileIcon,
+    WrenchIcon,
+    Pin,
+    PinOff,
+} from 'lucide-react';
 import { useDatabase } from '@/context/database';
 import { useQuery } from '@rocicorp/zero/react';
 import { Model } from '@/zero/types';
@@ -29,11 +39,14 @@ import {
 
 export function ModelSelector() {
     const [open, setOpen] = useState(false);
+    const [showAll, setShowAll] = useState(false);
     const [hoveredModel, setHoveredModel] = useState<Model | null>(null);
     const db = useDatabase();
     const [allModels] = useQuery(db.query.model);
     const settings = useSettings();
-    const models = allModels.filter(model => settings?.pinnedModels?.includes(model.id));
+    const pinnedModelIds = settings?.pinnedModels || [];
+    const models = allModels.filter(model => pinnedModelIds.includes(model.id));
+    const otherModels = allModels.filter(model => !pinnedModelIds.includes(model.id));
     const access = useAccess();
     const [proDialogOpen, setProDialogOpen] = useState(false);
     const [accountDialogOpen, setAccountDialogOpen] = useState(false);
@@ -43,8 +56,56 @@ export function ModelSelector() {
     useEffect(() => {
         if (!open) {
             setHoveredModel(null);
+            setShowAll(false);
         }
     }, [open]);
+
+    const handleSelectModel = (model: Model) => {
+        setOpen(false);
+        if (access.checkCanUseModel(model)) {
+            if (settings) {
+                db.mutate.setting.update({
+                    id: settings.id,
+                    modelId: model.id,
+                });
+            }
+        } else {
+            access.getCannotUseModelMatcher(model, {
+                onPremiumRequired: () => {
+                    setProDialogOpen(true);
+                },
+                onAccountRequired: () => {
+                    setAccountDialogOpen(true);
+                },
+                onInsufficientCreditsPro: () => {
+                    setInsufficientCreditsProDialogOpen(true);
+                },
+                onInsufficientCreditsNotPro: () => {
+                    setInsufficientCreditsDialogOpen(true);
+                },
+                onInsufficientCreditsAnonymous: () => {
+                    setInsufficientCreditsDialogOpen(true);
+                },
+            });
+        }
+    };
+
+    const handleTogglePin = (modelId: string, shouldPin: boolean) => {
+        if (!settings) return;
+        const current = settings.pinnedModels || [];
+        const activeModelCount = current.length;
+        let updated: string[];
+        if (shouldPin) {
+            if (current.includes(modelId)) return;
+            updated = [...current, modelId];
+        } else {
+            if (activeModelCount <= 1) {
+                return; // keep at least one pinned
+            }
+            updated = current.filter(id => id !== modelId);
+        }
+        db.mutate.setting.update({ id: settings.id, pinnedModels: updated });
+    };
 
     return (
         <Fragment>
@@ -61,73 +122,161 @@ export function ModelSelector() {
                             <span className="truncate hidden md:block">
                                 {settings?.model?.name}
                             </span>
+                            {settings?.model?.access === 'premium_required' && (
+                                <Badge variant="outline" className="text-[10px]">
+                                    PRO
+                                </Badge>
+                            )}
                         </div>
                         <ChevronsUpDown className="opacity-50" />
                     </Button>
                 </PopoverTrigger>
-                <PopoverContent className="p-0 relative" align="start">
+                <PopoverContent className={cn('p-0 relative')} align="start">
                     <Command>
                         <CommandInput placeholder="Find Model..." className="h-9" />
-                        <CommandList>
+                        <CommandList className={cn(showAll && 'max-h-[500px]')}>
                             <CommandEmpty>No model found.</CommandEmpty>
-                            <CommandGroup heading="Models">
-                                {models?.map(model => (
-                                    <CommandItem
-                                        key={model.id}
-                                        value={model.name}
-                                        onMouseEnter={() => setHoveredModel(model)}
-                                        onSelect={() => {
-                                            setOpen(false);
-                                            if (access.checkCanUseModel(model)) {
-                                                if (settings) {
-                                                    db.mutate.setting.update({
-                                                        id: settings.id,
-                                                        modelId: model.id,
-                                                    });
-                                                }
-                                            } else {
-                                                access.getCannotUseModelMatcher(model, {
-                                                    onPremiumRequired: () => {
-                                                        setProDialogOpen(true);
-                                                    },
-                                                    onAccountRequired: () => {
-                                                        setAccountDialogOpen(true);
-                                                    },
-                                                    onInsufficientCreditsPro: () => {
-                                                        setInsufficientCreditsProDialogOpen(true);
-                                                    },
-                                                    onInsufficientCreditsNotPro: () => {
-                                                        setInsufficientCreditsDialogOpen(true);
-                                                    },
-                                                    onInsufficientCreditsAnonymous: () => {
-                                                        setInsufficientCreditsDialogOpen(true);
-                                                    },
-                                                });
-                                            }
-                                        }}
-                                        className={cn(
-                                            !access.checkCanUseModel(model) && 'opacity-50'
-                                        )}
-                                    >
-                                        <span className="flex items-center gap-2 flex-1">
-                                            {model.icon && (
-                                                <ModelIcon
-                                                    className="fill-primary"
-                                                    model={model.icon as ModelType}
-                                                />
+                            {!showAll && (
+                                <CommandGroup heading="Models">
+                                    {models?.map(model => (
+                                        <CommandItem
+                                            key={model.id}
+                                            value={`${model.name} ${model.description}`}
+                                            onMouseEnter={() => setHoveredModel(model)}
+                                            onSelect={() => handleSelectModel(model)}
+                                            className={cn(
+                                                !access.checkCanUseModel(model) && 'opacity-50'
                                             )}
-                                            <span className="truncate">{model.name}</span>
-                                            <div className="flex-1" />
-                                            {model.access === 'premium_required' && (
-                                                <Badge variant="outline" className="text-xs">
-                                                    PRO
-                                                </Badge>
-                                            )}
-                                        </span>
-                                    </CommandItem>
-                                ))}
-                            </CommandGroup>
+                                        >
+                                            <span className="flex items-center gap-2 flex-1">
+                                                {model.icon && (
+                                                    <ModelIcon
+                                                        className="fill-primary"
+                                                        model={model.icon as ModelType}
+                                                    />
+                                                )}
+                                                <span className="truncate">{model.name}</span>
+                                                {model.access === 'premium_required' && (
+                                                    <Badge
+                                                        variant="outline"
+                                                        className="text-[10px]"
+                                                    >
+                                                        PRO
+                                                    </Badge>
+                                                )}
+                                            </span>
+                                        </CommandItem>
+                                    ))}
+                                </CommandGroup>
+                            )}
+
+                            {showAll && (
+                                <>
+                                    <CommandGroup heading="Pinned Models">
+                                        {models?.map(model => (
+                                            <CommandItem
+                                                key={`pinned-${model.id}`}
+                                                value={`${model.name}`}
+                                                onMouseEnter={() => setHoveredModel(model)}
+                                                onSelect={() => handleSelectModel(model)}
+                                                className={cn(
+                                                    !access.checkCanUseModel(model) && 'opacity-50'
+                                                )}
+                                            >
+                                                <span className="flex items-center gap-2 flex-1">
+                                                    {model.icon && (
+                                                        <ModelIcon
+                                                            className="fill-primary"
+                                                            model={model.icon as ModelType}
+                                                        />
+                                                    )}
+                                                    <span className="truncate">{model.name}</span>
+                                                    {model.access === 'premium_required' && (
+                                                        <Badge
+                                                            variant="outline"
+                                                            className="text-[10px]"
+                                                        >
+                                                            PRO
+                                                        </Badge>
+                                                    )}
+                                                </span>
+                                                <div className="flex items-center gap-2">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="size-5"
+                                                        onClick={e => {
+                                                            e.stopPropagation();
+                                                            handleTogglePin(model.id, false);
+                                                        }}
+                                                        aria-label="Unpin model"
+                                                    >
+                                                        <PinOff className="opacity-70 size-3" />
+                                                    </Button>
+                                                </div>
+                                            </CommandItem>
+                                        ))}
+                                    </CommandGroup>
+                                    <CommandSeparator />
+                                    <CommandGroup heading="Other Models">
+                                        {otherModels?.map(model => (
+                                            <CommandItem
+                                                key={`other-${model.id}`}
+                                                value={`${model.name}`}
+                                                onMouseEnter={() => setHoveredModel(model)}
+                                                onSelect={() => handleSelectModel(model)}
+                                                className={cn(
+                                                    !access.checkCanUseModel(model) && 'opacity-50'
+                                                )}
+                                            >
+                                                <span className="flex items-center gap-2 flex-1">
+                                                    {model.icon && (
+                                                        <ModelIcon
+                                                            className="fill-primary"
+                                                            model={model.icon as ModelType}
+                                                        />
+                                                    )}
+                                                    <span className="truncate">{model.name}</span>
+                                                    {model.access === 'premium_required' && (
+                                                        <Badge
+                                                            variant="outline"
+                                                            className="text-[10px]"
+                                                        >
+                                                            PRO
+                                                        </Badge>
+                                                    )}
+                                                </span>
+                                                <div className="flex items-center gap-2">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="size-5"
+                                                        onClick={e => {
+                                                            e.stopPropagation();
+                                                            handleTogglePin(model.id, true);
+                                                        }}
+                                                        aria-label="Pin model"
+                                                    >
+                                                        <Pin className="opacity-70 size-3" />
+                                                    </Button>
+                                                </div>
+                                            </CommandItem>
+                                        ))}
+                                    </CommandGroup>
+                                </>
+                            )}
                         </CommandList>
+                        <CommandSeparator />
+                        <div className="flex items-center justify-between p-2">
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                className="w-full"
+                                onClick={() => setShowAll(prev => !prev)}
+                            >
+                                {showAll ? 'Show pinned only' : 'Show all models'}
+                            </Button>
+                        </div>
                     </Command>
                     <div className="absolute top-0 right-0 translate-x-full pl-2 hidden md:block">
                         {hoveredModel && (
