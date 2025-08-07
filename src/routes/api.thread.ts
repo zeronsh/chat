@@ -102,6 +102,9 @@ const threadPostApiHandler = Effect.gen(function* () {
             }),
             abortSignal: controller.signal,
             providerOptions: {
+                openai: {
+                    include: ['reasoning.encrypted_content'],
+                },
                 gateway: {
                     order: ['groq', 'cerebras'],
                 },

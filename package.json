@@ -42,7 +42,7 @@
         "@tanstack/react-table": "^8.21.3",
         "@uidotdev/usehooks": "^2.4.1",
         "@uploadthing/react": "^7.3.2",
-        "ai": "5.0.0-beta.25",
+        "ai": "5.0.7",
         "better-auth": "^1.2.12",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",

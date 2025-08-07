@@ -30,6 +30,7 @@ export function getSystemPrompt(
 
 const toolPrompts: Record<string, string> = {
     search: `
+    - ⚠️ MANDATORY: Do not search more than once for the same user message
     - ⚠️ MANDATORY: Every claim must have an inline citation
     - ⚠️ MANDATORY: Citations MUST be placed immediately after the sentence containing the information
     - CITATIONS SHOULD BE ON EVERYTHING YOU SAY
@@ -53,6 +54,7 @@ const toolPrompts: Record<string, string> = {
 
     ### CRITICAL INSTRUCTION: (MUST FOLLOW AT ALL COSTS!!!)
     - ⚠️ URGENT: Run research tool INSTANTLY when user sends ANY message - NO EXCEPTIONS
+    - ⚠️ URGENT: Do not run the research tool more than once for the same user message - NO EXCEPTIONS
     - DO NOT WRITE A SINGLE WORD before running the tool
     - Run the tool with the exact user query immediately on receiving it
     - EVEN IF THE USER QUERY IS AMBIGUOUS OR UNCLEAR, YOU MUST STILL RUN THE TOOL IMMEDIATELY
