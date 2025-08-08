@@ -14,6 +14,11 @@ export const ReasoningPart = memo(function PureReasoningPart({
     index: number;
 }) {
     const part = usePart({ id, index, type: 'reasoning', selector: part => part });
+
+    if (!part) {
+        return null;
+    }
+
     const [_isOpen, setIsOpen] = useState<boolean | undefined>(undefined);
     const done = part.state === 'done';
     const debouncedDone = useDebounce(done, 1000);

@@ -65,20 +65,51 @@ export function useThreadSelector<T>(
     return useThreadContext().store(selector, equalityFn);
 }
 
-export function usePart<T extends ThreadMessage['parts'][number]['type'], Return>(options: {
+type PartType = ThreadMessage['parts'][number]['type'];
+
+export function usePart<Return>(options: {
+    id: string;
+    index: number;
+    type: 'reasoning';
+    selector: (part: Extract<ThreadMessage['parts'][number], { type: 'reasoning' }>) => Return;
+    equalityFn?: (a: Return | null, b: Return | null) => boolean;
+}): Return | null;
+
+export function usePart<T extends Exclude<PartType, 'reasoning'>, Return>(options: {
     id: string;
     index: number;
     type: T;
     selector: (part: Extract<ThreadMessage['parts'][number], { type: T }>) => Return;
     equalityFn?: (a: Return, b: Return) => boolean;
-}): Return {
-    const part = useThreadSelector(state => {
-        const part = state.messageMap[options.id].parts[options.index];
+}): Return;
+
+export function usePart(options: any): any {
+    const part = useThreadSelector<any>(state => {
+        const part = Object.assign({}, state.messageMap[options.id].parts[options.index]);
         if (part.type !== options.type) {
             throw new Error('Part type mismatch');
         }
-        return options.selector(part as Extract<ThreadMessage['parts'][number], { type: T }>);
+        if (part.type === 'reasoning') {
+            let i = options.index;
+            let nextPart = state.messageMap[options.id].parts[i + 1];
+            const prevPart = state.messageMap[options.id].parts[i - 1];
+
+            if (prevPart && prevPart.type === 'reasoning') {
+                return null;
+            }
+
+            if (nextPart) {
+                while (nextPart && nextPart.type === 'reasoning') {
+                    part.text += '\n\n' + nextPart.text;
+                    part.state = nextPart.state;
+                    i++;
+                    nextPart = state.messageMap[options.id].parts[i + 1];
+                }
+            }
+        }
+
+        return options.selector(part as any);
     }, options.equalityFn);
 
-    return part;
+    return part as any;
 }

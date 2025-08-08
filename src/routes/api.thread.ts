@@ -107,7 +107,6 @@ const threadPostApiHandler = Effect.gen(function* () {
                     parallelToolCalls: false,
                     include: ['reasoning.encrypted_content'],
                     reasoningSummary: 'auto',
-                    reasoningEffort: 'low',
                 } satisfies OpenAIResponsesProviderOptions,
                 gateway: {
                     order: ['groq', 'cerebras'],
