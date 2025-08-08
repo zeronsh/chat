@@ -17,7 +17,8 @@ export const ReasoningPart = memo(function PureReasoningPart({
     const [_isOpen, setIsOpen] = useState<boolean | undefined>(undefined);
     const done = part.state === 'done';
     const debouncedDone = useDebounce(done, 1000);
-    const isOpen = typeof _isOpen === 'boolean' ? _isOpen : !debouncedDone;
+    const isOpen =
+        (typeof _isOpen === 'boolean' ? _isOpen : !debouncedDone) && part.text.length > 0;
 
     const toggle = useCallback(() => {
         setIsOpen(!isOpen);
