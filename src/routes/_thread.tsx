@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { DefaultChatTransport } from 'ai';
 import { useParamsThreadId } from '@/hooks/use-params-thread-id';
-import { useDatabase } from '@/context/database';
+import { useDatabase } from '@/hooks/use-database';
 import { useQuery } from '@rocicorp/zero/react';
 import { useMemo } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';

@@ -1,21 +1,15 @@
-import { useDatabase } from '@/context/database';
-import { UserId } from '@/database/types';
+import { useCustomer, useUsage, useSettings } from '@/hooks/use-database';
 import { useUser } from '@/hooks/use-user';
 import { AnonymousLimits, FreeLimits, ProLimits } from '@/lib/constants';
-import { useQuery } from '@rocicorp/zero/react';
 import { useCallback, useMemo } from 'react';
-import { useSettings } from './use-settings';
 import { Model } from '@/zero/types';
 import { match, P } from 'ts-pattern';
 
 export function useAccess() {
-    const db = useDatabase();
-    const [customer] = useQuery(
-        db.query.userCustomer.where('userId', '=', UserId(db.userID)).one()
-    );
+    const customer = useCustomer();
     const user = useUser();
     const settings = useSettings();
-    const [usage] = useQuery(db.query.usage.where('userId', '=', UserId(db.userID)).one());
+    const usage = useUsage();
 
     const isPro = useMemo(() => {
         if (!customer) return false;

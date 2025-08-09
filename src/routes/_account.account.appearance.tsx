@@ -1,8 +1,8 @@
 import { Section } from '@/components/ui/section';
 
 import { Separator } from '@/components/ui/separator';
-import { useDatabase } from '@/context/database';
-import { useSettings } from '@/hooks/use-settings';
+import { useDatabase } from '@/hooks/use-database';
+import { useSettings } from '@/hooks/use-database';
 import { cn } from '@/lib/utils';
 import { createFileRoute } from '@tanstack/react-router';
 import { MoonIcon, SunIcon } from 'lucide-react';

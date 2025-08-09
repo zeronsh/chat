@@ -1,7 +1,7 @@
 import { Section } from '@/components/ui/section';
 import { Switch } from '@/components/ui/switch';
-import { useDatabase } from '@/context/database';
-import { useSettings } from '@/hooks/use-settings';
+import { useDatabase } from '@/hooks/use-database';
+import { useSettings } from '@/hooks/use-database';
 import { createFileRoute } from '@tanstack/react-router';
 import { useQuery } from '@rocicorp/zero/react';
 import ModelIcon from '@/components/thread/model-icon';

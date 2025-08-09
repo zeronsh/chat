@@ -1,4 +1,4 @@
-import { useDatabase } from '@/context/database';
+import { useDatabase } from '@/hooks/use-database';
 import { Section } from '@/components/ui/section';
 import { LogoutDialog, NotAnonymous, RevokeSessionDialog } from '@/components/app/auth';
 import { Button } from '@/components/ui/button';

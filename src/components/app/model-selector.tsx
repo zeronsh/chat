@@ -7,10 +7,9 @@ import {
     CommandItem,
     CommandList,
     CommandSeparator,
-    CommandShortcut,
 } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { useSettings } from '@/hooks/use-settings';
+import { useSettings } from '@/hooks/use-database';
 import { Fragment, useEffect, useState } from 'react';
 
 import ModelIcon, { type ModelType } from '@/components/thread/model-icon';
@@ -23,7 +22,7 @@ import {
     Pin,
     PinOff,
 } from 'lucide-react';
-import { useDatabase } from '@/context/database';
+import { useDatabase } from '@/hooks/use-database';
 import { useQuery } from '@rocicorp/zero/react';
 import { Model } from '@/zero/types';
 import { Badge } from '@/components/ui/badge';

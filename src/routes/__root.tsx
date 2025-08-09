@@ -3,7 +3,6 @@ import appCss from '@/global.css?url';
 
 import { HeadContent, Outlet, Scripts, createRootRoute } from '@tanstack/react-router';
 import { DatabaseProvider } from '@/context/database';
-import { useSettings } from '@/hooks/use-settings';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/sonner';
 
@@ -14,19 +13,29 @@ import { Effect } from 'effect';
 import * as queries from '@/database/queries';
 import { DatabaseLive } from '@/database/effect';
 import { useEffect, useRef } from 'react';
+import { useSettings } from '@/hooks/use-database';
+import { UserId } from '@/database/types';
 
+// @ts-ignore
 const getContext = createServerFn({ method: 'GET' }).handler(async () => {
     const program = Effect.Do.pipe(
         Effect.let('request', () => getWebRequest()),
         Effect.flatMap(({ request }) => {
             return Effect.Do.pipe(
                 Effect.bind('session', () => Session),
-                Effect.bind('settings', ({ session }) =>
-                    queries.getSettingsByUserId(session.user.id)
+                Effect.bind('context', ({ session }) =>
+                    queries.getContext(UserId(session.user.id))
                 ),
                 Effect.provide(DatabaseLive),
                 Effect.provide(SessionLive(request)),
-                Effect.map(({ settings, session }) => ({ settings, session }))
+                Effect.map(({ context, session }) => ({
+                    session,
+                    settings: context.settings,
+                    threads: context.threads,
+                    customer: context.customer,
+                    usage: context.usage,
+                    user: context.user,
+                }))
             );
         }),
         Effect.catchAll(_ => Effect.succeed(undefined))
@@ -75,6 +84,10 @@ export const Route = createRootRoute({
         return {
             settings: context?.settings,
             session: context?.session,
+            threads: context?.threads,
+            customer: context?.customer,
+            usage: context?.usage,
+            user: context?.user,
         };
     },
     notFoundComponent: () => <div>Not found</div>,
@@ -82,8 +95,7 @@ export const Route = createRootRoute({
 });
 
 function RootComponent({ bodyRef }: { bodyRef: React.RefObject<HTMLBodyElement | null> }) {
-    const loaderData = Route.useLoaderData();
-    const settings = useSettings() ?? loaderData.settings;
+    const settings = useSettings();
 
     useEffect(() => {
         if (bodyRef.current) {

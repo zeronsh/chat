@@ -10,8 +10,8 @@ import {
 } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { useDatabase } from '@/context/database';
-import { useSettings } from '@/hooks/use-settings';
+import { useDatabase } from '@/hooks/use-database';
+import { useSettings } from '@/hooks/use-database';
 import { cn } from '@/lib/utils';
 import { MoonIcon, PaintBucket, SunIcon } from 'lucide-react';
 import { useState } from 'react';

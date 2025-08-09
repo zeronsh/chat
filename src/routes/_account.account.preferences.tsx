@@ -2,11 +2,11 @@ import { Section } from '@/components/ui/section';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
-import { useSettings } from '@/hooks/use-settings';
+import { useSettings } from '@/hooks/use-database';
 import { createFileRoute } from '@tanstack/react-router';
 import { toast } from 'sonner';
 import z from 'zod';
-import { useDatabase } from '@/context/database';
+import { useDatabase } from '@/hooks/use-database';
 import { SingleFieldForm } from '@/components/app/single-field-form';
 
 export const Route = createFileRoute('/_account/account/preferences')({

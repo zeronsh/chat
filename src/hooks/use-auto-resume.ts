@@ -1,4 +1,4 @@
-import { useDatabase } from '@/context/database';
+import { useDatabase } from '@/hooks/use-database';
 import { useThreadContext, useThreadSelector } from '@/context/thread';
 import { useQuery } from '@rocicorp/zero/react';
 import { useEffect } from 'react';

@@ -192,6 +192,9 @@ export function getSettingsByUserId(userId: string) {
         return yield* Effect.tryPromise(() =>
             db.query.setting.findFirst({
                 where: (setting, { eq }) => eq(setting.userId, userId),
+                with: {
+                    model: true,
+                },
             })
         );
     });
@@ -342,4 +345,34 @@ export function resetUsage() {
                 .execute()
         );
     });
+}
+
+export function getThreadsByUserId(userId: UserId) {
+    return Effect.gen(function* () {
+        const db = yield* Database.instance;
+        return yield* Effect.tryPromise(() =>
+            db.query.thread.findMany({
+                where: (thread, { eq }) => eq(thread.userId, userId),
+                with: {
+                    messages: {
+                        orderBy: (message, { asc }) => asc(message.createdAt),
+                    },
+                },
+                limit: 20,
+                orderBy: (thread, { desc }) => desc(thread.updatedAt),
+            })
+        );
+    });
+}
+
+export function getContext(id: UserId) {
+    return Database.transaction(
+        Effect.Do.pipe(
+            Effect.bind('settings', () => getSettingsByUserId(id)),
+            Effect.bind('customer', () => getUserCustomerByUserId(id)),
+            Effect.bind('usage', () => getUsageByUserId(id)),
+            Effect.bind('user', () => getUserById(id)),
+            Effect.bind('threads', () => getThreadsByUserId(id))
+        )
+    );
 }

@@ -20,10 +20,9 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { useDatabase } from '@/context/database';
+import { useDatabase, useThreads } from '@/hooks/use-database';
 import { useThreadsByTimeRange } from '@/hooks/use-chats-by-time-range';
 import { Thread } from '@/zero/types';
-import { useQuery } from '@rocicorp/zero/react';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
 import { Loader2Icon, PencilIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import { useState } from 'react';
@@ -91,15 +90,7 @@ function AppSidebarThreads({
     setThreadToEdit: (thread: Thread | null) => void;
     setThreadToDelete: (thread: Thread | null) => void;
 }) {
-    const db = useDatabase();
-    const [threads] = useQuery(
-        db.query.thread
-            .related('messages', q => q.orderBy('createdAt', 'desc'))
-            .orderBy('updatedAt', 'desc'),
-        {
-            ttl: Infinity,
-        }
-    );
+    const threads = useThreads();
     const groups = useThreadsByTimeRange(threads);
 
     return (

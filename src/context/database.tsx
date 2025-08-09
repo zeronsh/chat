@@ -4,19 +4,9 @@ import { Route } from '@/routes/__root';
 import { schema, Schema } from '@/zero/schema';
 import { Zero } from '@rocicorp/zero';
 import { ZeroProvider } from '@rocicorp/zero/react';
-import { createContext, useContext, useEffect, useMemo } from 'react';
+import { createContext, useEffect, useMemo } from 'react';
 
-const DatabaseContext = createContext<Zero<Schema> | undefined>(undefined);
-
-export function useDatabase() {
-    const database = useContext(DatabaseContext);
-
-    if (!database) {
-        throw new Error('useZero must be used within a ZeroProvider');
-    }
-
-    return database;
-}
+export const DatabaseContext = createContext<Zero<Schema> | undefined>(undefined);
 
 export function DatabaseProvider({ children }: { children: React.ReactNode }) {
     const loaderData = Route.useLoaderData();
@@ -40,13 +30,7 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
         }
 
         if (typeof window === 'undefined') {
-            return new Zero({
-                userID: session.user.id,
-                auth: session.session.token,
-                server: env.VITE_PUBLIC_ZERO_URL,
-                schema,
-                kvStore: 'mem',
-            });
+            return undefined;
         }
 
         return new Zero({

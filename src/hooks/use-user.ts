@@ -1,4 +1,4 @@
-import { useDatabase } from '@/context/database';
+import { useDatabase } from '@/hooks/use-database';
 import { useQuery } from '@rocicorp/zero/react';
 
 export function useUser() {
