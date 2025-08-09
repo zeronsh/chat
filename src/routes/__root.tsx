@@ -95,6 +95,7 @@ function RootComponent() {
                 <Outlet />
                 <Toaster position="top-center" />
             </div>
+            <Scripts />
         </body>
     );
 }
@@ -104,7 +105,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <html lang="en">
             <head>
                 <HeadContent />
-                <Scripts />
             </head>
             <DatabaseProvider>{children}</DatabaseProvider>
         </html>

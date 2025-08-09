@@ -6,6 +6,7 @@ import { schema, Schema } from '@/zero/schema';
 import { Zero } from '@rocicorp/zero';
 import { ZeroProvider } from '@rocicorp/zero/react';
 import { createContext, useContext, useEffect, useMemo } from 'react';
+import { Scripts } from '@tanstack/react-router';
 
 const DatabaseContext = createContext<Zero<Schema> | undefined>(undefined);
 
@@ -49,6 +50,7 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
                 auth: session.session.token,
                 server: env.VITE_PUBLIC_ZERO_URL,
                 schema,
+                kvStore: 'mem',
             });
         }
 
@@ -84,7 +86,9 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
                     loaderData?.settings?.mode ?? 'dark',
                     loaderData?.settings?.theme ?? 'default'
                 )}
-            />
+            >
+                <Scripts />
+            </body>
         );
     }
 
