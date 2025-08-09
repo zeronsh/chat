@@ -81,7 +81,7 @@ export const Route = createRootRoute({
     component: () => <RootDocument />,
 });
 
-function RootComponent({ bodyRef }: { bodyRef: React.RefObject<HTMLBodyElement> }) {
+function RootComponent({ bodyRef }: { bodyRef: React.RefObject<HTMLBodyElement | null> }) {
     const loaderData = Route.useLoaderData();
     const settings = useSettings() ?? loaderData.settings;
 

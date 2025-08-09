@@ -6,7 +6,16 @@ import { SearchPart } from '@/components/thread/message/part/search-part';
 import { ResearchPart } from '@/components/thread/message/part/research-part';
 
 export function Part({ id, index }: { id: string; index: number }) {
-    const type = useThreadSelector(state => state.messageMap[id].parts[index].type);
+    const type = useThreadSelector(state => {
+        const parts = state.messageMap[id].parts;
+        if (parts[1]?.type === 'text' && parts[2]?.type === 'reasoning') {
+            const textPart = parts[1];
+            const reasoningPart = parts[2];
+            parts[1] = reasoningPart;
+            parts[2] = textPart;
+        }
+        return parts[index].type;
+    });
 
     switch (type) {
         case 'reasoning':

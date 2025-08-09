@@ -1,12 +1,10 @@
 import { authClient } from '@/lib/auth-client';
 import { env } from '@/lib/env';
-import { cn } from '@/lib/utils';
 import { Route } from '@/routes/__root';
 import { schema, Schema } from '@/zero/schema';
 import { Zero } from '@rocicorp/zero';
 import { ZeroProvider } from '@rocicorp/zero/react';
 import { createContext, useContext, useEffect, useMemo } from 'react';
-import { Scripts } from '@tanstack/react-router';
 
 const DatabaseContext = createContext<Zero<Schema> | undefined>(undefined);
 
@@ -23,15 +21,12 @@ export function useDatabase() {
 export function DatabaseProvider({ children }: { children: React.ReactNode }) {
     const loaderData = Route.useLoaderData();
 
-    const clientSession = authClient.useSession() ?? {
-        data: loaderData.session,
-        isPending: Boolean(loaderData.session),
-    };
+    const clientSession = authClient.useSession();
 
     const { session, isPending } = useMemo(() => {
         return {
-            session: clientSession.data ?? loaderData.session,
-            isPending: loaderData.session ? false : clientSession.isPending,
+            session: clientSession.data,
+            isPending: clientSession.isPending,
         };
     }, [clientSession, loaderData.session]);
 

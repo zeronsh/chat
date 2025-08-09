@@ -95,7 +95,10 @@ function AppSidebarThreads({
     const [threads] = useQuery(
         db.query.thread
             .related('messages', q => q.orderBy('createdAt', 'desc'))
-            .orderBy('updatedAt', 'desc')
+            .orderBy('updatedAt', 'desc'),
+        {
+            ttl: Infinity,
+        }
     );
     const groups = useThreadsByTimeRange(threads);
 
