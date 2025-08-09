@@ -35,16 +35,21 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
     }, [clientSession, loaderData.session]);
 
     const zero = useMemo(() => {
-        if (typeof window === 'undefined') {
-            return undefined;
-        }
-
         if (!session) {
             return undefined;
         }
 
         if (!session.user) {
             return undefined;
+        }
+
+        if (typeof window === 'undefined') {
+            return new Zero({
+                userID: session.user.id,
+                auth: session.session.token,
+                server: env.VITE_PUBLIC_ZERO_URL,
+                schema,
+            });
         }
 
         return new Zero({
