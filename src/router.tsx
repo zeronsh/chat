@@ -6,6 +6,7 @@ export const createRouter = () => {
     const router = createTanstackRouter({
         routeTree,
         scrollRestoration: true,
+        defaultStaleTime: Infinity,
         defaultPreloadStaleTime: Infinity,
     });
 
