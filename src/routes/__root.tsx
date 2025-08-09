@@ -25,7 +25,6 @@ const getContext = createServerFn({ method: 'GET' })
         return GetContextSchema.parse(obj);
     })
     .handler(async ({ data }) => {
-        console.log('getContext', data);
         const program = Effect.Do.pipe(
             Effect.let('request', () => getWebRequest()),
             Effect.flatMap(({ request }) => {
