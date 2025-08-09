@@ -67,7 +67,7 @@ export const ReasoningPart = memo(function PureReasoningPart({
         type: 'reasoning',
         selector: part => ({
             done: part?.state ? part?.state === 'done' : null,
-            hasText: part?.text ? part?.text?.length > 0 : null,
+            hasText: part?.text ? part?.text?.length > 0 : false,
         }),
     });
 
@@ -77,7 +77,7 @@ export const ReasoningPart = memo(function PureReasoningPart({
 
     const [_isOpen, setIsOpen] = useState<boolean | undefined>(undefined);
     const debouncedDone = useDebounce(done, 1000);
-    const isOpen = typeof _isOpen === 'boolean' ? _isOpen && hasText : !debouncedDone;
+    const isOpen = typeof _isOpen === 'boolean' ? _isOpen && hasText : !debouncedDone && hasText;
 
     const toggle = useCallback(() => {
         setIsOpen(!isOpen);
