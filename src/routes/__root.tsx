@@ -68,7 +68,8 @@ export const Route = createRootRoute({
             },
         ],
     }),
-    beforeLoad: async () => {
+    shouldReload: false,
+    loader: async () => {
         const settings = await getSettings();
         return {
             settings,
@@ -83,7 +84,7 @@ export const Route = createRootRoute({
 });
 
 function RootComponent() {
-    const context = Route.useRouteContext();
+    const context = Route.useLoaderData();
     const settings = useSettings() ?? context.settings;
 
     return (
