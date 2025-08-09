@@ -112,7 +112,7 @@ const getSession = Effect.fn('getSession')(function* (request: Request) {
     });
 
     if (!session) {
-        throw new APIError({
+        return yield* new APIError({
             status: 401,
             message: 'Unauthorized',
         });

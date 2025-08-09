@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { customAlphabet } from 'nanoid';
+import { marked } from 'marked';
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -22,3 +23,17 @@ export function seededRandom(seed: number): () => number {
         return state / m; // Normalize to [0, 1)
     };
 }
+
+export const lexer = (() => {
+    let lastText = '';
+    let lastResult: string[] = [];
+    return (markdown: string): string[] => {
+        if (markdown === lastText) {
+            return lastResult;
+        }
+        lastText = markdown;
+        const tokens = marked.lexer(markdown);
+        lastResult = tokens.map(token => token.raw);
+        return lastResult;
+    };
+})();

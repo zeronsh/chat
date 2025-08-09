@@ -1,6 +1,6 @@
 import { MessageContent } from '@/components/ui/message';
 import { usePart } from '@/context/thread';
-import { marked } from 'marked';
+import { lexer } from '@/lib/utils';
 import { memo } from 'react';
 
 export const MarkdownBlock = memo(
@@ -46,17 +46,3 @@ export const TextPart = memo(
         return true;
     }
 );
-
-const lexer = (() => {
-    let lastText = '';
-    let lastResult: string[] = [];
-    return (markdown: string): string[] => {
-        if (markdown === lastText) {
-            return lastResult;
-        }
-        lastText = markdown;
-        const tokens = marked.lexer(markdown);
-        lastResult = tokens.map(token => token.raw);
-        return lastResult;
-    };
-})();

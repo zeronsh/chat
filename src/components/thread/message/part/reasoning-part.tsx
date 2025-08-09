@@ -1,10 +1,58 @@
 import { MessageContent } from '@/components/ui/message';
 import { usePart } from '@/context/thread';
-import { cn } from '@/lib/utils';
+import { cn, lexer } from '@/lib/utils';
 import { useDebounce } from '@uidotdev/usehooks';
 import { AnimatePresence, motion } from 'framer-motion';
 import { BrainIcon, Loader2Icon } from 'lucide-react';
 import { memo, useState, useCallback } from 'react';
+
+export const ReasoningBlock = memo(
+    function PureReasoningBlock({
+        id,
+        index,
+        blockIndex,
+    }: {
+        id: string;
+        index: number;
+        blockIndex: number;
+    }) {
+        const content = usePart({
+            id,
+            index,
+            type: 'reasoning',
+            selector: part => lexer(part.text)[blockIndex],
+            equalityFn: (a, b) => a === b,
+        });
+
+        if (content === undefined || content === null) {
+            return null;
+        }
+
+        return (
+            <MessageContent className="text-sm text-muted-foreground" markdown>
+                {content}
+            </MessageContent>
+        );
+    },
+    function propsAreEqual(prevProps, nextProps) {
+        return (
+            prevProps.id === nextProps.id &&
+            prevProps.index === nextProps.index &&
+            prevProps.blockIndex === nextProps.blockIndex
+        );
+    }
+);
+
+export const ReasoningText = memo(
+    function PureReasoningText({ id, index }: { id: string; index: number }) {
+        return Array.from({ length: 100 }, (_, i) => i).map(i => (
+            <ReasoningBlock key={`${id}-${index}-${i}`} id={id} index={index} blockIndex={i} />
+        ));
+    },
+    function propsAreEqual() {
+        return true;
+    }
+);
 
 export const ReasoningPart = memo(function PureReasoningPart({
     id,
@@ -13,17 +61,16 @@ export const ReasoningPart = memo(function PureReasoningPart({
     id: string;
     index: number;
 }) {
-    const part = usePart({ id, index, type: 'reasoning', selector: part => part });
-
-    if (!part) {
-        return null;
-    }
+    const done = usePart({
+        id,
+        index,
+        type: 'reasoning',
+        selector: part => part?.state === 'done',
+    });
 
     const [_isOpen, setIsOpen] = useState<boolean | undefined>(undefined);
-    const done = part.state === 'done';
     const debouncedDone = useDebounce(done, 1000);
-    const isOpen =
-        (typeof _isOpen === 'boolean' ? _isOpen : !debouncedDone) && part.text.length > 0;
+    const isOpen = typeof _isOpen === 'boolean' ? _isOpen : !debouncedDone;
 
     const toggle = useCallback(() => {
         setIsOpen(!isOpen);
@@ -50,12 +97,7 @@ export const ReasoningPart = memo(function PureReasoningPart({
                         transition={{ duration: 0.2, ease: 'easeInOut' }}
                         className="overflow-hidden p-3 bg-sidebar rounded-lg mt-3 border border-foreground/10"
                     >
-                        <MessageContent
-                            markdown
-                            className="bg-transparent p-0! text-sm opacity-80 w-full max-w-full! prose dark:prose-invert"
-                        >
-                            {part.text}
-                        </MessageContent>
+                        <ReasoningText id={id} index={index} />
                     </motion.div>
                 )}
             </AnimatePresence>
