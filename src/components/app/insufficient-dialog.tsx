@@ -42,13 +42,13 @@ export function InsufficientCreditsDialog(props: {
                 <DialogHeader className="p-6 bg-background">
                     <DialogTitle>Insufficient credits</DialogTitle>
                     <DialogDescription>
-                        You do not have enough credits to use this model. Upgrade to PRO to get more
-                        credits.
+                        You do not have enough credits to use this model. Unlock PRO to get more
+                        credits and discover all premium features.
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter className="px-6 py-4 border-t border-foreground/10 bg-sidebar">
                     <Button type="button" asChild>
-                        <Link to="/account/subscription">Upgrade to PRO</Link>
+                        <Link to="/account/subscription">Unlock PRO</Link>
                     </Button>
                 </DialogFooter>
             </DialogContent>

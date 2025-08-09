@@ -63,7 +63,7 @@ function RouteComponent() {
                                     }}
                                     disabled={session?.user?.isAnonymous === true}
                                 >
-                                    Upgrade to Pro
+                                    Unlock PRO
                                 </Button>
                             </div>
                         )}
