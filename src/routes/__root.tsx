@@ -13,6 +13,7 @@ import { getWebRequest } from '@tanstack/react-start/server';
 import { Effect } from 'effect';
 import * as queries from '@/database/queries';
 import { DatabaseLive } from '@/database/effect';
+import { useEffect, useRef } from 'react';
 
 const getContext = createServerFn({ method: 'GET' }).handler(async () => {
     const program = Effect.Do.pipe(
@@ -77,36 +78,53 @@ export const Route = createRootRoute({
         };
     },
     notFoundComponent: () => <div>Not found</div>,
-    component: () => (
-        <RootDocument>
-            <RootComponent />
-        </RootDocument>
-    ),
+    component: () => <RootDocument />,
 });
 
-function RootComponent() {
+function RootComponent({ bodyRef }: { bodyRef: React.RefObject<HTMLBodyElement> }) {
     const loaderData = Route.useLoaderData();
     const settings = useSettings() ?? loaderData.settings;
+
+    useEffect(() => {
+        if (bodyRef.current) {
+            bodyRef.current.className = cn(
+                'fixed inset-0',
+                settings?.mode ?? 'dark',
+                settings?.theme ?? 'default'
+            );
+        }
+    }, [settings?.mode, settings?.theme]);
+
     return (
-        <body
-            className={cn('fixed inset-0', settings?.mode ?? 'dark', settings?.theme ?? 'default')}
-        >
-            <div className="fixed inset-0 flex text-foreground">
-                <Outlet />
-                <Toaster position="top-center" />
-            </div>
-            <Scripts />
-        </body>
+        <div className="fixed inset-0 flex text-foreground">
+            <Outlet />
+            <Toaster position="top-center" />
+        </div>
     );
 }
 
-function RootDocument({ children }: { children: React.ReactNode }) {
+function RootDocument() {
+    const ref = useRef<HTMLBodyElement>(null);
+    const loaderData = Route.useLoaderData();
+
     return (
         <html lang="en">
             <head>
                 <HeadContent />
             </head>
-            <DatabaseProvider>{children}</DatabaseProvider>
+            <body
+                ref={ref}
+                className={cn(
+                    'fixed inset-0',
+                    loaderData?.settings?.mode ?? 'dark',
+                    loaderData?.settings?.theme ?? 'default'
+                )}
+            >
+                <DatabaseProvider>
+                    <RootComponent bodyRef={ref} />
+                </DatabaseProvider>
+                <Scripts />
+            </body>
         </html>
     );
 }

@@ -79,17 +79,7 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
     }, [session, isPending]);
 
     if (isPending || !session || !zero) {
-        return (
-            <body
-                className={cn(
-                    'fixed inset-0',
-                    loaderData?.settings?.mode ?? 'dark',
-                    loaderData?.settings?.theme ?? 'default'
-                )}
-            >
-                <Scripts />
-            </body>
-        );
+        return null;
     }
 
     return (
