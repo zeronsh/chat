@@ -92,7 +92,12 @@ const threadPostApiHandler = Effect.gen(function* () {
         });
     });
 
-    const MODEL_REQUIRES_MIDDLEWARE = ['zai/glm-4.5-air', 'zai/glm-4.5'];
+    const MODEL_REQUIRES_MIDDLEWARE = [
+        'zai/glm-4.5-air',
+        'zai/glm-4.5',
+        'deepseek/deepseek-r1-distill-llama-70b',
+        'deepseek/deepseek-r1',
+    ];
 
     const actualModel = MODEL_REQUIRES_MIDDLEWARE.includes(model.model)
         ? wrapLanguageModel({

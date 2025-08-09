@@ -78,6 +78,13 @@
       "when": 1754588698380,
       "tag": "0010_add-gpt-5-models",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1754769921078,
+      "tag": "0011_add-deepseek-models",
+      "breakpoints": true
     }
   ]
 }
