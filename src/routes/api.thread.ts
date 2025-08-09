@@ -6,7 +6,7 @@ import { APIError } from '@/lib/error';
 import { z } from 'zod';
 import { UserId } from '@/database/types';
 import { nanoid } from 'nanoid';
-import { smoothStream, stepCountIs } from 'ai';
+import { extractReasoningMiddleware, smoothStream, stepCountIs, wrapLanguageModel } from 'ai';
 import { getTools, ToolContext } from '@/ai/tools';
 import { getSystemPrompt } from '@/ai/prompt';
 import {
@@ -21,6 +21,7 @@ import { Stream } from '@/ai/stream';
 import { listen, subscribe, unsubscribe } from '@/lib/redis';
 import { Database } from '@/database/effect';
 import { OpenAIResponsesProviderOptions } from '@ai-sdk/openai';
+import { gateway } from '@ai-sdk/gateway';
 
 export const ServerRoute = createServerFileRoute('/api/thread').methods({
     async POST({ request }) {
@@ -91,9 +92,20 @@ const threadPostApiHandler = Effect.gen(function* () {
         });
     });
 
+    const MODEL_REQUIRES_MIDDLEWARE = ['zai/glm-4.5-air', 'zai/glm-4.5'];
+
+    const actualModel = MODEL_REQUIRES_MIDDLEWARE.includes(model.model)
+        ? wrapLanguageModel({
+              model: gateway(model.model),
+              middleware: extractReasoningMiddleware({
+                  tagName: 'think',
+              }),
+          })
+        : model.model;
+
     const stream = yield* Stream.create.pipe(
         Stream.options({
-            model: model.model,
+            model: actualModel,
             messages,
             temperature: 0.8,
             stopWhen: stepCountIs(3),

@@ -67,25 +67,34 @@ export function useThreadSelector<T>(
 
 type PartType = ThreadMessage['parts'][number]['type'];
 
-export function usePart<Return>(options: {
+export function usePart<Return, SelectReturn>(options: {
     id: string;
     index: number;
     type: 'reasoning';
-    selector: (part: Extract<ThreadMessage['parts'][number], { type: 'reasoning' }>) => Return;
+    selector: (
+        part: Extract<ThreadMessage['parts'][number], { type: 'reasoning' }> | null
+    ) => SelectReturn;
     equalityFn?: (a: Return | null, b: Return | null) => boolean;
-}): Return | null;
+}): SelectReturn;
 
-export function usePart<T extends Exclude<PartType, 'reasoning'>, Return>(options: {
+export function usePart<T extends Exclude<PartType, 'reasoning'>, Return, SelectReturn>(options: {
     id: string;
     index: number;
     type: T;
-    selector: (part: Extract<ThreadMessage['parts'][number], { type: T }>) => Return;
+    selector: (part: Extract<ThreadMessage['parts'][number], { type: T }>) => SelectReturn;
     equalityFn?: (a: Return, b: Return) => boolean;
-}): Return;
+}): SelectReturn;
 
 export function usePart(options: any): any {
     const part = useThreadSelector<any>(state => {
-        const part = Object.assign({}, state.messageMap[options.id].parts[options.index]);
+        const parts = state.messageMap[options.id].parts;
+        if (parts[1]?.type === 'text' && parts[2]?.type === 'reasoning') {
+            const reasoningPart = parts[2];
+            const textPart = parts[1];
+            parts[1] = reasoningPart;
+            parts[2] = textPart;
+        }
+        const part = Object.assign({}, parts[options.index]);
         if (part.type !== options.type) {
             throw new Error('Part type mismatch');
         }
@@ -95,7 +104,7 @@ export function usePart(options: any): any {
             const prevPart = state.messageMap[options.id].parts[i - 1];
 
             if (prevPart && prevPart.type === 'reasoning') {
-                return null;
+                return options.selector(null);
             }
 
             if (nextPart) {

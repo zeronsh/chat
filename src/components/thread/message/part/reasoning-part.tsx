@@ -20,7 +20,7 @@ export const ReasoningBlock = memo(
             id,
             index,
             type: 'reasoning',
-            selector: part => lexer(part.text)[blockIndex],
+            selector: part => lexer(part?.text ?? '')[blockIndex],
             equalityFn: (a, b) => a === b,
         });
 
@@ -61,11 +61,14 @@ export const ReasoningPart = memo(function PureReasoningPart({
     id: string;
     index: number;
 }) {
-    const done = usePart({
+    const { done, hasText } = usePart({
         id,
         index,
         type: 'reasoning',
-        selector: part => (part?.state ? part.state === 'done' : null),
+        selector: part => ({
+            done: part?.state ? part?.state === 'done' : null,
+            hasText: part?.text ? part?.text?.length > 0 : null,
+        }),
     });
 
     if (done === null) {
@@ -74,7 +77,7 @@ export const ReasoningPart = memo(function PureReasoningPart({
 
     const [_isOpen, setIsOpen] = useState<boolean | undefined>(undefined);
     const debouncedDone = useDebounce(done, 1000);
-    const isOpen = typeof _isOpen === 'boolean' ? _isOpen : !debouncedDone;
+    const isOpen = typeof _isOpen === 'boolean' ? _isOpen && hasText : !debouncedDone;
 
     const toggle = useCallback(() => {
         setIsOpen(!isOpen);
