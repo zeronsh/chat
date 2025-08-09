@@ -347,6 +347,23 @@ export function resetUsage() {
     });
 }
 
+export function getThreadByIdAndUserId(threadId: string, userId: UserId) {
+    return Effect.gen(function* () {
+        const db = yield* Database.instance;
+        return yield* Effect.tryPromise(() =>
+            db.query.thread.findFirst({
+                where: (thread, { eq, and }) =>
+                    and(eq(thread.id, threadId), eq(thread.userId, userId)),
+                with: {
+                    messages: {
+                        orderBy: (message, { asc }) => asc(message.createdAt),
+                    },
+                },
+            })
+        );
+    });
+}
+
 export function getThreadsByUserId(userId: UserId) {
     return Effect.gen(function* () {
         const db = yield* Database.instance;
@@ -365,7 +382,7 @@ export function getThreadsByUserId(userId: UserId) {
     });
 }
 
-export function getContext(id: UserId) {
+export function getSSRData(id: UserId) {
     return Database.transaction(
         Effect.Do.pipe(
             Effect.bind('settings', () => getSettingsByUserId(id)),

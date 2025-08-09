@@ -14,35 +14,67 @@ import * as queries from '@/database/queries';
 import { DatabaseLive } from '@/database/effect';
 import { useEffect, useRef } from 'react';
 import { useSettings } from '@/hooks/use-database';
-import { UserId } from '@/database/types';
+import { SubscriptionData, UserId } from '@/database/types';
+import { z } from 'zod';
 
-// @ts-ignore
-const getContext = createServerFn({ method: 'GET' }).handler(async () => {
-    const program = Effect.Do.pipe(
-        Effect.let('request', () => getWebRequest()),
-        Effect.flatMap(({ request }) => {
-            return Effect.Do.pipe(
-                Effect.bind('session', () => Session),
-                Effect.bind('context', ({ session }) =>
-                    queries.getContext(UserId(session.user.id))
-                ),
-                Effect.provide(DatabaseLive),
-                Effect.provide(SessionLive(request)),
-                Effect.map(({ context, session }) => ({
-                    session,
-                    settings: context.settings,
-                    threads: context.threads,
-                    customer: context.customer,
-                    usage: context.usage,
-                    user: context.user,
-                }))
-            );
-        }),
-        Effect.catchAll(_ => Effect.succeed(undefined))
-    );
-
-    return Effect.runPromise(program);
+const GetContextSchema = z.object({
+    threadId: z.string().optional(),
 });
+const getContext = createServerFn({ method: 'GET' })
+    .validator((obj: unknown) => {
+        return GetContextSchema.parse(obj);
+    })
+    .handler(async ({ data }) => {
+        console.log('getContext', data);
+        const program = Effect.Do.pipe(
+            Effect.let('request', () => getWebRequest()),
+            Effect.flatMap(({ request }) => {
+                return Effect.Do.pipe(
+                    Effect.bind('session', () => Session),
+                    Effect.bind('context', ({ session }) =>
+                        queries.getSSRData(UserId(session.user.id))
+                    ),
+                    Effect.bind('thread', ({ session }) => {
+                        if (data.threadId) {
+                            return queries.getThreadByIdAndUserId(
+                                data.threadId,
+                                UserId(session.user.id)
+                            );
+                        }
+                        return Effect.succeed(undefined);
+                    }),
+                    Effect.provide(DatabaseLive),
+                    Effect.provide(SessionLive(request)),
+                    Effect.map(({ context, session, thread }) => ({
+                        session,
+                        settings: context.settings,
+                        threads: context.threads,
+                        customer: context.customer as
+                            | {
+                                  id: string;
+                                  userId: string;
+                                  subscription: SubscriptionData | null;
+                              }
+                            | undefined,
+                        usage: context.usage as
+                            | {
+                                  search: number;
+                                  id: string;
+                                  userId: string;
+                                  credits: number;
+                                  research: number;
+                              }
+                            | undefined,
+                        user: context.user,
+                        thread: thread,
+                    }))
+                );
+            }),
+            Effect.catchAll(_ => Effect.succeed(undefined))
+        );
+
+        return Effect.runPromise(program);
+    });
 
 export const Route = createRootRoute({
     head: () => ({
@@ -79,8 +111,11 @@ export const Route = createRootRoute({
         ],
     }),
     shouldReload: false,
-    loader: async () => {
-        const context = await getContext();
+    loader: async ({ params }) => {
+        const context = await getContext({
+            data: params,
+        });
+
         return {
             settings: context?.settings,
             session: context?.session,
@@ -88,6 +123,7 @@ export const Route = createRootRoute({
             customer: context?.customer,
             usage: context?.usage,
             user: context?.user,
+            thread: context?.thread,
         };
     },
     notFoundComponent: () => <div>Not found</div>,

@@ -2,8 +2,9 @@ import { DatabaseContext } from '@/context/database';
 import { useContext } from 'react';
 import { Route } from '@/routes/__root';
 import { useQuery } from '@rocicorp/zero/react';
-import { Thread } from '@/zero/types';
+import { Message, Thread } from '@/zero/types';
 import { UserId } from '@/database/types';
+import { useParamsThreadId } from '@/hooks/use-params-thread-id';
 
 export function useDatabase() {
     const database = useContext(DatabaseContext);
@@ -62,4 +63,26 @@ export function useUsage() {
     const [usage] = useQuery(db.query.usage.where('userId', '=', UserId(db.userID)).one());
 
     return usage ?? loaderData.usage;
+}
+
+export function useThreadFromParams() {
+    const threadId = useParamsThreadId();
+    const db = useDatabase();
+    const loaderData = Route.useLoaderData();
+
+    const [thread] = useQuery(
+        db.query.thread
+            .where('id', '=', threadId ?? '')
+            .related('messages', q => q.orderBy('createdAt', 'asc'))
+            .one()
+    );
+
+    return (
+        thread ??
+        (loaderData.thread && loaderData.thread.id === threadId
+            ? (loaderData.thread as unknown as Thread & {
+                  messages: Message[];
+              })
+            : undefined)
+    );
 }

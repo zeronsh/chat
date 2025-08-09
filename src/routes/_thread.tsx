@@ -1,8 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { DefaultChatTransport } from 'ai';
 import { useParamsThreadId } from '@/hooks/use-params-thread-id';
-import { useDatabase } from '@/hooks/use-database';
-import { useQuery } from '@rocicorp/zero/react';
+import { useDatabase, useThreadFromParams } from '@/hooks/use-database';
 import { useMemo } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/layout/app-sidebar';
@@ -18,15 +17,11 @@ export const Route = createFileRoute('/_thread')({
 });
 
 function RouteComponent() {
-    const threadId = useParamsThreadId();
     const db = useDatabase();
+    const threadId = useParamsThreadId();
+    const thread = useThreadFromParams();
 
-    const [thread] = useQuery(
-        db.query.thread
-            .where('id', '=', threadId ?? '')
-            .related('messages', q => q.orderBy('createdAt', 'asc'))
-            .one()
-    );
+    console.log('thread', thread?.title);
 
     const messages = useMemo(() => {
         return thread?.messages.map(message => message.message);
