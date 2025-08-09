@@ -65,8 +65,12 @@ export const ReasoningPart = memo(function PureReasoningPart({
         id,
         index,
         type: 'reasoning',
-        selector: part => part?.state === 'done',
+        selector: part => (part?.state ? part.state === 'done' : null),
     });
+
+    if (done === null) {
+        return null;
+    }
 
     const [_isOpen, setIsOpen] = useState<boolean | undefined>(undefined);
     const debouncedDone = useDebounce(done, 1000);
@@ -95,7 +99,7 @@ export const ReasoningPart = memo(function PureReasoningPart({
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.2, ease: 'easeInOut' }}
-                        className="overflow-hidden p-3 bg-sidebar rounded-lg mt-3 border border-foreground/10"
+                        className="flex flex-col overflow-hidden p-3 bg-sidebar rounded-lg mt-3 border border-foreground/10 gap-2"
                     >
                         <ReasoningText id={id} index={index} />
                     </motion.div>
