@@ -14,7 +14,7 @@ import { Effect } from 'effect';
 import * as queries from '@/database/queries';
 import { DatabaseLive } from '@/database/effect';
 
-const getSettings = createServerFn({ method: 'GET' }).handler(async () => {
+const getContext = createServerFn({ method: 'GET' }).handler(async () => {
     const program = Effect.Do.pipe(
         Effect.let('request', () => getWebRequest()),
         Effect.flatMap(({ request }) => {
@@ -25,7 +25,7 @@ const getSettings = createServerFn({ method: 'GET' }).handler(async () => {
                 ),
                 Effect.provide(DatabaseLive),
                 Effect.provide(SessionLive(request)),
-                Effect.map(({ settings }) => settings)
+                Effect.map(({ settings, session }) => ({ settings, session }))
             );
         }),
         Effect.catchAll(_ => Effect.succeed(undefined))
@@ -70,9 +70,10 @@ export const Route = createRootRoute({
     }),
     shouldReload: false,
     loader: async () => {
-        const settings = await getSettings();
+        const context = await getContext();
         return {
-            settings,
+            settings: context?.settings,
+            session: context?.session,
         };
     },
     notFoundComponent: () => <div>Not found</div>,
@@ -84,9 +85,8 @@ export const Route = createRootRoute({
 });
 
 function RootComponent() {
-    const context = Route.useLoaderData();
-    const settings = useSettings() ?? context.settings;
-
+    const loaderData = Route.useLoaderData();
+    const settings = useSettings() ?? loaderData.settings;
     return (
         <body
             className={cn('fixed inset-0', settings?.mode ?? 'dark', settings?.theme ?? 'default')}

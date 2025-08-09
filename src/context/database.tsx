@@ -1,5 +1,7 @@
 import { authClient } from '@/lib/auth-client';
 import { env } from '@/lib/env';
+import { cn } from '@/lib/utils';
+import { Route } from '@/routes/__root';
 import { schema, Schema } from '@/zero/schema';
 import { Zero } from '@rocicorp/zero';
 import { ZeroProvider } from '@rocicorp/zero/react';
@@ -18,7 +20,19 @@ export function useDatabase() {
 }
 
 export function DatabaseProvider({ children }: { children: React.ReactNode }) {
-    const { data: session, isPending } = authClient.useSession();
+    const loaderData = Route.useLoaderData();
+
+    const clientSession = authClient.useSession() ?? {
+        data: loaderData.session,
+        isPending: Boolean(loaderData.session),
+    };
+
+    const { session, isPending } = useMemo(() => {
+        return {
+            session: clientSession.data ?? loaderData.session,
+            isPending: loaderData.session ? false : clientSession.isPending,
+        };
+    }, [clientSession, loaderData.session]);
 
     const zero = useMemo(() => {
         if (typeof window === 'undefined') {
@@ -58,7 +72,15 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
     }, [session, isPending]);
 
     if (isPending || !session || !zero) {
-        return <body className="fixed inset-0 bg-background dark" />;
+        return (
+            <body
+                className={cn(
+                    'fixed inset-0',
+                    loaderData?.settings?.mode ?? 'dark',
+                    loaderData?.settings?.theme ?? 'default'
+                )}
+            />
+        );
     }
 
     return (
