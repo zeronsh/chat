@@ -1,17 +1,14 @@
 import { CodeBlock, CodeBlockCode } from '@/components/ui/code-block';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
-import { marked } from 'marked';
-import { createContext, memo, useContext, useId, useMemo } from 'react';
-import ReactMarkdown, { type Components } from 'react-markdown';
-import remarkBreaks from 'remark-breaks';
-import remarkGfm from 'remark-gfm';
+import Marked, { ReactRenderer } from 'marked-react';
+import { createContext, memo, useContext, useMemo } from 'react';
 
 export type MarkdownProps = {
     children: string;
     id?: string;
     className?: string;
-    components?: Partial<Components>;
+    components?: Partial<ReactRenderer>;
 };
 
 interface CitationSourceConfig {
@@ -72,12 +69,6 @@ const processCitation = (title: string, source: string): { text: string; url: st
     return null;
 };
 
-function extractLanguage(className?: string): string {
-    if (!className) return 'plaintext';
-    const match = className.match(/language-(\w+)/);
-    return match ? match[1] : 'plaintext';
-}
-
 function extractDomain(url: string | undefined): string {
     if (!url) return '';
     try {
@@ -90,38 +81,23 @@ function extractDomain(url: string | undefined): string {
     }
 }
 
-const INITIAL_COMPONENTS: Partial<Components> = {
-    code: function CodeComponent({ className, children, ...props }) {
-        const isInline =
-            !props.node?.position?.start.line ||
-            props.node?.position?.start.line === props.node?.position?.end.line;
-
-        if (isInline) {
-            return (
-                <span
-                    className={cn('bg-muted rounded-sm px-1 font-mono text-sm', className)}
-                    {...props}
-                >
-                    {children}
-                </span>
-            );
-        }
-
-        const language = extractLanguage(className);
-
+const INITIAL_COMPONENTS: Partial<ReactRenderer> = {
+    code: function CodeComponent(children, language) {
         return (
-            <CodeBlock className={className}>
-                <CodeBlockCode code={children as string} language={language} />
+            <CodeBlock>
+                <CodeBlockCode
+                    code={children as string}
+                    language={language?.trim() || 'plaintext'}
+                />
             </CodeBlock>
         );
     },
-    pre: function PreComponent({ children }) {
-        return <>{children}</>;
+    codespan: function CodeSpanComponent(children) {
+        return <span className={cn('bg-muted rounded-sm px-1 font-mono text-sm')}>{children}</span>;
     },
-    a: function LinkComponent({ children, href, ...props }) {
+    link: function LinkComponent(href, text) {
         const { citations } = useMarkdownContext();
         const citationIndex = citations.findIndex(citation => citation.link === href);
-        const { ref, ...anchorProps } = props;
 
         if (citationIndex !== -1) {
             const domain = extractDomain(href);
@@ -130,7 +106,6 @@ const INITIAL_COMPONENTS: Partial<Components> = {
                     <TooltipTrigger>
                         <a
                             href={href}
-                            {...anchorProps}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-xs bg-muted rounded-xl px-1 flex items-center no-underline"
@@ -143,8 +118,8 @@ const INITIAL_COMPONENTS: Partial<Components> = {
             );
         }
         return (
-            <a href={href} {...anchorProps} target="_blank" rel="noopener noreferrer">
-                {children}
+            <a href={href} target="_blank" rel="noopener noreferrer">
+                {text}
             </a>
         );
     },
@@ -156,13 +131,9 @@ const MemoizedMarkdownBlock = memo(
         components = INITIAL_COMPONENTS,
     }: {
         content: string;
-        components?: Partial<Components>;
+        components?: Partial<ReactRenderer>;
     }) {
-        return (
-            <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]} components={components}>
-                {content}
-            </ReactMarkdown>
-        );
+        return <Marked renderer={components}>{content}</Marked>;
     },
     function propsAreEqual(prevProps, nextProps) {
         return prevProps.content === nextProps.content;

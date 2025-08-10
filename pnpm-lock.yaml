@@ -113,6 +113,9 @@ importers:
       marked:
         specifier: ^16.0.0
         version: 16.1.1
+      marked-react:
+        specifier: ^3.0.1
+        version: 3.0.1(react@19.1.0)
       motion:
         specifier: ^12.23.1
         version: 12.23.7(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -4757,6 +4760,11 @@ packages:
 
   markdown-table@3.0.4:
     resolution: {integrity: sha512-wiYz4+JrLyb/DqW2hkFJxP7Vd7JuTDm77fvbM8VfEQdmSMqcImWeeRbHwZjBjIFki/VaMK2BhFi7oUUZeM5bqw==}
+
+  marked-react@3.0.1:
+    resolution: {integrity: sha512-jJnXAtEQB/5vYDDIW6TSZprgxKA4UrN9w6L6f0tLZpMDvM2Gt+za3HvdVpqHW74gKOYnIcScNK3kqQWCJlSJ1w==}
+    peerDependencies:
+      react: ^16.8.0 || >=17.0.0
 
   marked@16.1.1:
     resolution: {integrity: sha512-ij/2lXfCRT71L6u0M29tJPhP0bM5shLL3u5BePhFwPELj2blMJ6GDtD7PfJhRLhJ/c2UwrK17ySVcDzy2YHjHQ==}
@@ -11468,6 +11476,11 @@ snapshots:
       uc.micro: 2.1.0
 
   markdown-table@3.0.4: {}
+
+  marked-react@3.0.1(react@19.1.0):
+    dependencies:
+      marked: 16.1.1
+      react: 19.1.0
 
   marked@16.1.1: {}
 
