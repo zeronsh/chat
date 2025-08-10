@@ -89,28 +89,10 @@ export const Route = createRootRoute({
             },
             {
                 name: 'description',
-                content:
-                    'Zeron is a platform for chatting with models from OpenAI, Anthropic, and more.',
-            },
-            {
-                name: 'theme-color',
-                content: '#000000',
+                content: 'Chat with models from OpenAI, Anthropic, and more.',
             },
         ],
         links: [
-            {
-                rel: 'icon',
-                href: '/favicon.ico',
-            },
-            {
-                rel: 'apple-touch-icon',
-                href: '/logo512.png',
-            },
-            {
-                rel: 'mask-icon',
-                href: '/logo.svg',
-                color: '#000000',
-            },
             {
                 rel: 'preconnect',
                 href: 'https://fonts.googleapis.com',
