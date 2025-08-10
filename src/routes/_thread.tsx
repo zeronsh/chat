@@ -21,8 +21,6 @@ function RouteComponent() {
     const threadId = useParamsThreadId();
     const thread = useThreadFromParams();
 
-    console.log('thread', thread?.title);
-
     const messages = useMemo(() => {
         return thread?.messages.map(message => message.message);
     }, [thread]);
