@@ -2,7 +2,7 @@ import { relations } from 'drizzle-orm';
 import { index, integer, jsonb, pgEnum, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 import type { Capability, ThreadMessage } from '@/ai/types';
 import { member, organization, user } from '@/database/auth-schema';
-import { CustomerId, OrganizationId, SubscriptionData, UserId } from '@/database/types';
+import { SubscriptionData } from '@/database/types';
 
 export const message = pgTable('message', {
     id: text('id').primaryKey(),
@@ -100,30 +100,27 @@ export const usage = pgTable('usage', {
     id: text('id').primaryKey(),
     userId: text('user_id')
         .notNull()
-        .references(() => user.id, { onDelete: 'cascade' })
-        .$type<UserId>(),
+        .references(() => user.id, { onDelete: 'cascade' }),
     credits: integer('credits').notNull().default(0),
     search: integer('search').notNull().default(0),
     research: integer('research').notNull().default(0),
 });
 
 export const userCustomer = pgTable('user_customer', {
-    id: text('id').primaryKey().unique().$type<CustomerId>(),
+    id: text('id').primaryKey().unique(),
     userId: text('user_id')
         .notNull()
         .references(() => user.id, { onDelete: 'cascade' })
-        .unique()
-        .$type<UserId>(),
+        .unique(),
     subscription: jsonb('subscription').$type<SubscriptionData>(),
 });
 
 export const organizationCustomer = pgTable('organization_customer', {
-    id: text('id').primaryKey().unique().$type<CustomerId>(),
+    id: text('id').primaryKey().unique(),
     organizationId: text('organization_id')
         .notNull()
         .references(() => organization.id, { onDelete: 'cascade' })
-        .unique()
-        .$type<OrganizationId>(),
+        .unique(),
     subscription: jsonb('subscription').$type<SubscriptionData>(),
 });
 

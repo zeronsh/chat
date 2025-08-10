@@ -14,7 +14,7 @@ import * as queries from '@/database/queries';
 import { DatabaseLive } from '@/database/effect';
 import { useEffect, useRef } from 'react';
 import { useSettings } from '@/hooks/use-database';
-import { SubscriptionData, UserId } from '@/database/types';
+import { UserId } from '@/database/types';
 import { z } from 'zod';
 
 const GetContextSchema = z.object({
@@ -49,22 +49,8 @@ const getContext = createServerFn({ method: 'GET' })
                         session,
                         settings: context.settings,
                         threads: context.threads,
-                        customer: context.customer as
-                            | {
-                                  id: string;
-                                  userId: string;
-                                  subscription: SubscriptionData | null;
-                              }
-                            | undefined,
-                        usage: context.usage as
-                            | {
-                                  search: number;
-                                  id: string;
-                                  userId: string;
-                                  credits: number;
-                                  research: number;
-                              }
-                            | undefined,
+                        customer: context.customer,
+                        usage: context.usage,
                         user: context.user,
                         thread: thread,
                     }))
