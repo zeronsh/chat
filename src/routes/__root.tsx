@@ -77,7 +77,7 @@ const getContext = createServerFn({ method: 'GET' })
     });
 
 export const Route = createRootRoute({
-    head: () => ({
+    head: (ctx: any) => ({
         meta: [
             {
                 charSet: 'utf-8',
@@ -87,7 +87,7 @@ export const Route = createRootRoute({
                 content: 'width=device-width, initial-scale=1',
             },
             {
-                title: 'Zeron',
+                title: ctx?.loaderData?.thread?.title ?? 'Zeron',
             },
         ],
         links: [
