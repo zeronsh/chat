@@ -1,5 +1,6 @@
 import { authClient } from '@/lib/auth-client';
 import { env } from '@/lib/env';
+import { useSession } from '@/hooks/use-session';
 import { Route } from '@/routes/__root';
 import { schema, Schema } from '@/zero/schema';
 import { Zero } from '@rocicorp/zero';
@@ -11,7 +12,7 @@ export const DatabaseContext = createContext<Zero<Schema> | undefined>(undefined
 export function DatabaseProvider({ children }: { children: React.ReactNode }) {
     const loaderData = Route.useLoaderData();
 
-    const clientSession = authClient.useSession();
+    const clientSession = useSession();
 
     const { session, isPending } = useMemo(() => {
         return {

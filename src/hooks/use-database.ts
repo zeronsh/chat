@@ -86,3 +86,11 @@ export function useThreadFromParams() {
             : undefined)
     );
 }
+
+export function useUser() {
+    const db = useDatabase();
+    const loaderData = Route.useLoaderData();
+    const [user] = useQuery(db.query.user.where('id', '=', UserId(db.userID)).one());
+
+    return user ?? loaderData.user;
+}

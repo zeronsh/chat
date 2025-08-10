@@ -144,6 +144,7 @@ const Actions = memo(function PureActions({ id }: { id: string }) {
         state => state.messageMap[id].metadata,
         (a, b) => a?.model?.id === b?.model?.id
     );
+    const status = useThreadSelector(state => state.status);
     return (
         <MessageActions className={cn('gap-1 transition-opacity duration-200 opacity-100')}>
             <MessageAction tooltip="Copy" side="bottom">

@@ -1269,6 +1269,17 @@
     --shadow-lg: 0px 1px 2px 0px hsl(0 0% 0% / 0.18), 0px 4px 6px -1px hsl(0 0% 0% / 0.18);
     --shadow-xl: 0px 1px 2px 0px hsl(0 0% 0% / 0.18), 0px 8px 10px -1px hsl(0 0% 0% / 0.18);
     --shadow-2xl: 0px 1px 2px 0px hsl(0 0% 0% / 0.45);
+    --shiki-color-text: oklch(1 0 0);
+    --shiki-color-background: oklch(0 0 0);
+    --shiki-token-constant: oklch(0.9 0.17 75.35);
+    --shiki-token-string: oklch(0.9 0.22 264.53);
+    --shiki-token-comment: oklch(0.72 0 0);
+    --shiki-token-keyword: oklch(1 0 0);
+    --shiki-token-parameter: oklch(1 0 0);
+    --shiki-token-function: oklch(0.9 0.17 75.35);
+    --shiki-token-string-expression: oklch(0.9 0.22 264.53);
+    --shiki-token-punctuation: oklch(0.72 0 0);
+    --shiki-token-link: oklch(1 0 0);
 }
 
 .vercel @theme inline {

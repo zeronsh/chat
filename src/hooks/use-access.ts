@@ -1,5 +1,4 @@
-import { useCustomer, useUsage, useSettings } from '@/hooks/use-database';
-import { useUser } from '@/hooks/use-user';
+import { useCustomer, useUsage, useSettings, useUser } from '@/hooks/use-database';
 import { AnonymousLimits, FreeLimits, ProLimits } from '@/lib/constants';
 import { useCallback, useMemo } from 'react';
 import { Model } from '@/zero/types';

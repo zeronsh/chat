@@ -1,15 +1,13 @@
 // @ts-ignore
 import appCss from '@/global.css?url';
-
 import { HeadContent, Outlet, Scripts, createRootRoute } from '@tanstack/react-router';
 import { DatabaseProvider } from '@/context/database';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/sonner';
-
 import { createServerFn } from '@tanstack/react-start';
 import { Session, SessionLive } from '@/lib/auth';
 import { getWebRequest } from '@tanstack/react-start/server';
-import { Effect } from 'effect';
+import { Clock, Effect } from 'effect';
 import * as queries from '@/database/queries';
 import { DatabaseLive } from '@/database/effect';
 import { useEffect, useRef } from 'react';
@@ -30,6 +28,7 @@ const getContext = createServerFn({ method: 'GET' })
             Effect.let('request', () => getWebRequest()),
             Effect.flatMap(({ request }) => {
                 return Effect.Do.pipe(
+                    Effect.bind('now', () => Clock.currentTimeMillis),
                     Effect.bind('session', () => Session),
                     Effect.bind('context', ({ session }) =>
                         queries.getSSRData(UserId(session.user.id))
@@ -43,6 +42,8 @@ const getContext = createServerFn({ method: 'GET' })
                         }
                         return Effect.succeed(undefined);
                     }),
+                    Effect.bind('end', () => Clock.currentTimeMillis),
+                    Effect.tap(({ now, end }) => Effect.log(`SSR Duration: ${end - now}ms`)),
                     Effect.provide(DatabaseLive),
                     Effect.provide(SessionLive(request)),
                     Effect.map(({ context, session, thread }) => ({
@@ -74,6 +75,10 @@ export const Route = createRootRoute({
             },
             {
                 title: ctx?.loaderData?.thread?.title ?? 'Zeron',
+            },
+            {
+                name: 'description',
+                content: 'Chat with models from OpenAI, Anthropic, and more.',
             },
         ],
         links: [
