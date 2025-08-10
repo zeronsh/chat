@@ -1,11 +1,9 @@
 // @ts-ignore
 import appCss from '@/global.css?url';
-
 import { HeadContent, Outlet, Scripts, createRootRoute } from '@tanstack/react-router';
 import { DatabaseProvider } from '@/context/database';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/sonner';
-
 import { createServerFn } from '@tanstack/react-start';
 import { Session, SessionLive } from '@/lib/auth';
 import { getWebRequest } from '@tanstack/react-start/server';
