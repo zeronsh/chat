@@ -9,11 +9,12 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import { authClient } from '@/lib/auth-client';
+import { useSession } from '@/hooks/use-session';
 import { useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 
 export function Anonymous({ children }: { children: React.ReactNode }) {
-    const session = authClient.useSession();
+    const session = useSession();
 
     if (!session.data) {
         return null;
@@ -27,7 +28,7 @@ export function Anonymous({ children }: { children: React.ReactNode }) {
 }
 
 export function NotAnonymous({ children }: { children: React.ReactNode }) {
-    const session = authClient.useSession();
+    const session = useSession();
 
     if (!session.data) {
         return null;

@@ -3,15 +3,15 @@ import { Button } from '@/components/ui/button';
 import { useAccess } from '@/hooks/use-access';
 import { createFileRoute } from '@tanstack/react-router';
 import { Badge } from '@/components/ui/badge';
-import { authClient } from '@/lib/auth-client';
 import { Separator } from '@/components/ui/separator';
+import { useSession } from '@/hooks/use-session';
 
 export const Route = createFileRoute('/_account/account/subscription')({
     component: RouteComponent,
 });
 
 function RouteComponent() {
-    const { data: session } = authClient.useSession();
+    const { data: session } = useSession();
     const { isPro, isExpiring, limits, remainingSearches, remainingResearches, remainingCredits } =
         useAccess();
 

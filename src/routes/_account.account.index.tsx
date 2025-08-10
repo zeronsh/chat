@@ -13,6 +13,7 @@ import { useQuery } from '@rocicorp/zero/react';
 
 import { toast } from 'sonner';
 import { SingleFieldForm } from '@/components/app/single-field-form';
+import { useSession } from '@/hooks/use-session';
 
 export const Route = createFileRoute('/_account/account/')({
     component: RouteComponent,
@@ -20,7 +21,7 @@ export const Route = createFileRoute('/_account/account/')({
 
 function RouteComponent() {
     const db = useDatabase();
-    const { data: session } = authClient.useSession();
+    const { data: session } = useSession();
 
     const [activeSessions] = useQuery(db.query.session.where('userId', '=', db.userID));
 

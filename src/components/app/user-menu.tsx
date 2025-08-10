@@ -10,7 +10,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useAccess } from '@/hooks/use-access';
-import { useUser } from '@/hooks/use-user';
+import { useUser } from '@/hooks/use-database';
 import { authClient } from '@/lib/auth-client';
 import { getUsername } from '@/lib/usernames';
 import { Link, useNavigate } from '@tanstack/react-router';
