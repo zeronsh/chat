@@ -108,6 +108,17 @@ const threadPostApiHandler = Effect.gen(function* () {
           })
         : model.model;
 
+    const OPENAI_MODELS_WITH_REASONING = ['openai/gpt-5', 'openai/gpt-5-mini', 'openai/gpt-5-nano'];
+
+    const openai: OpenAIResponsesProviderOptions = {
+        parallelToolCalls: false,
+    };
+
+    if (OPENAI_MODELS_WITH_REASONING.includes(model.model)) {
+        openai.include = ['reasoning.encrypted_content'];
+        openai.reasoningSummary = 'auto';
+    }
+
     const stream = yield* Stream.create.pipe(
         Stream.options({
             model: actualModel,
@@ -120,11 +131,7 @@ const threadPostApiHandler = Effect.gen(function* () {
             }),
             abortSignal: controller.signal,
             providerOptions: {
-                openai: {
-                    parallelToolCalls: false,
-                    include: ['reasoning.encrypted_content'],
-                    reasoningSummary: 'auto',
-                } satisfies OpenAIResponsesProviderOptions,
+                openai,
                 gateway: {
                     order: ['groq', 'cerebras'],
                 },
