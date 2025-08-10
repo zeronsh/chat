@@ -20,6 +20,7 @@ import { z } from 'zod';
 const GetContextSchema = z.object({
     threadId: z.string().optional(),
 });
+
 const getContext = createServerFn({ method: 'GET' })
     .validator((obj: unknown) => {
         return GetContextSchema.parse(obj);
