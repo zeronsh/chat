@@ -31,15 +31,7 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
         }
 
         if (typeof window === 'undefined') {
-            return new Zero({
-                userID: session.user.id,
-                server: env.VITE_PUBLIC_ZERO_URL,
-                auth: async () => {
-                    return session.session.token;
-                },
-                schema,
-                kvStore: 'mem',
-            });
+            return undefined;
         }
 
         return new Zero({
