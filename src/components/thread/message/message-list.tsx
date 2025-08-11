@@ -12,7 +12,6 @@ export function MessageList() {
     const messageIds = useThreadSelector(state => state.messageIds);
     const instance = useStickToBottom({
         initial: 'instant',
-        resize: 'instant',
     });
 
     useAutoResume();

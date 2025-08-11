@@ -19,7 +19,7 @@ export function MessageContainer({
     return (
         <div
             className={cn(
-                'flex w-full max-w-3xl mx-auto',
+                'flex w-full max-w-3xl mx-auto px-4',
                 className,
                 !hasPreviousMessage && 'pt-40',
                 !hasNextMessage &&
