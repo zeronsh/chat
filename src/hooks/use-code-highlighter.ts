@@ -87,7 +87,7 @@ export const useCodeHighlighter = ({
                 setIsHighlighting(true);
                 const highlighter = await getHighlighter();
 
-                setTimeout(() => {
+                const timer = setTimeout(() => {
                     const supportedLangs = highlighter.getLoadedLanguages();
                     const langToUse = supportedLangs.includes(language) ? language : 'plaintext';
                     const highlighted = highlighter.codeToHtml(codeString, {
@@ -95,7 +95,8 @@ export const useCodeHighlighter = ({
                         theme: 'css-variables',
                     });
                     setHighlightedCode(highlighted);
-                }, 0);
+                }, 30);
+                return () => clearTimeout(timer);
             } catch (error) {
                 console.error('Error highlighting code:', error);
                 // Fallback to plain text if highlighting fails
