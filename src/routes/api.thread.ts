@@ -22,6 +22,7 @@ import { listen, subscribe, unsubscribe } from '@/lib/redis';
 import { Database } from '@/database/effect';
 import type { OpenAIResponsesProviderOptions } from '@ai-sdk/openai';
 import type { GoogleGenerativeAIProviderOptions } from '@ai-sdk/google';
+import type { AnthropicProviderOptions } from '@ai-sdk/anthropic';
 import { gateway } from '@ai-sdk/gateway';
 
 export const ServerRoute = createServerFileRoute('/api/thread').methods({
@@ -130,6 +131,15 @@ const threadPostApiHandler = Effect.gen(function* () {
         };
     }
 
+    const anthropic: AnthropicProviderOptions = {
+        sendReasoning: true,
+        thinking: {
+            type: 'enabled',
+            budgetTokens: 3000,
+        },
+        disableParallelToolUse: true,
+    };
+
     const stream = yield* Stream.create.pipe(
         Stream.options({
             model: actualModel,
@@ -145,6 +155,7 @@ const threadPostApiHandler = Effect.gen(function* () {
             providerOptions: {
                 openai,
                 google,
+                anthropic,
                 gateway: {
                     order: ['groq', 'cerebras'],
                 },

@@ -21,6 +21,7 @@
         "stripe:webhook": "stripe listen --forward-to localhost:5173/api/webhook/stripe"
     },
     "dependencies": {
+        "@ai-sdk/anthropic": "^2.0.1",
         "@ai-sdk/gateway": "^1.0.4",
         "@ai-sdk/google": "^2.0.3",
         "@ai-sdk/openai": "^2.0.7",
