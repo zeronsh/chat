@@ -44,7 +44,6 @@
         "@tanstack/react-start": "^1.129.5",
         "@tanstack/react-store": "^0.7.3",
         "@tanstack/react-table": "^8.21.3",
-        "@tanstack/react-virtual": "^3.13.12",
         "@uidotdev/usehooks": "^2.4.1",
         "@uploadthing/react": "^7.3.2",
         "ai": "5.0.8",
@@ -83,6 +82,7 @@
         "uploadthing": "^7.7.3",
         "use-stick-to-bottom": "^1.1.1",
         "usehooks-ts": "^3.1.1",
+        "virtua": "^0.41.5",
         "zod": "4.0.11",
         "zustand": "^5.0.6"
     },

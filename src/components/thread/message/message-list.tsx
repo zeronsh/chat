@@ -4,6 +4,7 @@ import { ZList } from '@/components/ui/z-list';
 import { useThreadContext, useThreadSelector } from '@/context/thread';
 import { useAutoResume } from '@/hooks/use-auto-resume';
 import { StickToBottom, useStickToBottom } from 'use-stick-to-bottom';
+import { Virtualizer } from 'virtua';
 
 export function MessageList() {
     const thread = useThreadContext();
@@ -16,24 +17,11 @@ export function MessageList() {
 
     return (
         <StickToBottom className="absolute top-0 left-0 right-0 bottom-4" instance={instance}>
-            <ZList
-                className="absolute inset-0 overflow-y-auto overflow-x-hidden"
-                data={messageIds}
-                getItemKey={id => id}
-                renderItem={({ item }) => <MessageItem id={item} />}
-                estimateSize={({ item }) => {
-                    const message = thread.store.getState().messageMap[item];
-                    if (!message) {
-                        return 300;
-                    }
-                    const text = message.parts.reduce((acc, part) => {
-                        return acc + (part.type === 'text' ? part.text : '');
-                    }, '');
-                    const lines = text.split('\n').length;
-                    return lines * 32;
-                }}
-                instance={instance}
-            />
+            <Virtualizer as={StickToBottom.Content} scrollRef={instance.scrollRef}>
+                {messageIds.map(id => (
+                    <MessageItem key={id} id={id} />
+                ))}
+            </Virtualizer>
             <MultiModalInput />
         </StickToBottom>
     );
