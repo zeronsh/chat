@@ -39,6 +39,7 @@ export function MessageList() {
                 ref={ref}
                 scrollRef={instance.scrollRef}
                 itemSize={500}
+                ssrCount={5}
                 overscan={2}
             >
                 {messageIds.map(id => (
