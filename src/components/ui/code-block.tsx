@@ -40,7 +40,7 @@ function CodeBlockCode({
 }: CodeBlockCodeProps) {
     const [isCopied, setIsCopied] = useState(false);
 
-    const lines = code.split('\n');
+    const lines = code.split(/(\n\n)/);
 
     function handleCopy() {
         if (isCopied) return;
@@ -50,10 +50,7 @@ function CodeBlockCode({
         });
     }
 
-    const classNames = cn(
-        'w-full overflow-x-auto text-[13px] [&>pre]:px-4 [&>pre]:py-4 shadow-xl',
-        className
-    );
+    const classNames = cn('w-full overflow-x-auto', className);
 
     return (
         <div className="relative">
@@ -70,9 +67,11 @@ function CodeBlockCode({
             </div>
 
             <div className={classNames} {...props}>
-                {lines.map((line, index) => (
-                    <CodeBlockLine key={index} line={line} language={language} />
-                ))}
+                <div className="py-4 text-[13px] [&>pre]:px-4 [&>pre]:py-4 shadow-xl">
+                    {lines.map((line, index) => (
+                        <CodeBlockLine key={index} line={line} language={language} />
+                    ))}
+                </div>
             </div>
         </div>
     );
