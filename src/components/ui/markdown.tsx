@@ -2,7 +2,7 @@ import { CodeBlock, CodeBlockCode } from '@/components/ui/code-block';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import Marked, { ReactRenderer } from 'marked-react';
-import { createContext, memo, useContext, useMemo } from 'react';
+import { createContext, memo, useContext, useId, useMemo } from 'react';
 
 export type MarkdownProps = {
     children: string;
@@ -83,8 +83,9 @@ function extractDomain(url: string | undefined): string {
 
 const INITIAL_COMPONENTS: Partial<ReactRenderer> = {
     code: function CodeComponent(children, language) {
+        const id = useId();
         return (
-            <CodeBlock>
+            <CodeBlock key={`${id}-${language}`}>
                 <CodeBlockCode
                     code={children as string}
                     language={language?.trim() || 'plaintext'}
@@ -93,16 +94,22 @@ const INITIAL_COMPONENTS: Partial<ReactRenderer> = {
         );
     },
     codespan: function CodeSpanComponent(children) {
-        return <span className={cn('bg-muted rounded-sm px-1 font-mono text-sm')}>{children}</span>;
+        const id = useId();
+        return (
+            <span key={`${id}}`} className={cn('bg-muted rounded-sm px-1 font-mono text-sm')}>
+                {children}
+            </span>
+        );
     },
     link: function LinkComponent(href, text) {
         const { citations } = useMarkdownContext();
         const citationIndex = citations.findIndex(citation => citation.link === href);
+        const id = useId();
 
         if (citationIndex !== -1) {
             const domain = extractDomain(href);
             return (
-                <Tooltip>
+                <Tooltip key={`${id}}`}>
                     <TooltipTrigger>
                         <a
                             href={href}
@@ -118,7 +125,7 @@ const INITIAL_COMPONENTS: Partial<ReactRenderer> = {
             );
         }
         return (
-            <a href={href} target="_blank" rel="noopener noreferrer">
+            <a key={`${id}}`} href={href} target="_blank" rel="noopener noreferrer">
                 {text}
             </a>
         );
