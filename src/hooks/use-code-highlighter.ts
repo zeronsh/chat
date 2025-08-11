@@ -77,17 +77,12 @@ export const useCodeHighlighter = ({
     const [isHighlighting, setIsHighlighting] = useState(true);
 
     useEffect(() => {
-        const highlightCode = async () => {
-            if (!shouldHighlight || !codeString) {
-                setIsHighlighting(false);
-                return;
-            }
+        setIsHighlighting(true);
 
-            try {
-                setIsHighlighting(true);
-                const highlighter = await getHighlighter();
-
-                const timer = setTimeout(() => {
+        const timer = setTimeout(() => {
+            requestAnimationFrame(async () => {
+                try {
+                    const highlighter = await getHighlighter();
                     const supportedLangs = highlighter.getLoadedLanguages();
                     const langToUse = supportedLangs.includes(language) ? language : 'plaintext';
                     const highlighted = highlighter.codeToHtml(codeString, {
@@ -95,18 +90,16 @@ export const useCodeHighlighter = ({
                         theme: 'css-variables',
                     });
                     setHighlightedCode(highlighted);
-                }, 30);
-                return () => clearTimeout(timer);
-            } catch (error) {
-                console.error('Error highlighting code:', error);
-                // Fallback to plain text if highlighting fails
-                setHighlightedCode(`<pre><code>${codeString}</code></pre>`);
-            } finally {
-                setIsHighlighting(false);
-            }
-        };
-
-        highlightCode();
+                } catch (error) {
+                    console.error('Error highlighting code:', error);
+                    // Fallback to plain text if highlighting fails
+                    setHighlightedCode(`<pre><code>${codeString}</code></pre>`);
+                } finally {
+                    setIsHighlighting(false);
+                }
+            });
+        }, 30);
+        return () => clearTimeout(timer);
     }, [codeString, language, shouldHighlight]);
 
     return {
