@@ -11,6 +11,9 @@ importers:
       '@ai-sdk/gateway':
         specifier: ^1.0.4
         version: 1.0.4(zod@4.0.11)
+      '@ai-sdk/google':
+        specifier: ^2.0.3
+        version: 2.0.3(zod@4.0.11)
       '@ai-sdk/openai':
         specifier: ^2.0.7
         version: 2.0.7(zod@4.0.11)
@@ -251,6 +254,12 @@ packages:
 
   '@ai-sdk/gateway@1.0.4':
     resolution: {integrity: sha512-1roLdgMbFU3Nr4MC97/te7w6OqxsWBkDUkpbCcvxF3jz/ku91WVaJldn/PKU8feMKNyI5W9wnqhbjb1BqbExOQ==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      zod: ^3.25.76 || ^4
+
+  '@ai-sdk/google@2.0.3':
+    resolution: {integrity: sha512-rQkY4nQGZnQw6pfftqsGsXXAqkGnl1gYjSbvD8+zyrVg2KAYeJU0NxIaacLWCORNcW+yQ/cqTpK/Uku/SIdEqA==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4
@@ -6624,6 +6633,12 @@ packages:
 snapshots:
 
   '@ai-sdk/gateway@1.0.4(zod@4.0.11)':
+    dependencies:
+      '@ai-sdk/provider': 2.0.0
+      '@ai-sdk/provider-utils': 3.0.1(zod@4.0.11)
+      zod: 4.0.11
+
+  '@ai-sdk/google@2.0.3(zod@4.0.11)':
     dependencies:
       '@ai-sdk/provider': 2.0.0
       '@ai-sdk/provider-utils': 3.0.1(zod@4.0.11)

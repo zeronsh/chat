@@ -20,7 +20,8 @@ import {
 import { Stream } from '@/ai/stream';
 import { listen, subscribe, unsubscribe } from '@/lib/redis';
 import { Database } from '@/database/effect';
-import { OpenAIResponsesProviderOptions } from '@ai-sdk/openai';
+import type { OpenAIResponsesProviderOptions } from '@ai-sdk/openai';
+import type { GoogleGenerativeAIProviderOptions } from '@ai-sdk/google';
 import { gateway } from '@ai-sdk/gateway';
 
 export const ServerRoute = createServerFileRoute('/api/thread').methods({
@@ -119,6 +120,16 @@ const threadPostApiHandler = Effect.gen(function* () {
         openai.reasoningSummary = 'auto';
     }
 
+    const GOOGLE_MODELS_WITH_REASONING = ['google/gemini-2.5-flash', 'google/gemini-2.5-pro'];
+
+    const google: GoogleGenerativeAIProviderOptions = {};
+
+    if (GOOGLE_MODELS_WITH_REASONING.includes(model.model)) {
+        google.thinkingConfig = {
+            includeThoughts: true,
+        };
+    }
+
     const stream = yield* Stream.create.pipe(
         Stream.options({
             model: actualModel,
@@ -128,10 +139,12 @@ const threadPostApiHandler = Effect.gen(function* () {
             system: getSystemPrompt(settings, activeTools),
             experimental_transform: smoothStream({
                 chunking: 'word',
+                delayInMs: 5,
             }),
             abortSignal: controller.signal,
             providerOptions: {
                 openai,
+                google,
                 gateway: {
                     order: ['groq', 'cerebras'],
                 },
