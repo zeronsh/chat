@@ -39,6 +39,7 @@ export function ZList<T>(props: ZListProps<T>) {
                 }}
             >
                 <div
+                    className="px-4"
                     style={{
                         position: 'absolute',
                         top: 0,

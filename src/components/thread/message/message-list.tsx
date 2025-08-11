@@ -20,7 +20,7 @@ export function MessageList() {
             initial="instant"
         >
             <ZList
-                className="absolute inset-0 overflow-y-auto"
+                className="absolute inset-0 overflow-y-auto overflow-x-hidden"
                 data={messageIds}
                 getItemKey={id => id}
                 renderItem={({ item }) => <MessageItem id={item} />}

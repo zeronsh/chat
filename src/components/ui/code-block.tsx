@@ -13,7 +13,7 @@ function CodeBlock({ children, className, ...props }: CodeBlockProps) {
     return (
         <div
             className={cn(
-                'not-prose flex w-full flex-col overflow-clip border',
+                'not-prose flex min-w-full w-0 flex-col overflow-clip border',
                 'border-border bg-card text-card-foreground rounded-xl',
                 className
             )}
@@ -53,7 +53,7 @@ function CodeBlockCode({
     const classNames = cn('w-full overflow-x-auto', className);
 
     return (
-        <div className="relative">
+        <div className="relative w-full">
             <div className="flex gap-2 items-center border-b justify-between p-2">
                 <div className="text-sm text-muted-foreground">{language}</div>
                 <Button
@@ -67,7 +67,7 @@ function CodeBlockCode({
             </div>
 
             <div className={classNames} {...props}>
-                <div className="py-4 text-[13px] [&>pre]:px-4 [&>pre]:py-4 shadow-xl">
+                <div className="py-4 text-[13px] [&>pre]:px-4 [&>pre]:py-4">
                     {lines.map((line, index) => (
                         <CodeBlockLine key={index} line={line} language={language} />
                     ))}
