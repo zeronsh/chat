@@ -83,27 +83,25 @@ export const useCodeHighlighter = ({
         }
         setIsHighlighting(true);
 
-        const timer = setTimeout(() => {
-            requestAnimationFrame(async () => {
-                try {
-                    const highlighter = await getHighlighter();
-                    const supportedLangs = highlighter.getLoadedLanguages();
-                    const langToUse = supportedLangs.includes(language) ? language : 'plaintext';
-                    const highlighted = highlighter.codeToHtml(codeString, {
-                        lang: langToUse,
-                        theme: 'css-variables',
-                    });
-                    setHighlightedCode(highlighted);
-                } catch (error) {
-                    console.error('Error highlighting code:', error);
-                    // Fallback to plain text if highlighting fails
-                    setHighlightedCode(`<pre><code>${codeString}</code></pre>`);
-                } finally {
-                    setIsHighlighting(false);
-                }
-            });
-        }, 30);
-        return () => clearTimeout(timer);
+        const timer = requestAnimationFrame(async () => {
+            try {
+                const highlighter = await getHighlighter();
+                const supportedLangs = highlighter.getLoadedLanguages();
+                const langToUse = supportedLangs.includes(language) ? language : 'plaintext';
+                const highlighted = highlighter.codeToHtml(codeString, {
+                    lang: langToUse,
+                    theme: 'css-variables',
+                });
+                setHighlightedCode(highlighted);
+            } catch (error) {
+                console.error('Error highlighting code:', error);
+                // Fallback to plain text if highlighting fails
+                setHighlightedCode(`<pre><code>${codeString}</code></pre>`);
+            } finally {
+                setIsHighlighting(false);
+            }
+        });
+        return () => cancelAnimationFrame(timer);
     }, [codeString, language, shouldHighlight]);
 
     return {

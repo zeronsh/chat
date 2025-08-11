@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { useCodeHighlighter } from '@/hooks/use-code-highlighter';
 import { cn } from '@/lib/utils';
 import { Check, Copy } from 'lucide-react';
-import { memo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 export type CodeBlockProps = {
     children?: React.ReactNode;
@@ -40,7 +40,11 @@ function CodeBlockCode({
 }: CodeBlockCodeProps) {
     const [isCopied, setIsCopied] = useState(false);
 
-    const lines = code.split(/(\n\n)/);
+    const { highlightedCode } = useCodeHighlighter({
+        codeString: code,
+        language,
+        shouldHighlight: true,
+    });
 
     function handleCopy() {
         if (isCopied) return;
@@ -51,6 +55,22 @@ function CodeBlockCode({
     }
 
     const classNames = cn('w-full overflow-x-auto', className);
+
+    const content = useMemo(() => {
+        if (!code.trim()) {
+            return <pre className="px-4" />;
+        }
+
+        if (!highlightedCode) {
+            return (
+                <pre className="px-4 py-0! font-mono">
+                    <code>{code}</code>
+                </pre>
+            );
+        }
+
+        return <div className="px-4" dangerouslySetInnerHTML={{ __html: highlightedCode }} />;
+    }, [highlightedCode, code]);
 
     return (
         <div className="relative w-full">
@@ -67,40 +87,11 @@ function CodeBlockCode({
             </div>
 
             <div className={classNames} {...props}>
-                <div className="py-4 text-[13px] [&>pre]:px-4 [&>pre]:py-4">
-                    {lines.map((line, index) => (
-                        <CodeBlockLine key={index} line={line} language={language} />
-                    ))}
-                </div>
+                <div className="py-4 text-[13px] [&>pre]:px-4 [&>pre]:py-4">{content}</div>
             </div>
         </div>
     );
 }
-
-const CodeBlockLine = memo(
-    function CodeBlockLine({ line, language }: { line: string; language: string }) {
-        const { highlightedCode } = useCodeHighlighter({
-            codeString: line,
-            language,
-            shouldHighlight: true,
-        });
-
-        if (!line.trim()) {
-            return <pre className="px-4" />;
-        }
-
-        if (!highlightedCode) {
-            return (
-                <pre className="px-4 py-0! font-mono">
-                    <code>{line}</code>
-                </pre>
-            );
-        }
-
-        return <div className="px-4" dangerouslySetInnerHTML={{ __html: highlightedCode }} />;
-    },
-    (prevProps, nextProps) => prevProps.line === nextProps.line
-);
 
 export type CodeBlockGroupProps = React.HTMLAttributes<HTMLDivElement>;
 
