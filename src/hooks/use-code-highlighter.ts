@@ -77,6 +77,10 @@ export const useCodeHighlighter = ({
     const [isHighlighting, setIsHighlighting] = useState(true);
 
     useEffect(() => {
+        if (!shouldHighlight) {
+            setIsHighlighting(false);
+            return;
+        }
         setIsHighlighting(true);
 
         const timer = setTimeout(() => {

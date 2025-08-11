@@ -44,6 +44,7 @@
         "@tanstack/react-start": "^1.129.5",
         "@tanstack/react-store": "^0.7.3",
         "@tanstack/react-table": "^8.21.3",
+        "@tanstack/react-virtual": "^3.13.12",
         "@uidotdev/usehooks": "^2.4.1",
         "@uploadthing/react": "^7.3.2",
         "ai": "5.0.8",
