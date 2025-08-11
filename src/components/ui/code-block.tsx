@@ -91,7 +91,7 @@ const CodeBlockLine = memo(
         }
 
         if (!highlightedCode) {
-            return <pre className="px-4 py-0!">{line}</pre>;
+            return <pre className="px-4 py-0! font-mono">{line}</pre>;
         }
 
         return <div className="px-4" dangerouslySetInnerHTML={{ __html: highlightedCode }} />;
