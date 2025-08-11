@@ -4,6 +4,12 @@ import { cn } from '@/lib/utils';
 import Marked, { ReactRenderer } from 'marked-react';
 import { createContext, memo, useContext, useId, useMemo } from 'react';
 
+const generateKey = () => {
+    return (
+        Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
+    );
+};
+
 export type MarkdownProps = {
     children: string;
     id?: string;
@@ -83,7 +89,7 @@ function extractDomain(url: string | undefined): string {
 
 const INITIAL_COMPONENTS: Partial<ReactRenderer> = {
     code: function CodeComponent(children, language) {
-        const id = useId();
+        const id = generateKey();
         return (
             <CodeBlock key={`${id}-${language}`}>
                 <CodeBlockCode
@@ -94,7 +100,7 @@ const INITIAL_COMPONENTS: Partial<ReactRenderer> = {
         );
     },
     codespan: function CodeSpanComponent(children) {
-        const id = useId();
+        const id = generateKey();
         return (
             <span key={`${id}}`} className={cn('bg-muted rounded-sm px-1 font-mono text-sm')}>
                 {children}
@@ -104,7 +110,7 @@ const INITIAL_COMPONENTS: Partial<ReactRenderer> = {
     link: function LinkComponent(href, text) {
         const { citations } = useMarkdownContext();
         const citationIndex = citations.findIndex(citation => citation.link === href);
-        const id = useId();
+        const id = generateKey();
 
         if (citationIndex !== -1) {
             const domain = extractDomain(href);

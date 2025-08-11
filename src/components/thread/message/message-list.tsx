@@ -1,12 +1,11 @@
 import { MessageItem } from '@/components/thread/message/message-item';
 import { MultiModalInput } from '@/components/thread/multi-modal-input';
-import { useThreadContext, useThreadSelector } from '@/context/thread';
+import { useThreadSelector } from '@/context/thread';
 import { useAutoResume } from '@/hooks/use-auto-resume';
 import { StickToBottom, useStickToBottom } from 'use-stick-to-bottom';
 import { Virtualizer } from 'virtua';
 
 export function MessageList() {
-    const thread = useThreadContext();
     const messageIds = useThreadSelector(state => state.messageIds);
     const instance = useStickToBottom({
         initial: 'instant',
