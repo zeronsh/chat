@@ -35,7 +35,7 @@ export function ProDialog(props: { open: boolean; setOpen: (open: boolean) => vo
                                     <span className="text-2xl font-bold">$25</span>
                                     <span className="text-sm text-white/80">/month</span>
                                 </div>
-                                <p className="text-sm text-white/70">
+                                <p className="text-sm text-white/70 text-left">
                                     Upgrade to PRO to unlock all features and get access to premium
                                     models and higher limits for research, search, and more.
                                 </p>
@@ -49,7 +49,7 @@ export function ProDialog(props: { open: boolean; setOpen: (open: boolean) => vo
                                     <MoveRightIcon className="size-3" />
                                     <span className="text-sm">$25.00</span>
                                 </div>
-                                <div className="text-xs text-white/70 mt-2">
+                                <div className="text-xs text-white/70 mt-2 text-left">
                                     Save over 70% on chat subscriptions by using Zeron
                                 </div>
                             </DialogDescription>
