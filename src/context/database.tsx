@@ -22,16 +22,16 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
     }, [clientSession, loaderData.session]);
 
     const zero = useMemo(() => {
-        if (!session) {
-            return undefined;
-        }
-
-        if (!session.user) {
-            return undefined;
-        }
-
-        if (typeof window === 'undefined') {
-            return undefined;
+        if (typeof window === 'undefined' || !session || !session.user) {
+            return new Zero({
+                userID: '__unauthenticated__',
+                server: env.VITE_PUBLIC_ZERO_URL,
+                auth: async () => {
+                    return undefined;
+                },
+                schema,
+                kvStore: 'mem',
+            });
         }
 
         return new Zero({

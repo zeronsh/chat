@@ -12,7 +12,6 @@ import * as queries from '@/database/queries';
 import { DatabaseLive } from '@/database/effect';
 import { useEffect, useRef } from 'react';
 import { useSettings } from '@/hooks/use-database';
-import { UserId } from '@/database/types';
 import { z } from 'zod';
 
 const GetContextSchema = z.object({
@@ -30,29 +29,28 @@ const getContext = createServerFn({ method: 'GET' })
                 return Effect.Do.pipe(
                     Effect.bind('now', () => Clock.currentTimeMillis),
                     Effect.bind('session', () => Session),
-                    Effect.bind('context', ({ session }) =>
-                        queries.getSSRData(UserId(session.user.id))
-                    ),
+                    Effect.bind('context', ({ session }) => queries.getSSRData(session.user.id)),
                     Effect.bind('thread', ({ session }) => {
                         if (data.threadId) {
-                            return queries.getThreadByIdAndUserId(
-                                data.threadId,
-                                UserId(session.user.id)
-                            );
+                            return queries.getThreadByIdAndUserId(data.threadId, session.user.id);
                         }
-                        return Effect.succeed(undefined);
+                        return Effect.succeed(null);
                     }),
                     Effect.bind('end', () => Clock.currentTimeMillis),
                     Effect.tap(({ now, end }) => Effect.log(`SSR Duration: ${end - now}ms`)),
-                    Effect.provide(DatabaseLive),
-                    Effect.provide(SessionLive(request)),
-                    Effect.map(({ context, session, thread }) => ({
-                        session,
-                        thread,
-                        ...context,
-                    }))
+                    Effect.provide(SessionLive(request))
                 );
             }),
+            Effect.map(({ context, session, thread }) => ({
+                session,
+                thread,
+                settings: context.results[0],
+                customer: context.results[1],
+                usage: context.results[2],
+                user: context.results[3],
+                threads: context.results[4],
+            })),
+            Effect.provide(DatabaseLive),
             Effect.catchAll(_ => Effect.succeed(undefined))
         );
 
@@ -60,7 +58,23 @@ const getContext = createServerFn({ method: 'GET' })
     });
 
 export const Route = createRootRoute({
-    head: (ctx: any) => ({
+    shouldReload: false,
+    loader: async ({ params }) => {
+        const context = await getContext({
+            data: params,
+        });
+
+        return {
+            settings: context?.settings,
+            session: context?.session,
+            threads: context?.threads,
+            customer: context?.customer,
+            usage: context?.usage,
+            user: context?.user,
+            thread: context?.thread,
+        };
+    },
+    head: ctx => ({
         meta: [
             {
                 charSet: 'utf-8',
@@ -79,54 +93,21 @@ export const Route = createRootRoute({
         ],
         links: [
             {
-                rel: 'preconnect',
-                href: 'https://fonts.googleapis.com',
-            },
-            {
-                rel: 'preconnect',
-                href: 'https://fonts.gstatic.com',
-                crossOrigin: 'anonymous',
-            },
-            {
-                rel: 'stylesheet',
-                href: 'https://fonts.googleapis.com/css2?family=Geist+Mono:wght@100..900&family=Geist:wght@100..900&display=swap',
-            },
-            {
                 rel: 'stylesheet',
                 href: appCss,
             },
         ],
     }),
-    shouldReload: false,
-    loader: async ({ params }) => {
-        const context = await getContext({
-            data: params,
-        });
-
-        return {
-            settings: context?.settings,
-            session: context?.session,
-            threads: context?.threads,
-            customer: context?.customer,
-            usage: context?.usage,
-            user: context?.user,
-            thread: context?.thread,
-        };
-    },
     notFoundComponent: () => <div>Not found</div>,
     component: () => <RootDocument />,
 });
 
-function RootComponent({ bodyRef }: { bodyRef: React.RefObject<HTMLBodyElement | null> }) {
+function RootComponent({ htmlRef }: { htmlRef: React.RefObject<HTMLHtmlElement | null> }) {
     const settings = useSettings();
 
     useEffect(() => {
-        if (bodyRef.current) {
-            bodyRef.current.className = cn(
-                'fixed inset-0',
-                settings?.mode ?? 'dark',
-                settings?.theme ?? 'default'
-            );
+        if (htmlRef.current) {
+            htmlRef.current.className = cn(settings?.mode ?? 'dark', settings?.theme ?? 'default');
         }
     }, [settings?.mode, settings?.theme]);
 
@@ -139,24 +120,24 @@ function RootComponent({ bodyRef }: { bodyRef: React.RefObject<HTMLBodyElement |
 }
 
 function RootDocument() {
-    const ref = useRef<HTMLBodyElement>(null);
+    const ref = useRef<HTMLHtmlElement>(null);
     const loaderData = Route.useLoaderData();
 
     return (
-        <html lang="en">
+        <html
+            lang="en"
+            ref={ref}
+            className={cn(
+                loaderData?.settings?.mode ?? 'dark',
+                loaderData?.settings?.theme ?? 'default'
+            )}
+        >
             <head>
                 <HeadContent />
             </head>
-            <body
-                ref={ref}
-                className={cn(
-                    'fixed inset-0',
-                    loaderData?.settings?.mode ?? 'dark',
-                    loaderData?.settings?.theme ?? 'default'
-                )}
-            >
+            <body className="fixed inset-0">
                 <DatabaseProvider>
-                    <RootComponent bodyRef={ref} />
+                    <RootComponent htmlRef={ref} />
                 </DatabaseProvider>
                 <Scripts />
             </body>

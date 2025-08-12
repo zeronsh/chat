@@ -4,6 +4,7 @@ import { schema } from '@/database/schema';
 import { CustomerId, OrganizationId, SubscriptionData, UserId } from '@/database/types';
 import { Effect } from 'effect';
 import { and, eq, gt, not, sql } from 'drizzle-orm';
+import { UnknownException } from 'effect/Cause';
 
 export function getThreadById(threadId: string) {
     return Effect.gen(function* () {
@@ -200,7 +201,7 @@ export function getSettingsByUserId(userId: string) {
     });
 }
 
-export function getUserCustomerByUserId(userId: UserId) {
+export function getUserCustomerByUserId(userId: string) {
     return Effect.gen(function* () {
         const db = yield* Database.instance;
         return yield* Effect.tryPromise(() =>
@@ -211,7 +212,7 @@ export function getUserCustomerByUserId(userId: UserId) {
     });
 }
 
-export function createUserCustomer(values: { userId: UserId; customerId: CustomerId }) {
+export function createUserCustomer(values: { userId: string; customerId: CustomerId }) {
     return Effect.gen(function* () {
         const db = yield* Database.instance;
         return yield* Effect.tryPromise(() =>
@@ -286,7 +287,7 @@ export function updateOrganizationCustomerSubscription(values: {
     });
 }
 
-export function getUsageByUserId(userId: UserId) {
+export function getUsageByUserId(userId: string) {
     return Effect.gen(function* () {
         const db = yield* Database.instance;
         return yield* Effect.tryPromise(() =>
@@ -298,7 +299,7 @@ export function getUsageByUserId(userId: UserId) {
 }
 
 export function incrementUsage(
-    values: { userId: UserId; type: 'search' | 'research' | 'credits' },
+    values: { userId: string; type: 'search' | 'research' | 'credits' },
     amount: number
 ) {
     return Effect.gen(function* () {
@@ -315,7 +316,7 @@ export function incrementUsage(
 }
 
 export function decrementUsage(
-    values: { userId: UserId; type: 'search' | 'research' | 'credits' },
+    values: { userId: string; type: 'search' | 'research' | 'credits' },
     amount: number
 ) {
     return Effect.gen(function* () {
@@ -347,7 +348,10 @@ export function resetUsage() {
     });
 }
 
-export function getThreadByIdAndUserId(threadId: string, userId: UserId) {
+export function getThreadByIdAndUserId(
+    threadId: string,
+    userId: string
+): Effect.Effect<any, UnknownException, Database> {
     return Effect.gen(function* () {
         const db = yield* Database.instance;
         return yield* Effect.tryPromise(() =>
@@ -364,7 +368,7 @@ export function getThreadByIdAndUserId(threadId: string, userId: UserId) {
     });
 }
 
-export function getThreadsByUserId(userId: UserId) {
+export function getThreadsByUserId(userId: string) {
     return Effect.gen(function* () {
         const db = yield* Database.instance;
         return yield* Effect.tryPromise(() =>
@@ -382,14 +386,23 @@ export function getThreadsByUserId(userId: UserId) {
     });
 }
 
-export function getSSRData(id: UserId) {
+export function getSSRData(id: string) {
     return Database.transaction(
         Effect.Do.pipe(
-            Effect.bind('settings', () => getSettingsByUserId(id)),
-            Effect.bind('customer', () => getUserCustomerByUserId(id)),
-            Effect.bind('usage', () => getUsageByUserId(id)),
-            Effect.bind('user', () => getUserById(id)),
-            Effect.bind('threads', () => getThreadsByUserId(id))
+            Effect.bind('results', () =>
+                Effect.all(
+                    [
+                        getSettingsByUserId(id),
+                        getUserCustomerByUserId(id),
+                        getUsageByUserId(id),
+                        getUserById(id),
+                        getThreadsByUserId(id),
+                    ],
+                    {
+                        concurrency: 'unbounded',
+                    }
+                )
+            )
         )
     );
 }
