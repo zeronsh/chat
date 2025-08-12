@@ -74,7 +74,7 @@ export function ModelSelector() {
                     setProDialogOpen(true);
                 },
                 onAccountRequired: () => {
-                    setAccountDialogOpen(true);
+                    setProDialogOpen(true);
                 },
                 onInsufficientCreditsPro: () => {
                     setInsufficientCreditsProDialogOpen(true);
