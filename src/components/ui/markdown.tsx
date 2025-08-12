@@ -2,7 +2,7 @@ import { CodeBlock, CodeBlockCode } from '@/components/ui/code-block';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import Marked, { ReactRenderer } from 'marked-react';
-import { createContext, memo, useContext, useId, useMemo } from 'react';
+import { createContext, memo, useContext, useMemo } from 'react';
 
 const generateKey = () => {
     return (

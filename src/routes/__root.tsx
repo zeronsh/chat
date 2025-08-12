@@ -48,12 +48,8 @@ const getContext = createServerFn({ method: 'GET' })
                     Effect.provide(SessionLive(request)),
                     Effect.map(({ context, session, thread }) => ({
                         session,
-                        settings: context.settings,
-                        threads: context.threads,
-                        customer: context.customer,
-                        usage: context.usage,
-                        user: context.user,
-                        thread: thread,
+                        thread,
+                        ...context,
                     }))
                 );
             }),
