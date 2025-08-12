@@ -46,7 +46,7 @@ export function useThreads() {
                   createdAt: thread.createdAt.getTime(),
                   updatedAt: thread.updatedAt.getTime(),
               })) as Thread[]
-          ).filter(thread => thread.userId === db.userID) ?? [];
+          )?.filter(thread => thread.userId === db.userID) ?? [];
 }
 
 export function useCustomer() {
