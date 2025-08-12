@@ -40,11 +40,13 @@ export function useThreads() {
 
     return threads.length > 0
         ? threads
-        : (loaderData.threads?.map(thread => ({
-              ...thread,
-              createdAt: thread.createdAt.getTime(),
-              updatedAt: thread.updatedAt.getTime(),
-          })) as Thread[]) ?? [];
+        : (
+              loaderData.threads?.map(thread => ({
+                  ...thread,
+                  createdAt: thread.createdAt.getTime(),
+                  updatedAt: thread.updatedAt.getTime(),
+              })) as Thread[]
+          ).filter(thread => thread.userId === db.userID) ?? [];
 }
 
 export function useCustomer() {
