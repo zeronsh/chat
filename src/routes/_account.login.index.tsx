@@ -7,31 +7,25 @@ import { useForm } from '@tanstack/react-form';
 import { Navigate, createFileRoute, useNavigate } from '@tanstack/react-router';
 import { ArrowRightIcon, GithubIcon, Loader2 } from 'lucide-react';
 import { FcGoogle } from 'react-icons/fc';
-
+import { zodValidator } from '@tanstack/zod-adapter';
 import z from 'zod';
 
 const schema = z.object({
     email: z.string().email(),
 });
 
-async function onGoogleLogin() {
-    await authClient.signIn.social({
-        provider: 'google',
-    });
-}
-
-async function onGithubLogin() {
-    await authClient.signIn.social({
-        provider: 'github',
-    });
-}
-
 export const Route = createFileRoute('/_account/login/')({
     component: RouteComponent,
+    validateSearch: zodValidator(
+        z.object({
+            callbackUrl: z.string().optional().catch('/'),
+        })
+    ),
 });
 
 function RouteComponent() {
     const navigate = useNavigate();
+    const search = Route.useSearch();
     const form = useForm({
         defaultValues: {
             email: '',
@@ -39,6 +33,7 @@ function RouteComponent() {
         onSubmit: async ({ value }) => {
             await authClient.signIn.magicLink({
                 email: value.email,
+                callbackURL: search.callbackUrl,
             });
             navigate({ to: '/magic-link' });
         },
@@ -116,11 +111,27 @@ function RouteComponent() {
                         <Separator className="flex-1" />
                     </div>
                     <div className="flex flex-col gap-2 w-full">
-                        <Button variant="outline" onClick={onGoogleLogin}>
+                        <Button
+                            variant="outline"
+                            onClick={async () => {
+                                await authClient.signIn.social({
+                                    provider: 'google',
+                                    callbackURL: search.callbackUrl,
+                                });
+                            }}
+                        >
                             <FcGoogle size={16} />
                             <span className="text-sm">Continue with Google</span>
                         </Button>
-                        <Button variant="outline" onClick={onGithubLogin}>
+                        <Button
+                            variant="outline"
+                            onClick={async () => {
+                                await authClient.signIn.social({
+                                    provider: 'github',
+                                    callbackURL: search.callbackUrl,
+                                });
+                            }}
+                        >
                             <GithubIcon className="text-foreground" size={16} />
                             <span className="text-sm">Continue with GitHub</span>
                         </Button>

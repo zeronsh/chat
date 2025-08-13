@@ -1,10 +1,11 @@
 import { Section } from '@/components/ui/section';
 import { Button } from '@/components/ui/button';
 import { useAccess } from '@/hooks/use-access';
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { useSession } from '@/hooks/use-session';
+import { Anonymous, NotAnonymous } from '@/components/app/auth';
 
 export const Route = createFileRoute('/_account/account/subscription')({
     component: RouteComponent,
@@ -48,23 +49,31 @@ function RouteComponent() {
 
                         {!isPro && (
                             <div>
-                                <Button
-                                    variant="outline"
-                                    onClick={() => {
-                                        const url = new URL(
-                                            '/api/checkout',
-                                            window.location.origin
-                                        );
-                                        url.searchParams.set(
-                                            'redirectUrl',
-                                            window.location.origin + '/account/subscription'
-                                        );
-                                        window.location.href = url.toString();
-                                    }}
-                                    disabled={session?.user?.isAnonymous === true}
-                                >
-                                    Upgrade to Pro
-                                </Button>
+                                <NotAnonymous>
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => {
+                                            const url = new URL(
+                                                '/api/checkout',
+                                                window.location.origin
+                                            );
+                                            url.searchParams.set(
+                                                'redirectUrl',
+                                                window.location.origin + '/account/subscription'
+                                            );
+                                            window.location.href = url.toString();
+                                        }}
+                                    >
+                                        Upgrade to Pro
+                                    </Button>
+                                </NotAnonymous>
+                                <Anonymous>
+                                    <Button variant="outline" asChild>
+                                        <Link to="/login" search={{ callbackUrl: '/api/checkout' }}>
+                                            Upgrade to Pro
+                                        </Link>
+                                    </Button>
+                                </Anonymous>
                             </div>
                         )}
 

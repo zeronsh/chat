@@ -1,4 +1,4 @@
-import { Anonymous } from '@/components/app/auth';
+import { Anonymous, NotAnonymous } from '@/components/app/auth';
 import ZeronIcon from '@/components/icons/zeron';
 import ModelIcon from '@/components/thread/model-icon';
 import { Button } from '@/components/ui/button';
@@ -53,13 +53,36 @@ export function ProDialog(props: { open: boolean; setOpen: (open: boolean) => vo
                                     Save over 70% on chat subscriptions by using Zeron
                                 </div>
                             </DialogDescription>
-                            <Button
-                                type="button"
-                                className="backdrop-blur-md bg-white/80 border border-white/10 text-black/80 hover:bg-white/90"
-                                asChild
-                            >
-                                <Link to="/account/subscription">Get Started</Link>
-                            </Button>
+                            <Anonymous>
+                                <Button
+                                    type="button"
+                                    className="backdrop-blur-md bg-white/80 border border-white/10 text-black/80 hover:bg-white/90"
+                                    asChild
+                                >
+                                    <Link to="/login" search={{ callbackUrl: '/api/checkout' }}>
+                                        Get Started
+                                    </Link>
+                                </Button>
+                            </Anonymous>
+                            <NotAnonymous>
+                                <Button
+                                    type="button"
+                                    className="backdrop-blur-md bg-white/80 border border-white/10 text-black/80 hover:bg-white/90"
+                                    onClick={() => {
+                                        const url = new URL(
+                                            '/api/checkout',
+                                            window.location.origin
+                                        );
+                                        url.searchParams.set(
+                                            'redirectUrl',
+                                            window.location.origin + '/account/subscription'
+                                        );
+                                        window.location.href = url.toString();
+                                    }}
+                                >
+                                    Get Started
+                                </Button>
+                            </NotAnonymous>
                         </div>
                     </div>
                 </DialogHeader>
