@@ -15,12 +15,14 @@ import {
     EditIcon,
     XIcon,
     AlertTriangleIcon,
+    MessageCircleIcon,
 } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useParamsThreadId } from '@/hooks/use-params-thread-id';
 import { cn } from '@/lib/utils';
 import { useUploadThing } from '@/lib/uploadthing';
-import { useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { FileAttachment } from './file-attachment';
 import { toast } from 'sonner';
 import { useThreadContext, useThreadSelector } from '@/context/thread';
@@ -137,6 +139,8 @@ export function MultiModalInput() {
         canResearch,
         canUseModel,
         cannotUseModelReason,
+        canModelUseTools,
+        canModelViewFiles,
     } = useAccess();
 
     const matcher = useMemo(() => {
@@ -154,6 +158,8 @@ export function MultiModalInput() {
             input,
             pendingFileCount,
             canUseModel,
+            canModelUseTools,
+            canModelViewFiles,
         });
     }, [
         isPro,
@@ -169,7 +175,15 @@ export function MultiModalInput() {
         input,
         pendingFileCount,
         canUseModel,
+        canModelUseTools,
+        canModelViewFiles,
     ]);
+
+    useEffect(() => {
+        if (!canModelUseTools) {
+            setTool('');
+        }
+    }, [canModelUseTools]);
 
     return (
         <form
@@ -326,80 +340,194 @@ export function MultiModalInput() {
                 </div>
                 <PromptInputTextarea className="px-6" placeholder="Ask me anything..." />
                 <PromptInputActions className="flex items-center px-3 pb-3">
-                    <PromptInputAction
-                        tooltip={matcher
-                            .with({ canSearch: true }, () => 'Search the web')
-                            .with(
-                                {
-                                    remainingSearches: P.number.lte(0),
-                                },
-                                () => 'You have reached your search limit'
-                            )
-                            .otherwise(() => 'Search is not available')}
-                    >
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            type="button"
-                            className={cn(
-                                'h-8 rounded-full',
-                                tool === 'search' &&
-                                    'text-primary hover:text-primary border-primary!'
-                            )}
-                            onClick={() => setTool(tool === 'search' ? '' : 'search')}
-                            disabled={matcher
-                                .with({ canSearch: false }, () => true)
-                                .otherwise(() => false)}
+                    {/* Switch-like tool selector */}
+                    <div className="flex items-center bg-muted rounded-full p-1 relative h-10">
+                        {/* Chat icon - default tab */}
+                        <PromptInputAction tooltip="Chat">
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                type="button"
+                                className={cn(
+                                    'h-8 w-8 rounded-full relative z-10 hover:text-primary',
+                                    tool === '' && 'text-primary'
+                                )}
+                                onClick={() => setTool('')}
+                            >
+                                <MessageCircleIcon className="size-4 z-1" />
+                                {tool === '' && (
+                                    <motion.div
+                                        className="absolute inset-0 h-8 w-full rounded-full bg-background z-0"
+                                        layoutId="toolThumb"
+                                        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                                    />
+                                )}
+                            </Button>
+                        </PromptInputAction>
+
+                        {/* Search icon */}
+                        <PromptInputAction
+                            tooltip={matcher
+                                .with(
+                                    { canSearch: true, canModelUseTools: true },
+                                    () => 'Search the web'
+                                )
+                                .with(
+                                    { canModelUseTools: false },
+                                    () => 'This model cannot use tools'
+                                )
+                                .with(
+                                    {
+                                        remainingSearches: P.number.lte(0),
+                                    },
+                                    () => 'You have reached your search limit'
+                                )
+                                .otherwise(() => 'Search is not available')}
                         >
-                            <GlobeIcon className="size-5" />
-                            <span className="text-sm">Search</span>
-                        </Button>
-                    </PromptInputAction>
-                    <PromptInputAction
-                        tooltip={matcher
-                            .with({ canResearch: true }, () => 'Deep research')
-                            .with(
-                                {
-                                    isPro: true,
-                                    remainingResearches: P.number.lte(0),
-                                },
-                                () => 'You have reached your research limit'
-                            )
-                            .with(
-                                { isPro: false },
-                                () => 'Research is only available for Pro users'
-                            )
-                            .otherwise(() => 'Deep research is not available')}
-                    >
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            type="button"
-                            className={cn(
-                                'h-8 rounded-full',
-                                tool === 'research' &&
-                                    'text-primary hover:text-primary border-primary!'
-                            )}
-                            onClick={() => setTool(tool === 'research' ? '' : 'research')}
-                            disabled={matcher
-                                .with({ canResearch: false }, () => true)
-                                .otherwise(() => false)}
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                type="button"
+                                className={cn(
+                                    'h-8 w-8 rounded-full relative z-10 hover:text-primary',
+                                    tool === 'search' && 'text-primary',
+                                    matcher
+                                        .with({ canSearch: false }, () => 'opacity-50')
+                                        .with({ canModelUseTools: false }, () => 'opacity-50')
+                                        .otherwise(() => null)
+                                )}
+                                onClick={() => {
+                                    matcher
+                                        .with({ canSearch: true, canModelUseTools: true }, () => {
+                                            setTool('search');
+                                        })
+                                        .with({ canModelUseTools: false }, () => {
+                                            toast('This model cannot use tools');
+                                        })
+                                        .with(
+                                            {
+                                                remainingSearches: P.number.lte(0),
+                                            },
+                                            () => {
+                                                toast('You have reached your search limit');
+                                            }
+                                        )
+                                        .otherwise(() => {
+                                            toast('Search is not available');
+                                        });
+                                }}
+                            >
+                                <GlobeIcon className="size-4 z-1" />
+                                {tool === 'search' && (
+                                    <motion.div
+                                        className="absolute inset-0 h-8 w-full rounded-full bg-background"
+                                        layoutId="toolThumb"
+                                        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                                    />
+                                )}
+                            </Button>
+                        </PromptInputAction>
+
+                        {/* Research icon */}
+                        <PromptInputAction
+                            tooltip={matcher
+                                .with(
+                                    { canResearch: true, canModelUseTools: true },
+                                    () => 'Deep research'
+                                )
+                                .with(
+                                    {
+                                        isPro: true,
+                                        remainingResearches: P.number.lte(0),
+                                    },
+                                    () => 'You have reached your research limit'
+                                )
+                                .with(
+                                    { isPro: false },
+                                    () => 'Research is only available for Pro users'
+                                )
+                                .with(
+                                    { canModelUseTools: false },
+                                    () => 'This model cannot use tools'
+                                )
+                                .otherwise(() => 'Deep research is not available')}
                         >
-                            <TelescopeIcon className="size-5" />
-                            <span className="text-sm">Research</span>
-                            <span className="text-[10px] font-medium bg-primary/10 text-primary px-1.5 py-0.5 rounded-full hidden md:block">
-                                BETA
-                            </span>
-                        </Button>
-                    </PromptInputAction>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                type="button"
+                                className={cn(
+                                    'h-8 w-16 rounded-full relative z-10 hover:text-primary',
+                                    tool === 'research' && 'text-primary',
+                                    matcher
+                                        .with({ canResearch: false }, () => 'opacity-50')
+                                        .with({ canModelUseTools: false }, () => 'opacity-50')
+                                        .otherwise(() => null)
+                                )}
+                                onClick={() => {
+                                    matcher
+                                        .with({ canResearch: true, canModelUseTools: true }, () => {
+                                            setTool('research');
+                                        })
+                                        .with(
+                                            {
+                                                isPro: true,
+                                                remainingResearches: P.number.lte(0),
+                                            },
+                                            () => {
+                                                toast('You have reached your research limit');
+                                            }
+                                        )
+                                        .with({ canModelUseTools: false }, () => {
+                                            toast('This model cannot use tools');
+                                        })
+                                        .with({ isPro: false }, () => {
+                                            setProDialogOpen(true);
+                                        })
+                                        .otherwise(() => null);
+                                }}
+                            >
+                                <div className="flex items-center gap-1">
+                                    <TelescopeIcon className="size-4 z-1" />
+                                    <span className="text-[8px] font-medium text-primary px-1 py-0.5 rounded-full z-1 bg-primary/10">
+                                        BETA
+                                    </span>
+                                </div>
+                                {tool === 'research' && (
+                                    <motion.div
+                                        className="absolute inset-0 h-8 w-full rounded-full bg-background"
+                                        layoutId="toolThumb"
+                                        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                                    />
+                                )}
+                            </Button>
+                        </PromptInputAction>
+                    </div>
                     <div className="flex-1" />
-                    <PromptInputAction tooltip="Attach files">
+                    <PromptInputAction
+                        tooltip={matcher
+                            .with(
+                                { canModelViewFiles: true },
+                                () => 'Attach files'
+                            )
+                            .with(
+                                { canModelViewFiles: false },
+                                () => 'This model does not support file uploads'
+                            )
+                            .otherwise(() => 'Attach files')}
+                    >
                         <Button
                             variant="outline"
                             size="icon"
                             className="h-8 w-8 rounded-full"
                             type="button"
                             onClick={handlePaperclipClick}
+                            disabled={matcher
+                                .with(
+                                    { canModelViewFiles: false },
+                                    () => true
+                                )
+                                .otherwise(() => false)}
                         >
                             <Paperclip className="size-5" />
                             <input
@@ -438,6 +566,14 @@ export function MultiModalInput() {
                                 () => 'Waiting for files to upload'
                             )
                             .with(
+                                { 
+                                    attachments: P.array(P.any), 
+                                    canModelViewFiles: false,
+                                    status: 'ready' 
+                                },
+                                () => 'This model does not support file uploads'
+                            )
+                            .with(
                                 { canUseModel: false, status: 'ready' },
                                 () => cannotUseModelReason
                             )
@@ -470,6 +606,14 @@ export function MultiModalInput() {
                                 .with(
                                     {
                                         pendingFileCount: P.number.gt(0),
+                                    },
+                                    () => true
+                                )
+                                .with(
+                                    { 
+                                        attachments: P.array(P.any), 
+                                        canModelViewFiles: false,
+                                        status: 'ready' 
                                     },
                                     () => true
                                 )

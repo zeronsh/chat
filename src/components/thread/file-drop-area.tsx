@@ -1,6 +1,7 @@
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { FileWithPath, useDropzone } from 'react-dropzone';
+import { useAccess } from '@/hooks/use-access';
 
 type FileDropAreaProps = {
     className?: string;
@@ -16,6 +17,8 @@ export function FileDropArea({
     className,
 }: FileDropAreaProps) {
     const [isDragActive, setIsDragActive] = useState(false);
+
+    const { canModelViewFiles } = useAccess();
 
     const onDrop = async (accepted: FileWithPath[]) => {
         setIsDragActive(false);
@@ -35,6 +38,7 @@ export function FileDropArea({
         onDragLeave: () => setIsDragActive(false),
         noClick: true,
         noKeyboard: true,
+        disabled: !canModelViewFiles,
     });
 
     return (

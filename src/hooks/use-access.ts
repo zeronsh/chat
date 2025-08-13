@@ -83,6 +83,22 @@ export function useAccess() {
         [remainingCredits, user?.isAnonymous, isPro]
     );
 
+    const canModelUseTools = useMemo(() => {
+        if (!settings?.model) return false;
+        if (settings.model?.capabilities?.includes('tools')) return true;
+        return false;
+    }, [settings?.model]);
+
+    const canModelViewFiles = useMemo(() => {
+        if (!settings?.model) return false;
+        if (
+            settings.model?.capabilities?.includes('vision') ||
+            settings.model?.capabilities?.includes('documents')
+        )
+            return true;
+        return false;
+    }, [settings?.model]);
+
     const getCannotUseModelMatcher = useCallback(
         <T>(
             model: Model,
@@ -159,5 +175,7 @@ export function useAccess() {
         cannotUseModelReason,
         checkCanUseModel,
         getCannotUseModelMatcher,
+        canModelUseTools,
+        canModelViewFiles,
     };
 }
