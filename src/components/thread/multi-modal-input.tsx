@@ -506,10 +506,7 @@ export function MultiModalInput() {
                     <div className="flex-1" />
                     <PromptInputAction
                         tooltip={matcher
-                            .with(
-                                { canModelViewFiles: true },
-                                () => 'Attach files'
-                            )
+                            .with({ canModelViewFiles: true }, () => 'Attach files')
                             .with(
                                 { canModelViewFiles: false },
                                 () => 'This model does not support file uploads'
@@ -523,10 +520,7 @@ export function MultiModalInput() {
                             type="button"
                             onClick={handlePaperclipClick}
                             disabled={matcher
-                                .with(
-                                    { canModelViewFiles: false },
-                                    () => true
-                                )
+                                .with({ canModelViewFiles: false }, () => true)
                                 .otherwise(() => false)}
                         >
                             <Paperclip className="size-5" />
@@ -566,10 +560,10 @@ export function MultiModalInput() {
                                 () => 'Waiting for files to upload'
                             )
                             .with(
-                                { 
-                                    attachments: P.array(P.any), 
+                                {
+                                    attachments: P.when(a => a.length > 0),
                                     canModelViewFiles: false,
-                                    status: 'ready' 
+                                    status: 'ready',
                                 },
                                 () => 'This model does not support file uploads'
                             )
@@ -610,10 +604,10 @@ export function MultiModalInput() {
                                     () => true
                                 )
                                 .with(
-                                    { 
-                                        attachments: P.array(P.any), 
+                                    {
+                                        attachments: P.when(a => a.length > 0),
                                         canModelViewFiles: false,
-                                        status: 'ready' 
+                                        status: 'ready',
                                     },
                                     () => true
                                 )
