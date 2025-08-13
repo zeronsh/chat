@@ -1,5 +1,4 @@
 import { cn } from '@/lib/utils';
-import { LoaderIcon } from 'lucide-react';
 import { useState } from 'react';
 import { FileWithPath, useDropzone } from 'react-dropzone';
 

@@ -9,10 +9,12 @@ export function ThreadContainer({ children }: { children: React.ReactNode }) {
     const setPendingFileCount = useThreadSelector(state => state.setPendingFileCount);
     const setAttachments = useThreadSelector(state => state.setAttachments);
 
-    const { startUpload, isUploading } = useUploadThing('fileUploader', {
-        onUploadBegin: () => {
+    const { startUpload } = useUploadThing('fileUploader', {
+        onBeforeUploadBegin: file => {
             setPendingFileCount(prev => prev + 1);
+            return file;
         },
+
         onClientUploadComplete: files => {
             setPendingFileCount(prev => prev - files.length);
             const newAttachments: FileAttachment[] = files.map(file => ({

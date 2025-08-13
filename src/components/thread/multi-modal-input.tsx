@@ -48,8 +48,9 @@ export function MultiModalInput() {
     const { sendMessage } = useThreadContext();
 
     const { startUpload } = useUploadThing('fileUploader', {
-        onUploadBegin: () => {
+        onBeforeUploadBegin: file => {
             setPendingFileCount(prev => prev + 1);
+            return file;
         },
         onClientUploadComplete: files => {
             setPendingFileCount(prev => prev - files.length);
