@@ -1,8 +1,9 @@
 import { CodeBlock, CodeBlockCode } from '@/components/ui/code-block';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { useThreadSelector } from '@/context/thread';
 import { cn } from '@/lib/utils';
 import Marked, { ReactRenderer } from 'marked-react';
-import { createContext, memo, useContext, useMemo } from 'react';
+import { createContext, memo, useContext, useId, useMemo } from 'react';
 
 const generateKey = () => {
     return (
@@ -15,6 +16,7 @@ export type MarkdownProps = {
     id?: string;
     className?: string;
     components?: Partial<ReactRenderer>;
+    animated?: boolean;
 };
 
 interface CitationSourceConfig {
@@ -87,7 +89,47 @@ function extractDomain(url: string | undefined): string {
     }
 }
 
+function StreamingText({ children }: { children: string }) {
+    const id = useId();
+    const words = children.split(/\s+/);
+    const segments = words.reduce<string[]>((acc, cur, idx) => {
+        if (idx % 10 === 0) {
+            const segment = words.slice(idx, idx + 10).join(' ');
+            // Add trailing space except for the last segment
+            acc.push(idx + 10 >= words.length ? segment : segment + ' ');
+        }
+        return acc;
+    }, []);
+
+    return segments.map((segment, idx) => {
+        const isWhitespace = /^\s+$/.test(segment);
+        return (
+            <span
+                key={`${id}-${idx}`}
+                className={cn('fade-segment', isWhitespace && 'fade-segment-space')}
+                style={{
+                    animationDelay: `${idx * 1.5}ms`,
+                }}
+            >
+                {segment}
+            </span>
+        );
+    });
+}
+
+function Text({ children }: { children: React.ReactNode }) {
+    const { animated } = useMarkdownContext();
+    const streaming = useThreadSelector(state => state.status === 'streaming');
+    if (typeof children === 'string' && streaming && animated) {
+        return <StreamingText children={children} />;
+    }
+    return children;
+}
+
 const INITIAL_COMPONENTS: Partial<ReactRenderer> = {
+    text: function TextComponent(children) {
+        return <Text>{children}</Text>;
+    },
     code: function CodeComponent(children, language) {
         const id = generateKey();
         return (
@@ -157,6 +199,7 @@ MemoizedMarkdownBlock.displayName = 'MemoizedMarkdownBlock';
 
 type MarkdownContextType = {
     citations: { text: string; link: string }[];
+    animated: boolean;
 };
 
 const MarkdownContext = createContext<MarkdownContextType | null>(null);
@@ -173,6 +216,7 @@ function MarkdownComponent({
     children,
     className,
     components = INITIAL_COMPONENTS,
+    animated = false,
 }: MarkdownProps) {
     const citations = useMemo(() => {
         const citations: { text: string; link: string }[] = [];
@@ -219,7 +263,7 @@ function MarkdownComponent({
     }, [children]);
 
     return (
-        <MarkdownContext.Provider value={{ citations }}>
+        <MarkdownContext.Provider value={{ citations, animated }}>
             <div className={className}>
                 <MemoizedMarkdownBlock content={children} components={components} />
             </div>

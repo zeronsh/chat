@@ -18,7 +18,7 @@ import {
     MessageCircleIcon,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { Link, useNavigate } from '@tanstack/react-router';
+import { useNavigate } from '@tanstack/react-router';
 import { useParamsThreadId } from '@/hooks/use-params-thread-id';
 import { cn } from '@/lib/utils';
 import { useUploadThing } from '@/lib/uploadthing';

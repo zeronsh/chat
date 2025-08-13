@@ -1,5 +1,5 @@
 import { MessageContent } from '@/components/ui/message';
-import { usePart } from '@/context/thread';
+import { usePart, useThreadSelector } from '@/context/thread';
 import { lexer } from '@/lib/utils';
 import { memo } from 'react';
 
@@ -21,11 +21,22 @@ export const MarkdownBlock = memo(
             equalityFn: (a, b) => a === b,
         });
 
+        const isLastMessage = useThreadSelector(state => {
+            const nextMessageIndex = state.messages.findIndex(msg => msg.id === id) + 1;
+            const nextMessage = state.messages[nextMessageIndex];
+
+            return nextMessage === undefined;
+        });
+
         if (content === undefined) {
             return null;
         }
 
-        return <MessageContent markdown>{content}</MessageContent>;
+        return (
+            <MessageContent markdown animated={isLastMessage}>
+                {content}
+            </MessageContent>
+        );
     },
     function propsAreEqual(prevProps, nextProps) {
         return (
