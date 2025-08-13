@@ -7,10 +7,12 @@ import { Limits } from '@/lib/constants';
 import { Effect, Runtime } from 'effect';
 import { getResearchTool } from '@/ai/tools/research-tool';
 import { Database } from '@/database/effect';
+import { getCodeTool } from '@/ai/tools/code-tool';
 
 const tools = {
     search: getSearchTool,
     research: getResearchTool,
+    code: getCodeTool,
 } as const;
 
 type ExtractTool<T> = T extends Effect.Effect<infer U, any, any> ? U : never;
@@ -38,6 +40,8 @@ export const getTools = Effect.gen(function* () {
     for (const tool of ctx.tools) {
         activeTools[tool] = yield* tools[tool as keyof typeof tools];
     }
+
+    activeTools['code'] = yield* tools['code'];
 
     return activeTools;
 });

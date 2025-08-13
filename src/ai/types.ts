@@ -37,11 +37,16 @@ export type DataParts = {
     'research-complete': {
         toolCallId: string;
     };
+    'code-delta': {
+        toolCallId: string;
+        delta: string;
+    };
 };
 
 export type Tools = {
     search: InferUITool<AvailableTools['search']>;
     research: InferUITool<AvailableTools['research']>;
+    code: InferUITool<AvailableTools['code']>;
 };
 
 export type ThreadMessage = UIMessage<Metadata, DataParts, Tools>;
