@@ -13,6 +13,7 @@ import { DatabaseLive } from '@/database/effect';
 import { useEffect, useRef } from 'react';
 import { useSettings } from '@/hooks/use-database';
 import { z } from 'zod';
+import { ProDialog } from '@/components/app/pro-dialog';
 
 const GetContextSchema = z.object({
     threadId: z.string().optional(),
@@ -128,6 +129,7 @@ function RootComponent({ htmlRef }: { htmlRef: React.RefObject<HTMLHtmlElement |
         <div className="fixed inset-0 flex text-foreground">
             <Outlet />
             <Toaster position="top-center" />
+            <ProDialog />
         </div>
     );
 }

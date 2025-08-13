@@ -35,6 +35,7 @@ import {
     InsufficientCreditsProDialog,
     InsufficientCreditsDialog,
 } from '@/components/app/insufficient-dialog';
+import { dialogStore } from '@/stores/dialogs';
 
 export function ModelSelector() {
     const [open, setOpen] = useState(false);
@@ -47,10 +48,10 @@ export function ModelSelector() {
     const models = allModels.filter(model => pinnedModelIds.includes(model.id));
     const otherModels = allModels.filter(model => !pinnedModelIds.includes(model.id));
     const access = useAccess();
-    const [proDialogOpen, setProDialogOpen] = useState(false);
     const [accountDialogOpen, setAccountDialogOpen] = useState(false);
     const [insufficientCreditsProDialogOpen, setInsufficientCreditsProDialogOpen] = useState(false);
     const [insufficientCreditsDialogOpen, setInsufficientCreditsDialogOpen] = useState(false);
+    const setProDialogOpen = dialogStore(store => store.proDialog.setOpen);
 
     useEffect(() => {
         if (!open) {
@@ -334,7 +335,6 @@ export function ModelSelector() {
                     </div>
                 </PopoverContent>
             </Popover>
-            <ProDialog open={proDialogOpen} setOpen={setProDialogOpen} />
             <AccountDialog open={accountDialogOpen} setOpen={setAccountDialogOpen} />
             <InsufficientCreditsProDialog
                 open={insufficientCreditsProDialogOpen}

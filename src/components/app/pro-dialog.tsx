@@ -9,12 +9,15 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import { dialogStore } from '@/stores/dialogs';
 import { Link } from '@tanstack/react-router';
 import { CheckIcon, DiamondIcon, MoveRightIcon } from 'lucide-react';
 
-export function ProDialog(props: { open: boolean; setOpen: (open: boolean) => void }) {
+export function ProDialog() {
+    const { proDialog } = dialogStore();
+
     return (
-        <Dialog open={props.open} onOpenChange={props.setOpen}>
+        <Dialog open={proDialog.open} onOpenChange={proDialog.setOpen}>
             <DialogContent
                 className="p-0 overflow-hidden gap-0 bg-background"
                 showCloseButton={false}

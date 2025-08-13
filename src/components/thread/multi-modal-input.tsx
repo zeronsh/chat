@@ -28,6 +28,7 @@ import type { FileAttachment as FileAttachmentType } from '@/thread/store';
 import { useAccess } from '@/hooks/use-access';
 import { match, P } from 'ts-pattern';
 import { ScrollToBottomButton } from '@/components/thread/scroll-to-bottom-button';
+import { dialogStore } from '@/stores/dialogs';
 
 export function MultiModalInput() {
     const id = useThreadSelector(state => state.id!);
@@ -43,6 +44,7 @@ export function MultiModalInput() {
     const setEditingMessageId = useThreadSelector(state => state.setEditingMessageId);
     const editingMessageId = useThreadSelector(state => state.editingMessageId);
     const setMessages = useThreadSelector(state => state.setMessages);
+    const setProDialogOpen = dialogStore(store => store.proDialog.setOpen);
     const { sendMessage } = useThreadContext();
 
     const { startUpload } = useUploadThing('fileUploader', {
@@ -209,11 +211,9 @@ export function MultiModalInput() {
                                 <Button
                                     variant="link"
                                     className="h-6 underline font-normal cursor-pointer px-0 text-xs"
-                                    asChild
+                                    onClick={() => setProDialogOpen(true)}
                                 >
-                                    <Link to="/account/subscription">
-                                        Subscribe now to increase your limits
-                                    </Link>
+                                    Subscribe now to increase your limits
                                 </Button>
                             </div>
                         )
@@ -236,11 +236,9 @@ export function MultiModalInput() {
                                 <Button
                                     variant="link"
                                     className="h-6 underline font-normal cursor-pointer px-0 text-xs"
-                                    asChild
+                                    onClick={() => setProDialogOpen(true)}
                                 >
-                                    <Link to="/account/subscription">
-                                        Subscribe now to increase your limits
-                                    </Link>
+                                    Subscribe now to increase your limits
                                 </Button>
                             </div>
                         )
