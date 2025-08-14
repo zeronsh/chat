@@ -193,7 +193,7 @@ code {
 @keyframes fadeIn {
     from {
         opacity: 0;
-        filter: blur(1px);
+        filter: blur(2px);
     }
     to {
         opacity: 1;
