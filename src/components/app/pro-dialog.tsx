@@ -10,11 +10,17 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { dialogStore } from '@/stores/dialogs';
-import { Link } from '@tanstack/react-router';
+import { Link, useLocation } from '@tanstack/react-router';
 import { CheckIcon, DiamondIcon, MoveRightIcon } from 'lucide-react';
+import { useEffect } from 'react';
 
 export function ProDialog() {
     const { proDialog } = dialogStore();
+    const location = useLocation();
+
+    useEffect(() => {
+        proDialog.setOpen(false);
+    }, [location.pathname]);
 
     return (
         <Dialog open={proDialog.open} onOpenChange={proDialog.setOpen}>
