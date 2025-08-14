@@ -5,6 +5,7 @@ import { useAutoResume } from '@/hooks/use-auto-resume';
 import { StickToBottom, useStickToBottom } from 'use-stick-to-bottom';
 import { Virtualizer, VirtualizerHandle } from 'virtua';
 import { useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
 
 export function MessageList() {
     const mounted = useRef(false);
@@ -33,20 +34,26 @@ export function MessageList() {
     }, [messageIds.length]);
 
     return (
-        <StickToBottom className="absolute top-0 left-0 right-0 bottom-4" instance={instance}>
-            <Virtualizer
-                as={StickToBottom.Content}
-                ref={ref}
-                scrollRef={instance.scrollRef}
-                itemSize={500}
-                ssrCount={5}
-                overscan={2}
-            >
-                {messageIds.map(id => (
-                    <MessageItem key={id} id={id} />
-                ))}
-            </Virtualizer>
-            <MultiModalInput />
-        </StickToBottom>
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.2 }}
+        >
+            <StickToBottom className="absolute top-0 left-0 right-0 bottom-4" instance={instance}>
+                <Virtualizer
+                    as={StickToBottom.Content}
+                    ref={ref}
+                    scrollRef={instance.scrollRef}
+                    itemSize={500}
+                    ssrCount={5}
+                    overscan={2}
+                >
+                    {messageIds.map(id => (
+                        <MessageItem key={id} id={id} />
+                    ))}
+                </Virtualizer>
+                <MultiModalInput />
+            </StickToBottom>
+        </motion.div>
     );
 }
