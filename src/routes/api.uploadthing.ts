@@ -20,7 +20,7 @@ const router = {
             maxFileCount: 5,
         },
         pdf: {
-            maxFileSize: '8MB',
+            maxFileSize: '32MB',
             maxFileCount: 5,
         },
         text: {
