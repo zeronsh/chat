@@ -5,7 +5,6 @@ import { useAutoResume } from '@/hooks/use-auto-resume';
 import { StickToBottom, useStickToBottom } from 'use-stick-to-bottom';
 import { Virtualizer, VirtualizerHandle } from 'virtua';
 import { useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
 
 export function MessageList() {
     const mounted = useRef(false);
