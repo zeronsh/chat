@@ -59,6 +59,11 @@ const threadStopPostApiHandler = Effect.gen(function* () {
 
     yield* publish(`abort:${params.id}`, 'abort');
 
+    yield* queries.updateThread({
+        threadId: params.id,
+        status: 'ready',
+    });
+
     return new Response(null, { status: 200 });
 });
 
