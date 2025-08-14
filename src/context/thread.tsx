@@ -47,6 +47,12 @@ export function ThreadProvider({
         }
     }, [init.messages]);
 
+    useEffect(() => {
+        if (thread.status === 'streaming') {
+            thread.store.getState().setStatus('streaming');
+        }
+    }, [thread.status]);
+
     return <ThreadContext.Provider value={thread}>{children}</ThreadContext.Provider>;
 }
 
