@@ -29,7 +29,7 @@ export function useSettings() {
 export function useThreads() {
     const db = useDatabase();
     const loaderData = Route.useLoaderData();
-    const [threads] = useQuery(
+    const [threads, result] = useQuery(
         db.query.thread
             .related('messages', q => q.orderBy('createdAt', 'desc'))
             .orderBy('updatedAt', 'desc'),
@@ -38,7 +38,7 @@ export function useThreads() {
         }
     );
 
-    return threads.length > 0
+    return threads.length > 0 || result.type === 'complete'
         ? threads
         : (
               loaderData.threads?.map(thread => ({
