@@ -38,9 +38,8 @@ export function MessageList() {
                 as={StickToBottom.Content}
                 ref={ref}
                 scrollRef={instance.scrollRef}
-                itemSize={500}
                 ssrCount={5}
-                overscan={2}
+                overscan={1}
             >
                 {messageIds.map(id => (
                     <MessageItem key={id} id={id} />
