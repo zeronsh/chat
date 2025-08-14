@@ -34,12 +34,13 @@ export function MessageList() {
     }, [messageIds.length]);
 
     return (
-        <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.2 }}
-        >
-            <StickToBottom className="absolute top-0 left-0 right-0 bottom-4" instance={instance}>
+        <StickToBottom className="absolute top-0 left-0 right-0 bottom-4" instance={instance}>
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.2 }}
+                className="absolute top-0 left-0 right-0 bottom-0"
+            >
                 <Virtualizer
                     as={StickToBottom.Content}
                     ref={ref}
@@ -52,8 +53,8 @@ export function MessageList() {
                         <MessageItem key={id} id={id} />
                     ))}
                 </Virtualizer>
-                <MultiModalInput />
-            </StickToBottom>
-        </motion.div>
+            </motion.div>
+            <MultiModalInput />
+        </StickToBottom>
     );
 }
