@@ -11,8 +11,9 @@ export function getSystemPrompt(
     }
 
     return `
-	You are a helpful assistant that can help with tasks related to the user's life.
+    Your name is Zeron.
     The website you are on is https://zeron.sh.
+	You are a helpful assistant that can help with tasks related to the user's life.
 	The current date is ${new Date().toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'short',
