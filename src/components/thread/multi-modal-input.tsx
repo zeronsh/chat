@@ -341,7 +341,7 @@ export function MultiModalInput() {
                 <PromptInputTextarea className="px-6" placeholder="Ask me anything..." />
                 <PromptInputActions className="flex items-center px-3 pb-3">
                     {/* Switch-like tool selector */}
-                    <div className="flex items-center bg-muted rounded-full p-1 relative h-10">
+                    <div className="flex items-center bg-primary/5 rounded-full p-1 relative h-10">
                         {/* Chat icon - default tab */}
                         <PromptInputAction tooltip="Chat">
                             <Button
@@ -420,7 +420,7 @@ export function MultiModalInput() {
                                 <GlobeIcon className="size-4 z-1" />
                                 {tool === 'search' && (
                                     <motion.div
-                                        className="absolute inset-0 h-8 w-full rounded-full bg-background"
+                                        className="absolute inset-0 h-8 w-full rounded-full bg-background z-0"
                                         layoutId="toolThumb"
                                         transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                                     />
@@ -495,7 +495,7 @@ export function MultiModalInput() {
                                 </div>
                                 {tool === 'research' && (
                                     <motion.div
-                                        className="absolute inset-0 h-8 w-full rounded-full bg-background"
+                                        className="absolute inset-0 h-8 w-full rounded-full bg-background z-0"
                                         layoutId="toolThumb"
                                         transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                                     />
