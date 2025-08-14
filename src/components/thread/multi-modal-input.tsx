@@ -210,9 +210,14 @@ export function MultiModalInput() {
             }}
         >
             {!threadId && (
-                <div className="max-w-3xl mx-auto font-serif">
+                <motion.div
+                    className="max-w-3xl mx-auto font-serif"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5 }}
+                >
                     <h2 className="text-2xl">Hello, {getUsername(user)}</h2>
-                </div>
+                </motion.div>
             )}
             <ScrollToBottomButton variant="default" />
             <PromptInput
