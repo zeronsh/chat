@@ -13,29 +13,20 @@ import { useSettings } from '@/hooks/use-database';
 import { Fragment, useEffect, useState } from 'react';
 
 import ModelIcon, { type ModelType } from '@/components/thread/model-icon';
-import {
-    BrainIcon,
-    ChevronsUpDown,
-    EyeIcon,
-    FileIcon,
-    WrenchIcon,
-    Pin,
-    PinOff,
-} from 'lucide-react';
+import { ChevronsUpDown, Pin, PinOff } from 'lucide-react';
 import { useDatabase } from '@/hooks/use-database';
 import { useQuery } from '@rocicorp/zero/react';
 import { Model } from '@/zero/types';
-import { Badge } from '@/components/ui/badge';
-import { match } from 'ts-pattern';
+
 import { useAccess } from '@/hooks/use-access';
 import { cn } from '@/lib/utils';
-import { ProDialog } from '@/components/app/pro-dialog';
 import { AccountDialog } from '@/components/app/account-dialog';
 import {
     InsufficientCreditsProDialog,
     InsufficientCreditsDialog,
 } from '@/components/app/insufficient-dialog';
 import { dialogStore } from '@/stores/dialogs';
+import { CapabilityBadges } from '@/components/ui/capability-badges';
 
 export function ModelSelector() {
     const [open, setOpen] = useState(false);
@@ -123,21 +114,21 @@ export function ModelSelector() {
                                 {settings?.model?.name}
                             </span>
                             {settings?.model?.access === 'premium_required' && (
-                                <Badge variant="outline" className="text-[10px]">
+                                <span className="text-[10px] font-medium text-primary px-2 py-0.5 rounded-full z-1 bg-primary/10">
                                     PRO
-                                </Badge>
+                                </span>
                             )}
                         </div>
                         <ChevronsUpDown className="opacity-50" />
                     </Button>
                 </PopoverTrigger>
-                <PopoverContent className={cn('p-0 relative')} align="start">
+                <PopoverContent className={cn('p-0 relative min-w-[350px]')} align="start">
                     <Command>
                         <CommandInput placeholder="Find Model..." className="h-9" />
                         <CommandList className={cn(showAll && 'max-h-[500px]')}>
                             <CommandEmpty>No model found.</CommandEmpty>
                             {!showAll && (
-                                <CommandGroup heading="Models">
+                                <CommandGroup>
                                     {models?.map(model => (
                                         <CommandItem
                                             key={model.id}
@@ -157,14 +148,15 @@ export function ModelSelector() {
                                                 )}
                                                 <span className="truncate">{model.name}</span>
                                                 {model.access === 'premium_required' && (
-                                                    <Badge
-                                                        variant="outline"
-                                                        className="text-[10px]"
-                                                    >
+                                                    <span className="text-[10px] font-medium text-primary px-2 py-0.5 rounded-full z-1 bg-primary/10">
                                                         PRO
-                                                    </Badge>
+                                                    </span>
                                                 )}
                                             </span>
+                                            <CapabilityBadges
+                                                capabilities={model.capabilities ?? []}
+                                                variant="compact"
+                                            />
                                         </CommandItem>
                                     ))}
                                 </CommandGroup>
@@ -192,14 +184,14 @@ export function ModelSelector() {
                                                     )}
                                                     <span className="truncate">{model.name}</span>
                                                     {model.access === 'premium_required' && (
-                                                        <Badge
-                                                            variant="outline"
-                                                            className="text-[10px]"
-                                                        >
+                                                        <span className="text-[10px] font-medium text-primary px-2 py-0.5 rounded-full z-1 bg-primary/10">
                                                             PRO
-                                                        </Badge>
+                                                        </span>
                                                     )}
                                                 </span>
+                                                <CapabilityBadges
+                                                    capabilities={model.capabilities}
+                                                />
                                                 <div className="flex items-center gap-2">
                                                     <Button
                                                         variant="ghost"
@@ -238,14 +230,14 @@ export function ModelSelector() {
                                                     )}
                                                     <span className="truncate">{model.name}</span>
                                                     {model.access === 'premium_required' && (
-                                                        <Badge
-                                                            variant="outline"
-                                                            className="text-[10px]"
-                                                        >
+                                                        <span className="text-[10px] font-medium text-primary px-2 py-0.5 rounded-full z-1 bg-primary/10">
                                                             PRO
-                                                        </Badge>
+                                                        </span>
                                                     )}
                                                 </span>
+                                                <CapabilityBadges
+                                                    capabilities={model.capabilities}
+                                                />
                                                 <div className="flex items-center gap-2">
                                                     <Button
                                                         variant="ghost"
@@ -288,10 +280,13 @@ export function ModelSelector() {
                                     />
                                     <span className="text-sm">{hoveredModel.name}</span>
                                 </div>
+                                <div className="flex items-center gap-2 px-2">
+                                    <CapabilityBadges capabilities={hoveredModel.capabilities} />
+                                </div>
                                 <div className="text-sm text-muted-foreground px-2">
                                     {hoveredModel.description}
                                 </div>
-                                <div className="flex items-center gap-2 text-sm text-muted-foreground justify-between px-2 border-t border-foreground/10 pt-4">
+                                <div className="flex items-center gap-2 text-sm text-muted-foreground justify-between px-2 border-t border-foreground/10 pt-4 pb-4">
                                     <div>Cost</div>
                                     <div>
                                         <span className="font-semibold">
@@ -300,35 +295,6 @@ export function ModelSelector() {
                                         </span>
                                         /message
                                     </div>
-                                </div>
-                                <div className="text-sm flex gap-2 flex-wrap p-2 border-t border-foreground/10">
-                                    {hoveredModel.capabilities
-                                        ?.sort((a, b) => a.localeCompare(b))
-                                        .map(c => (
-                                            <Badge
-                                                key={c}
-                                                variant="outline"
-                                                className="text-xs flex items-center gap-1"
-                                            >
-                                                {match(c)
-                                                    .with('reasoning', () => (
-                                                        <BrainIcon className="size-4 text-pink-400" />
-                                                    ))
-                                                    .with('vision', () => (
-                                                        <EyeIcon className="size-4 text-blue-400" />
-                                                    ))
-                                                    .with('documents', () => (
-                                                        <FileIcon className="size-4 text-yellow-400" />
-                                                    ))
-                                                    .with('tools', () => (
-                                                        <WrenchIcon className="size-4 text-green-400" />
-                                                    ))
-                                                    .exhaustive()}
-                                                <span className="text-xs">
-                                                    {c.charAt(0).toUpperCase() + c.slice(1)}
-                                                </span>
-                                            </Badge>
-                                        ))}
                                 </div>
                             </div>
                         )}

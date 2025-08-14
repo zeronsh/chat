@@ -6,8 +6,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { useQuery } from '@rocicorp/zero/react';
 import ModelIcon from '@/components/thread/model-icon';
 import { Badge } from '@/components/ui/badge';
-import { match } from 'ts-pattern';
-import { BrainIcon, EyeIcon, FileIcon, WrenchIcon } from 'lucide-react';
+import { CapabilityBadges } from '@/components/ui/capability-badges';
 
 export const Route = createFileRoute('/_account/account/models')({
     component: RouteComponent,
