@@ -31,6 +31,8 @@ import { useAccess } from '@/hooks/use-access';
 import { match, P } from 'ts-pattern';
 import { ScrollToBottomButton } from '@/components/thread/scroll-to-bottom-button';
 import { dialogStore } from '@/stores/dialogs';
+import { useUser } from '@/hooks/use-database';
+import { getUsername } from '@/lib/usernames';
 
 export function MultiModalInput() {
     const id = useThreadSelector(state => state.id!);
@@ -47,6 +49,7 @@ export function MultiModalInput() {
     const editingMessageId = useThreadSelector(state => state.editingMessageId);
     const setMessages = useThreadSelector(state => state.setMessages);
     const setProDialogOpen = dialogStore(store => store.proDialog.setOpen);
+    const user = useUser();
     const { sendMessage } = useThreadContext();
 
     const { startUpload } = useUploadThing('fileUploader', {
@@ -186,10 +189,13 @@ export function MultiModalInput() {
     }, [canModelUseTools]);
 
     return (
-        <form
+        <motion.form
+            layoutId="multi-modal-input"
+            transition={{ type: 'spring', stiffness: 1000, damping: 40 }}
             className={cn({
                 'absolute px-4 pt-4 flex flex-col gap-4': true,
                 'bottom-0 left-0 right-0': true,
+                'top-[25vh]': !threadId,
             })}
             onSubmit={async e => {
                 e.preventDefault();
@@ -203,6 +209,11 @@ export function MultiModalInput() {
                 }
             }}
         >
+            {!threadId && (
+                <div className="max-w-3xl mx-auto font-serif">
+                    <h2 className="text-2xl">Hello, {getUsername(user)}</h2>
+                </div>
+            )}
             <ScrollToBottomButton variant="default" />
             <PromptInput
                 className="max-w-3xl mx-auto p-0 bg-muted/50 backdrop-blur-md w-full border-foreground/10 overflow-hidden"
@@ -624,6 +635,6 @@ export function MultiModalInput() {
                     </PromptInputAction>
                 </PromptInputActions>
             </PromptInput>
-        </form>
+        </motion.form>
     );
 }
