@@ -23,15 +23,7 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
 
     const zero = useMemo(() => {
         if (typeof window === 'undefined' || !session || !session.user) {
-            return new Zero({
-                userID: '__unauthenticated__',
-                server: env.VITE_PUBLIC_ZERO_URL,
-                auth: async () => {
-                    return undefined;
-                },
-                schema,
-                kvStore: 'mem',
-            });
+            return undefined;
         }
 
         return new Zero({
