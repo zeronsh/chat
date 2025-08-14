@@ -188,19 +188,19 @@ export function convertUIMessagesToModelMessages(
                         return true;
                     });
 
-                    // for (const part of message.parts) {
-                    //     if (part.type === 'file') {
-                    //         if (
-                    //             part.mediaType.startsWith('application/pdf') ||
-                    //             part.mediaType.startsWith('text/plain')
-                    //         ) {
-                    //             // @ts-expect-error - TODO: fix this
-                    //             part.url = await fetch(part.url)
-                    //                 .then(res => res.blob())
-                    //                 .then(blob => blob.arrayBuffer());
-                    //         }
-                    //     }
-                    // }
+                    for (const part of message.parts) {
+                        if (part.type === 'file') {
+                            if (
+                                part.mediaType.startsWith('application/pdf') ||
+                                part.mediaType.startsWith('text/plain')
+                            ) {
+                                // @ts-expect-error - TODO: fix this
+                                part.url = await fetch(part.url)
+                                    .then(res => res.blob())
+                                    .then(blob => blob.arrayBuffer());
+                            }
+                        }
+                    }
 
                     return message;
                 })
