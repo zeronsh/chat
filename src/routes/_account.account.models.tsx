@@ -90,65 +90,9 @@ function RouteComponent() {
                                     <div>
                                         {model.capabilities && model.capabilities.length > 0 && (
                                             <div className="flex items-center gap-1">
-                                                {model.capabilities
-                                                    .sort((a, b) => a.localeCompare(b))
-                                                    .map(c => (
-                                                        <div
-                                                            key={c}
-                                                            className="flex items-center gap-1"
-                                                            title={
-                                                                c.charAt(0).toUpperCase() +
-                                                                c.slice(1)
-                                                            }
-                                                        >
-                                                            {match(c)
-                                                                .with('reasoning', () => (
-                                                                    <Badge
-                                                                        variant="outline"
-                                                                        className="text-xs"
-                                                                    >
-                                                                        <BrainIcon className="size-3 text-pink-400" />
-                                                                        <span className="text-xs">
-                                                                            Reasoning
-                                                                        </span>
-                                                                    </Badge>
-                                                                ))
-                                                                .with('vision', () => (
-                                                                    <Badge
-                                                                        variant="outline"
-                                                                        className="text-xs"
-                                                                    >
-                                                                        <EyeIcon className="size-3 text-blue-400" />
-                                                                        <span className="text-xs">
-                                                                            Vision
-                                                                        </span>
-                                                                    </Badge>
-                                                                ))
-                                                                .with('documents', () => (
-                                                                    <Badge
-                                                                        variant="outline"
-                                                                        className="text-xs"
-                                                                    >
-                                                                        <FileIcon className="size-3 text-yellow-400" />
-                                                                        <span className="text-xs">
-                                                                            Documents
-                                                                        </span>
-                                                                    </Badge>
-                                                                ))
-                                                                .with('tools', () => (
-                                                                    <Badge
-                                                                        variant="outline"
-                                                                        className="text-xs"
-                                                                    >
-                                                                        <WrenchIcon className="size-3 text-green-400" />
-                                                                        <span className="text-xs">
-                                                                            Tools
-                                                                        </span>
-                                                                    </Badge>
-                                                                ))
-                                                                .exhaustive()}
-                                                        </div>
-                                                    ))}
+                                                <CapabilityBadges
+                                                    capabilities={model.capabilities}
+                                                />
                                             </div>
                                         )}
                                     </div>
