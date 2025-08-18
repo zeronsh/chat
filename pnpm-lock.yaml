@@ -235,8 +235,8 @@ importers:
         specifier: ^0.31.4
         version: 0.31.4
       drizzle-zero:
-        specifier: ^0.12.0
-        version: 0.12.0(@rocicorp/zero@0.21.2025070200(@opentelemetry/core@2.0.1(@opentelemetry/api@1.9.0))(typescript@5.9.2))(@types/pg@8.15.4)(drizzle-orm@0.44.3(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(bun-types@1.2.19(@types/react@19.1.8))(kysely@0.28.3)(pg@8.16.3)(postgres@3.4.7))(pg@8.16.3)(postgres@3.4.7)(prettier@3.6.2)
+        specifier: ^0.13.3
+        version: 0.13.3(@rocicorp/zero@0.21.2025070200(@opentelemetry/core@2.0.1(@opentelemetry/api@1.9.0))(typescript@5.9.2))(@types/pg@8.15.4)(drizzle-orm@0.44.3(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(bun-types@1.2.19(@types/react@19.1.8))(kysely@0.28.3)(pg@8.16.3)(postgres@3.4.7))(pg@8.16.3)(postgres@3.4.7)(prettier@3.6.2)
       tailwindcss:
         specifier: ^4.0.6
         version: 4.1.11
@@ -3851,8 +3851,8 @@ packages:
       sqlite3:
         optional: true
 
-  drizzle-zero@0.12.0:
-    resolution: {integrity: sha512-sq56QjJwznjOuG9feG8+kGNX5K9bYdYbs0G9bleAfmBGAl/ywZ0POJ8MqqtK5bhK367OisUpm7BJp5J04n9snw==}
+  drizzle-zero@0.13.3:
+    resolution: {integrity: sha512-KCSzzwk+jla8gOujZ8b6Fe1202oconvJgbSJjjv/k3l5jTxaULsJDU3VXcOYPs7HFum7vic3xvTPWqA98O2jzA==}
     hasBin: true
     peerDependencies:
       '@rocicorp/zero': '>=0.13.2025013101'
@@ -10543,7 +10543,7 @@ snapshots:
       pg: 8.16.3
       postgres: 3.4.7
 
-  drizzle-zero@0.12.0(@rocicorp/zero@0.21.2025070200(@opentelemetry/core@2.0.1(@opentelemetry/api@1.9.0))(typescript@5.9.2))(@types/pg@8.15.4)(drizzle-orm@0.44.3(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(bun-types@1.2.19(@types/react@19.1.8))(kysely@0.28.3)(pg@8.16.3)(postgres@3.4.7))(pg@8.16.3)(postgres@3.4.7)(prettier@3.6.2):
+  drizzle-zero@0.13.3(@rocicorp/zero@0.21.2025070200(@opentelemetry/core@2.0.1(@opentelemetry/api@1.9.0))(typescript@5.9.2))(@types/pg@8.15.4)(drizzle-orm@0.44.3(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(bun-types@1.2.19(@types/react@19.1.8))(kysely@0.28.3)(pg@8.16.3)(postgres@3.4.7))(pg@8.16.3)(postgres@3.4.7)(prettier@3.6.2):
     dependencies:
       '@rocicorp/zero': 0.21.2025070200(@opentelemetry/core@2.0.1(@opentelemetry/api@1.9.0))(typescript@5.9.2)
       commander: 14.0.0

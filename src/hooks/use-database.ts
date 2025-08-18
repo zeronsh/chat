@@ -34,19 +34,19 @@ export function useThreads() {
             .related('messages', q => q.orderBy('createdAt', 'desc'))
             .orderBy('updatedAt', 'desc'),
         {
-            ttl: Infinity,
+            ttl: 60 * 60 * 24,
         }
     );
 
     return threads.length > 0 || result.type === 'complete'
         ? threads
-        : (
+        : ((
               loaderData.threads?.map(thread => ({
                   ...thread,
                   createdAt: thread.createdAt.getTime(),
                   updatedAt: thread.updatedAt.getTime(),
               })) as Thread[]
-          )?.filter(thread => thread.userId === db.userID) ?? [];
+          )?.filter(thread => thread.userId === db.userID) ?? []);
 }
 
 export function useCustomer() {
@@ -76,7 +76,10 @@ export function useThreadFromParams() {
         db.query.thread
             .where('id', '=', threadId ?? '')
             .related('messages', q => q.orderBy('createdAt', 'asc'))
-            .one()
+            .one(),
+        {
+            ttl: 60 * 60 * 24,
+        }
     );
 
     return (

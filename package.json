@@ -98,7 +98,7 @@
         "@types/react-dom": "^19",
         "@vitejs/plugin-react": "^4.7.0",
         "drizzle-kit": "^0.31.4",
-        "drizzle-zero": "^0.12.0",
+        "drizzle-zero": "^0.13.3",
         "tailwindcss": "^4.0.6",
         "tailwindcss-animate": "^1.0.7",
         "tsx": "^4.20.3",
