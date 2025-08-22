@@ -29,6 +29,7 @@ export type AppStore = {
     getMessageIdsByThreadId: (threadId: string | undefined) => string[];
     getMessagesByThreadId: (threadId: string) => ThreadMessage[];
     getMessageById: (threadId: string, id: string) => ThreadMessage | undefined;
+    getMessagePartsLengthById: (threadId: string, id: string) => number;
     getMessageMetadataById: (threadId: string, id: string) => ThreadMessage['metadata'] | undefined;
 };
 
@@ -208,6 +209,12 @@ function createAppStore(init: { threads: Record<string, Thread> }) {
                 getMessageMetadataById: (threadId: string, id: string) => {
                     return get().threads[threadId].messages.find(message => message.id === id)
                         ?.metadata;
+                },
+                getMessagePartsLengthById: (threadId: string, id: string) => {
+                    return (
+                        get().threads[threadId].messages.find(message => message.id === id)?.parts
+                            .length ?? 0
+                    );
                 },
             }))
         )

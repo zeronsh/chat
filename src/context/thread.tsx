@@ -4,6 +4,8 @@ import { ThreadMessage } from '@/ai/types';
 import { ChatInit } from 'ai';
 import { nanoid } from '@/lib/utils';
 import { ThreadStoreImpl } from '@/thread/store';
+import { useThreadIdOrThrow } from '@/hooks/use-params-thread-id';
+import { useAppStore } from '@/stores/app';
 
 const ThreadContext = createContext<Thread<ThreadMessage> | null>(null);
 
@@ -92,8 +94,9 @@ export function usePart<T extends Exclude<PartType, 'reasoning'>, Return, Select
 }): SelectReturn;
 
 export function usePart(options: any): any {
-    const part = useThreadSelector<any>(state => {
-        const parts = state.messageMap[options.id].parts;
+    const threadId = useThreadIdOrThrow();
+    const part = useAppStore<any>(state => {
+        const parts = state.getMessageById(threadId, options.id)!.parts;
         if (parts[1]?.type === 'text' && parts[2]?.type === 'reasoning') {
             const reasoningPart = parts[2];
             const textPart = parts[1];
@@ -106,8 +109,8 @@ export function usePart(options: any): any {
         }
         if (part.type === 'reasoning') {
             let i = options.index;
-            let nextPart = state.messageMap[options.id].parts[i + 1];
-            const prevPart = state.messageMap[options.id].parts[i - 1];
+            let nextPart = state.getMessageById(threadId, options.id)!.parts[i + 1];
+            const prevPart = state.getMessageById(threadId, options.id)!.parts[i - 1];
 
             if (prevPart && prevPart.type === 'reasoning') {
                 return options.selector(null);
@@ -118,7 +121,7 @@ export function usePart(options: any): any {
                     part.text += '\n\n' + nextPart.text;
                     part.state = nextPart.state;
                     i++;
-                    nextPart = state.messageMap[options.id].parts[i + 1];
+                    nextPart = state.getMessageById(threadId, options.id)!.parts[i + 1];
                 }
             }
         }

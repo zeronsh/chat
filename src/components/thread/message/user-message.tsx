@@ -9,6 +9,8 @@ import { CopyIcon, EditIcon } from 'lucide-react';
 import { Fragment, memo, useMemo } from 'react';
 import { toast } from 'sonner';
 import { useCopyToClipboard } from 'usehooks-ts';
+import { useAppStore } from '@/stores/app';
+import { useThreadIdOrThrow } from '@/hooks/use-params-thread-id';
 
 export const UserMessage = memo(function PureUserMessage({
     id,
@@ -20,23 +22,24 @@ export const UserMessage = memo(function PureUserMessage({
     hasNextMessage: boolean;
 }) {
     const [_, copy] = useCopyToClipboard();
-    const message = useThreadSelector(state => state.messageMap[id]);
-    const setEditingMessageId = useThreadSelector(state => state.setEditingMessageId);
-    const setInput = useThreadSelector(state => state.setInput);
-    const setAttachments = useThreadSelector(state => state.setAttachments);
+    const threadId = useThreadIdOrThrow();
+    const message = useAppStore(state => state.getMessageById(threadId, id)!);
+    // const setEditingMessageId = useThreadSelector(state => state.setEditingMessageId);
+    // const setInput = useThreadSelector(state => state.setInput);
+    // const setAttachments = useThreadSelector(state => state.setAttachments);
 
     async function handleCopyClick() {
-        const text = message.parts
-            .filter(part => part.type === 'text')
-            .map(part => part.text)
-            .join('\n')
-            .trim();
+        // const text = message.parts
+        //     .filter(part => part.type === 'text')
+        //     .map(part => part.text)
+        //     .join('\n')
+        //     .trim();
 
-        if (!text) {
-            return;
-        }
+        // if (!text) {
+        //     return;
+        // }
 
-        await copy(text);
+        // await copy(text);
         toast.success('Copied to clipboard');
     }
 
@@ -45,21 +48,21 @@ export const UserMessage = memo(function PureUserMessage({
     }, [message.parts]);
 
     function handleEditClick() {
-        setEditingMessageId(id);
-        setInput(
-            message.parts
-                .filter(part => part.type === 'text')
-                .map(part => part.text)
-                .join('\n')
-        );
-        setAttachments(
-            fileParts.map(part => ({
-                type: 'file',
-                url: part.url,
-                filename: part.filename || 'untitled',
-                mediaType: part.mediaType,
-            }))
-        );
+        // setEditingMessageId(id);
+        // setInput(
+        //     message.parts
+        //         .filter(part => part.type === 'text')
+        //         .map(part => part.text)
+        //         .join('\n')
+        // );
+        // setAttachments(
+        //     fileParts.map(part => ({
+        //         type: 'file',
+        //         url: part.url,
+        //         filename: part.filename || 'untitled',
+        //         mediaType: part.mediaType,
+        //     }))
+        // );
     }
 
     return (

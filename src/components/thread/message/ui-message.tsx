@@ -1,8 +1,10 @@
 import { Part } from '@/components/thread/message/part';
 import { memo } from 'react';
-import { useThreadSelector } from '@/context/thread';
+import { useAppStore } from '@/stores/app';
+import { useThreadIdOrThrow } from '@/hooks/use-params-thread-id';
 
 export const UIMessage = memo(function PureUIMessage({ id }: { id: string }) {
-    const partsLength = useThreadSelector(state => state.messageMap[id].parts.length);
+    const threadId = useThreadIdOrThrow();
+    const partsLength = useAppStore(state => state.getMessagePartsLengthById(threadId, id));
     return Array.from({ length: partsLength }).map((_, i) => <Part key={i} id={id} index={i} />);
 });

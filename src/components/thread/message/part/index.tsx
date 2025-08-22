@@ -4,10 +4,13 @@ import { ErrorPart } from '@/components/thread/message/part/error-part';
 import { TextPart } from '@/components/thread/message/part/text-part';
 import { SearchPart } from '@/components/thread/message/part/search-part';
 import { ResearchPart } from '@/components/thread/message/part/research-part';
+import { useAppStore } from '@/stores/app';
+import { useThreadIdOrThrow } from '@/hooks/use-params-thread-id';
 
 export function Part({ id, index }: { id: string; index: number }) {
-    const type = useThreadSelector(state => {
-        const parts = state.messageMap[id].parts;
+    const threadId = useThreadIdOrThrow();
+    const type = useAppStore(state => {
+        const parts = state.getMessageById(threadId, id)!.parts;
         if (parts[1]?.type === 'text' && parts[2]?.type === 'reasoning') {
             const textPart = parts[1];
             const reasoningPart = parts[2];
