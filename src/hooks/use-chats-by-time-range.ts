@@ -1,6 +1,6 @@
-import { Thread } from '@/zero/types';
+import { Thread } from '@/stores/app';
 
-export function useThreadsByTimeRange<T extends Thread>(threads: T[]) {
+export function useThreadsByTimeRange(threads: Thread[]) {
     const MS_PER_DAY = 24 * 60 * 60 * 1000;
     const DAYS_30 = 30;
 

@@ -7,3 +7,11 @@ export function useParamsThreadId() {
 
     return threadId;
 }
+
+export function useThreadIdOrThrow() {
+    const threadId = useParamsThreadId();
+    if (!threadId) {
+        throw new Error('Thread ID is required');
+    }
+    return threadId;
+}

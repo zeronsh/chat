@@ -19,7 +19,7 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
             session: clientSession.data,
             isPending: clientSession.isPending,
         };
-    }, [clientSession, loaderData.session]);
+    }, [clientSession, loaderData?.session]);
 
     const zero = useMemo(() => {
         if (typeof window === 'undefined' || !session || !session.user) {

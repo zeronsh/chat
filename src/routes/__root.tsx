@@ -14,6 +14,7 @@ import { useEffect, useRef } from 'react';
 import { useSettings } from '@/hooks/use-database';
 import { z } from 'zod';
 import { ProDialog } from '@/components/app/pro-dialog';
+import { AppProvider } from '@/context/app';
 
 const GetContextSchema = z.object({
     threadId: z.string().optional(),
@@ -152,7 +153,9 @@ function RootDocument() {
             </head>
             <body className="fixed inset-0">
                 <DatabaseProvider>
-                    <RootComponent htmlRef={ref} />
+                    <AppProvider>
+                        <RootComponent htmlRef={ref} />
+                    </AppProvider>
                 </DatabaseProvider>
                 <Scripts />
             </body>

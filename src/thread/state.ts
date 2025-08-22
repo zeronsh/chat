@@ -1,47 +1,47 @@
 import type { UIMessage, ChatState, ChatStatus } from 'ai';
 import type { ThreadStore } from '@/thread/store';
+import { useAppStore } from '@/stores/app';
+import { ThreadMessage } from '@/ai/types';
 
-export class ThreadState<UI_MESSAGE extends UIMessage> implements ChatState<UI_MESSAGE> {
-    private store: ThreadStore<UI_MESSAGE>;
+const store = useAppStore;
 
-    constructor(store: ThreadStore<UI_MESSAGE>) {
-        this.store = store;
+export class ThreadState implements ChatState<ThreadMessage> {
+    constructor(private id: string) {}
+
+    get messages(): ThreadMessage[] {
+        return store.getState().getMessagesByThreadId(this.id);
     }
 
-    get messages(): UI_MESSAGE[] {
-        return this.store.getState().messages;
-    }
-
-    set messages(newMessages: UI_MESSAGE[]) {
-        this.store.getState().setMessages(newMessages);
+    set messages(newMessages: ThreadMessage[]) {
+        store.getState().setMessagesByThreadId(this.id, newMessages);
     }
 
     get status(): ChatStatus {
-        return this.store.getState().status;
+        return store.getState().getThreadById(this.id)?.status ?? 'ready';
     }
 
     set status(newStatus: ChatStatus) {
-        this.store.getState().setStatus(newStatus);
+        store.getState().setStatusByThreadId(this.id, newStatus);
     }
 
     get error(): Error | undefined {
-        return this.store.getState().error;
+        return undefined;
     }
 
     set error(newError: Error | undefined) {
-        this.store.getState().setError(newError);
+        // do nothing
     }
 
-    pushMessage = (message: UI_MESSAGE) => {
-        this.store.getState().pushMessage(message);
+    pushMessage = (message: ThreadMessage) => {
+        store.getState().pushMessageByThreadId(this.id, message);
     };
 
     popMessage = () => {
-        this.store.getState().popMessage();
+        store.getState().popMessageByThreadId(this.id);
     };
 
-    replaceMessage = (index: number, message: UI_MESSAGE) => {
-        this.store.getState().replaceMessage(index, message);
+    replaceMessage = (index: number, message: ThreadMessage) => {
+        store.getState().replaceMessageByThreadId(this.id, index, message);
     };
 
     snapshot = <T>(snapshot: T) => {

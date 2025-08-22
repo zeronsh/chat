@@ -5,11 +5,14 @@ import { useAutoResume } from '@/hooks/use-auto-resume';
 import { StickToBottom, useStickToBottom } from 'use-stick-to-bottom';
 import { Virtualizer, VirtualizerHandle } from 'virtua';
 import { useEffect, useRef } from 'react';
+import { useAppStore } from '@/stores/app';
+import { useParamsThreadId } from '@/hooks/use-params-thread-id';
 
 export function MessageList() {
     const mounted = useRef(false);
     const ref = useRef<VirtualizerHandle>(null);
-    const messageIds = useThreadSelector(state => state.messageIds);
+    const threadId = useParamsThreadId();
+    const messageIds = useAppStore(state => state.getMessageIdsByThreadId(threadId));
     const instance = useStickToBottom({
         initial: 'instant',
     });

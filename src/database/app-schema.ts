@@ -3,6 +3,7 @@ import { index, integer, jsonb, pgEnum, pgTable, text, timestamp } from 'drizzle
 import type { Capability, ThreadMessage } from '@/ai/types';
 import { member, organization, user } from '@/database/auth-schema';
 import { SubscriptionData } from '@/database/types';
+import { ChatStatus } from 'ai';
 
 export const message = pgTable('message', {
     id: text('id').primaryKey(),
@@ -24,7 +25,7 @@ export const thread = pgTable(
     {
         id: text('id').primaryKey(),
         title: text('title'),
-        status: statusEnum('status').notNull().default('ready'),
+        status: statusEnum('status').notNull().default('ready').$type<ChatStatus>(),
         streamId: text('stream_id'),
         createdAt: timestamp('created_at').notNull().defaultNow(),
         updatedAt: timestamp('updated_at').notNull().defaultNow(),

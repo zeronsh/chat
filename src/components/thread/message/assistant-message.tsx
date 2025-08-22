@@ -10,6 +10,8 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { CopyIcon, RefreshCcwIcon } from 'lucide-react';
 import { Fragment, memo } from 'react';
+import { useAppStore } from '@/stores/app';
+import { useThreadIdOrThrow } from '@/hooks/use-params-thread-id';
 
 export const AssistantMessage = memo(function PureAssistantMessage({
     id,
@@ -20,8 +22,9 @@ export const AssistantMessage = memo(function PureAssistantMessage({
     hasPreviousMessage: boolean;
     hasNextMessage: boolean;
 }) {
-    const status = useThreadSelector(state => state.status);
-    const length = useThreadSelector(state => state.messageMap[id].parts.length);
+    const threadId = useThreadIdOrThrow();
+    const status = useAppStore(state => state.getThreadById(threadId)?.status);
+    const length = useAppStore(state => state.getMessageById(threadId, id)?.parts.length);
 
     if (length === 0) {
         return (
@@ -45,7 +48,7 @@ export const AssistantMessage = memo(function PureAssistantMessage({
                 <UIMessage id={id} />
                 {(status !== 'streaming' && status !== 'submitted') || hasNextMessage ? (
                     <Fragment>
-                        <ToolResultPills id={id} />
+                        {/* <ToolResultPills id={id} /> */}
                         <Actions id={id} />
                     </Fragment>
                 ) : (
@@ -140,11 +143,9 @@ const ToolResultPills = memo(function PureToolResultPills({ id }: { id: string }
 
 const Actions = memo(function PureActions({ id }: { id: string }) {
     const thread = useThreadContext();
-    const metadata = useThreadSelector(
-        state => state.messageMap[id].metadata,
-        (a, b) => a?.model?.id === b?.model?.id
-    );
-    const status = useThreadSelector(state => state.status);
+    const threadId = useThreadIdOrThrow();
+    const metadata = useAppStore(state => state.getMessageMetadataById(threadId, id));
+    const status = useAppStore(state => state.getThreadById(threadId)?.status);
     return (
         <MessageActions className={cn('gap-1 transition-opacity duration-200 opacity-100')}>
             <MessageAction tooltip="Copy" side="bottom">
@@ -153,13 +154,13 @@ const Actions = memo(function PureActions({ id }: { id: string }) {
                     size="icon"
                     className="size-8"
                     onClick={async () => {
-                        await navigator.clipboard.writeText(
-                            thread.store
-                                .getState()
-                                .messageMap[id].parts.filter(part => part.type === 'text')
-                                .map(part => part.text)
-                                .join('\n')
-                        );
+                        // await navigator.clipboard.writeText(
+                        //     thread.store
+                        //         .getState()
+                        //         .messageMap[id].parts.filter(part => part.type === 'text')
+                        //         .map(part => part.text)
+                        //         .join('\n')
+                        // );
                         toast.success('Copied to clipboard');
                     }}
                 >

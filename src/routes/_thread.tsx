@@ -11,6 +11,7 @@ import { ThreadProvider } from '@/context/thread';
 import { MessageList } from '@/components/thread/message/message-list';
 import { ToolSidebar } from '@/components/layout/tool-sidebar';
 import { ThreadContainer } from '@/components/thread/thread-container';
+import { useAppStore } from '@/stores/app';
 
 export const Route = createFileRoute('/_thread')({
     component: RouteComponent,
@@ -19,11 +20,7 @@ export const Route = createFileRoute('/_thread')({
 function RouteComponent() {
     const db = useDatabase();
     const threadId = useParamsThreadId();
-    const thread = useThreadFromParams();
-
-    const messages = useMemo(() => {
-        return thread?.messages.map(message => message.message);
-    }, [thread]);
+    const thread = useAppStore(state => state.getThreadById(threadId));
 
     return (
         <SidebarProvider>
@@ -32,7 +29,7 @@ function RouteComponent() {
             <ThreadProvider
                 key={threadId}
                 id={threadId}
-                messages={messages}
+                messages={thread?.messages}
                 transport={
                     new DefaultChatTransport({
                         api: '/api/thread',

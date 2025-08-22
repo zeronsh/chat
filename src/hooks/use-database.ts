@@ -23,7 +23,7 @@ export function useSettings() {
         db.query.setting.where('userId', '=', db.userID).related('model').one()
     );
 
-    return settings ?? loaderData.settings;
+    return settings ?? loaderData?.settings;
 }
 
 export function useThreads() {
@@ -38,15 +38,7 @@ export function useThreads() {
         }
     );
 
-    return threads.length > 0 || result.type === 'complete'
-        ? threads
-        : ((
-              loaderData.threads?.map(thread => ({
-                  ...thread,
-                  createdAt: thread.createdAt.getTime(),
-                  updatedAt: thread.updatedAt.getTime(),
-              })) as Thread[]
-          )?.filter(thread => thread.userId === db.userID) ?? []);
+    return threads;
 }
 
 export function useCustomer() {
@@ -56,7 +48,7 @@ export function useCustomer() {
         db.query.userCustomer.where('userId', '=', UserId(db.userID)).one()
     );
 
-    return customer ?? loaderData.customer;
+    return customer ?? loaderData?.customer;
 }
 
 export function useUsage() {
@@ -64,7 +56,7 @@ export function useUsage() {
     const loaderData = Route.useLoaderData();
     const [usage] = useQuery(db.query.usage.where('userId', '=', UserId(db.userID)).one());
 
-    return usage ?? loaderData.usage;
+    return usage ?? loaderData?.usage;
 }
 
 export function useThreadFromParams() {
@@ -84,8 +76,8 @@ export function useThreadFromParams() {
 
     return (
         thread ??
-        (loaderData.thread && loaderData.thread.id === threadId
-            ? (loaderData.thread as unknown as Thread & {
+        (loaderData?.thread && loaderData?.thread.id === threadId
+            ? (loaderData?.thread as unknown as Thread & {
                   messages: Message[];
               })
             : undefined)
@@ -97,5 +89,5 @@ export function useUser() {
     const loaderData = Route.useLoaderData();
     const [user] = useQuery(db.query.user.where('id', '=', UserId(db.userID)).one());
 
-    return user ?? loaderData.user;
+    return user ?? loaderData?.user;
 }

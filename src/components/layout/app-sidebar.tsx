@@ -22,7 +22,6 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useDatabase, useThreads } from '@/hooks/use-database';
 import { useThreadsByTimeRange } from '@/hooks/use-chats-by-time-range';
-import { Thread } from '@/zero/types';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
 import { Loader2Icon, PencilIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import { useState } from 'react';
@@ -31,6 +30,7 @@ import { useForm } from '@tanstack/react-form';
 import z from 'zod';
 import { Label } from '@/components/ui/label';
 import ZeronIcon from '../icons/zeron';
+import { Thread, useAppStore } from '@/stores/app';
 
 export function AppSidebar() {
     const [threadToEdit, setThreadToEdit] = useState<Thread | null>(null);
@@ -90,7 +90,7 @@ function AppSidebarThreads({
     setThreadToEdit: (thread: Thread | null) => void;
     setThreadToDelete: (thread: Thread | null) => void;
 }) {
-    const threads = useThreads();
+    const threads = useAppStore(state => state.getAllThreads());
     const groups = useThreadsByTimeRange(threads);
 
     return (

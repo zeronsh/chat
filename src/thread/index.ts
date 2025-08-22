@@ -1,17 +1,18 @@
 import { AbstractChat, ChatInit, UIMessage } from 'ai';
 import { ThreadState } from '@/thread/state';
 import { createThreadStore, type ThreadStore } from '@/thread/store';
+import { ThreadMessage } from '@/ai/types';
 
-export class Thread<UI_MESSAGE extends UIMessage> extends AbstractChat<UI_MESSAGE> {
-    protected state: ThreadState<UI_MESSAGE>;
-    public store: ThreadStore<UI_MESSAGE>;
+export class Thread extends AbstractChat<ThreadMessage> {
+    protected state: ThreadState;
+    public store: ThreadStore<ThreadMessage>;
 
-    constructor(init: ChatInit<UI_MESSAGE>) {
-        const store = createThreadStore<UI_MESSAGE>({
+    constructor(init: ChatInit<ThreadMessage>) {
+        const store = createThreadStore<ThreadMessage>({
             id: init.id,
             messages: init.messages ?? [],
         });
-        const state = new ThreadState<UI_MESSAGE>(store);
+        const state = new ThreadState(init.id!);
 
         super({ ...init, state });
 
