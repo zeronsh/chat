@@ -21,19 +21,12 @@ export const MarkdownBlock = memo(
             equalityFn: (a, b) => a === b,
         });
 
-        const isLastMessage = useThreadSelector(state => {
-            const nextMessageIndex = state.messages.findIndex(msg => msg.id === id) + 1;
-            const nextMessage = state.messages[nextMessageIndex];
-
-            return nextMessage === undefined;
-        });
-
         if (content === undefined) {
             return null;
         }
 
         return (
-            <MessageContent markdown animated={isLastMessage}>
+            <MessageContent markdown animated={true}>
                 {content}
             </MessageContent>
         );
@@ -47,11 +40,40 @@ export const MarkdownBlock = memo(
     }
 );
 
+export const FinishedMarkdownBlock = memo(function PureFinishedMarkdownBlock({
+    id,
+    index,
+}: {
+    id: string;
+    index: number;
+}) {
+    const content = usePart({
+        id,
+        index,
+        type: 'text',
+        selector: part => part.text,
+        equalityFn: (a, b) => a === b,
+    });
+
+    return <MessageContent markdown>{content}</MessageContent>;
+});
+
 export const TextPart = memo(
     function PureTextPart({ id, index }: { id: string; index: number }) {
-        return Array.from({ length: 100 }, (_, i) => i).map(i => (
-            <MarkdownBlock key={`${id}-${index}-${i}`} id={id} index={index} blockIndex={i} />
-        ));
+        const shouldAnimate = useThreadSelector(state => {
+            const nextMessageIndex = state.messages.findIndex(msg => msg.id === id) + 1;
+            const nextMessage = state.messages[nextMessageIndex];
+
+            return nextMessage === undefined && state.status === 'streaming';
+        });
+
+        if (shouldAnimate) {
+            return Array.from({ length: 100 }, (_, i) => i).map(i => (
+                <MarkdownBlock key={`${id}-${index}-${i}`} id={id} index={index} blockIndex={i} />
+            ));
+        }
+
+        return <FinishedMarkdownBlock id={id} index={index} />;
     },
     function propsAreEqual() {
         return true;
