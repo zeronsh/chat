@@ -24,7 +24,7 @@ import { useDatabase, useThreads } from '@/hooks/use-database';
 import { useThreadsByTimeRange } from '@/hooks/use-chats-by-time-range';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
 import { Loader2Icon, PencilIcon, PlusIcon, TrashIcon } from 'lucide-react';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Fragment } from 'react/jsx-runtime';
 import { useForm } from '@tanstack/react-form';
 import z from 'zod';
@@ -91,7 +91,41 @@ function AppSidebarThreads({
     setThreadToDelete: (thread: Thread | null) => void;
 }) {
     const threads = useAppStore(state => state.getAllThreads());
+    const navigate = useNavigate();
+    const params = useParams({ from: '/_thread/$threadId', shouldThrow: false });
     const groups = useThreadsByTimeRange(threads);
+
+    const onHandleKeyDown = useCallback(
+        (e: KeyboardEvent) => {
+            if (e.shiftKey && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                if (threads.length === 0) return;
+
+                const currentThreadId = params?.threadId;
+                const currentIndex = threads.findIndex(thread => thread.id === currentThreadId);
+
+                let nextIndex: number;
+                if (e.key === 'ArrowUp') {
+                    nextIndex = currentIndex <= 0 ? threads.length - 1 : currentIndex - 1;
+                } else {
+                    nextIndex = currentIndex >= threads.length - 1 ? 0 : currentIndex + 1;
+                }
+
+                const nextThread = threads[nextIndex];
+                if (nextThread) {
+                    navigate({ to: '/$threadId', params: { threadId: nextThread.id } });
+                }
+            }
+        },
+        [threads, params?.threadId, navigate]
+    );
+
+    useEffect(() => {
+        document.addEventListener('keydown', onHandleKeyDown);
+        return () => document.removeEventListener('keydown', onHandleKeyDown);
+    }, [onHandleKeyDown]);
 
     return (
         <Fragment>
