@@ -92,6 +92,13 @@
       "when": 1754965897403,
       "tag": "0012_add-glm-45v",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1755817652752,
+      "tag": "0013_add-deepseek-3.1",
+      "breakpoints": true
     }
   ]
 }
