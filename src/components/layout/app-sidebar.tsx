@@ -19,7 +19,12 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipPositioner,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { useDatabase, useThreads } from '@/hooks/use-database';
 import { useThreadsByTimeRange } from '@/hooks/use-chats-by-time-range';
 import { Thread } from '@/zero/types';
@@ -219,7 +224,7 @@ function ThreadItem({
                     <div className="absolute top-0 right-0 bottom-0 pointer-events-none flex justify-end gap-2 px-4 items-center group-hover/thread-item:opacity-100 opacity-0 transition-all duration-100 bg-gradient-to-l from-sidebar to-transparent w-full rounded-r-md" />
                     <div className="absolute top-0 right-0 bottom-0 flex justify-end gap-2 px-2 items-center group-hover/thread-item:opacity-100 group-hover/thread-item:translate-x-0 translate-x-full opacity-0 transition-all duration-100 rounded-r-lg pointer-events-none group-hover/thread-item:pointer-events-auto">
                         <Tooltip>
-                            <TooltipTrigger asChild>
+                            <TooltipTrigger>
                                 <Button
                                     variant="ghost"
                                     size="icon"
@@ -229,10 +234,12 @@ function ThreadItem({
                                     <PencilIcon className="size-4" />
                                 </Button>
                             </TooltipTrigger>
-                            <TooltipContent>Edit Thread Title</TooltipContent>
+                            <TooltipPositioner className="pointer-events-none">
+                                <TooltipContent>Edit Thread Title</TooltipContent>
+                            </TooltipPositioner>
                         </Tooltip>
                         <Tooltip>
-                            <TooltipTrigger asChild>
+                            <TooltipTrigger>
                                 <Button
                                     variant="ghost"
                                     size="icon"
@@ -242,7 +249,9 @@ function ThreadItem({
                                     <TrashIcon className="size-4" />
                                 </Button>
                             </TooltipTrigger>
-                            <TooltipContent>Delete Thread</TooltipContent>
+                            <TooltipPositioner className="pointer-events-none">
+                                <TooltipContent>Delete Thread</TooltipContent>
+                            </TooltipPositioner>
                         </Tooltip>
                     </div>
                 </div>

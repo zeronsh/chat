@@ -16,7 +16,13 @@ import {
     SheetTitle,
 } from '@/components/ui/sheet';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipPositioner,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 const SIDEBAR_COOKIE_NAME = 'sidebar_state';
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
@@ -118,7 +124,7 @@ function SidebarProvider({
 
     return (
         <SidebarContext.Provider value={contextValue}>
-            <TooltipProvider delayDuration={0}>
+            <TooltipProvider delay={0}>
                 <div
                     data-slot="sidebar-wrapper"
                     style={
@@ -511,13 +517,14 @@ function SidebarMenuButton({
 
     return (
         <Tooltip>
-            <TooltipTrigger asChild>{button}</TooltipTrigger>
-            <TooltipContent
+            <TooltipTrigger>{button}</TooltipTrigger>
+            <TooltipPositioner
                 side="right"
                 align="center"
                 hidden={state !== 'collapsed' || isMobile}
-                {...tooltip}
-            />
+            >
+                <TooltipContent {...tooltip} />
+            </TooltipPositioner>
         </Tooltip>
     );
 }

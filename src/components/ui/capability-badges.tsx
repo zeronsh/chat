@@ -1,5 +1,10 @@
 import { Badge } from '@/components/ui/badge';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipPositioner,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { BrainIcon, EyeIcon, FileIcon, WrenchIcon } from 'lucide-react';
 import { match } from 'ts-pattern';
 import { cn } from '@/lib/utils';
@@ -49,9 +54,11 @@ export function CapabilityBadges({ capabilities, className }: CapabilityBadgesPr
                                 .exhaustive()}
                         </div>
                     </TooltipTrigger>
-                    <TooltipContent>
-                        {capability.charAt(0).toUpperCase() + capability.slice(1)}
-                    </TooltipContent>
+                    <TooltipPositioner>
+                        <TooltipContent>
+                            {capability.charAt(0).toUpperCase() + capability.slice(1)}
+                        </TooltipContent>
+                    </TooltipPositioner>
                 </Tooltip>
             ))}
         </div>

@@ -1,5 +1,10 @@
 import { CodeBlock, CodeBlockCode } from '@/components/ui/code-block';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipPositioner,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { useThreadSelector } from '@/context/thread';
 import { cn } from '@/lib/utils';
 import Marked, { ReactRenderer } from 'marked-react';
@@ -168,7 +173,9 @@ const INITIAL_COMPONENTS: Partial<ReactRenderer> = {
                             {domain || citationIndex + 1}
                         </a>
                     </TooltipTrigger>
-                    <TooltipContent>{citations[citationIndex].text}</TooltipContent>
+                    <TooltipPositioner>
+                        <TooltipContent>{citations[citationIndex].text}</TooltipContent>
+                    </TooltipPositioner>
                 </Tooltip>
             );
         }

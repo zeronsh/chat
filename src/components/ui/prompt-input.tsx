@@ -1,5 +1,11 @@
 import { Textarea } from '@/components/ui/textarea';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipPositioner,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 
@@ -156,12 +162,12 @@ function PromptInputAction({
 
     return (
         <Tooltip {...props}>
-            <TooltipTrigger asChild disabled={disabled}>
+            <TooltipTrigger disabled={disabled}>
                 <div>{children}</div>
             </TooltipTrigger>
-            <TooltipContent side={side} className={className}>
-                {tooltip}
-            </TooltipContent>
+            <TooltipPositioner side={side}>
+                <TooltipContent className={className}>{tooltip}</TooltipContent>
+            </TooltipPositioner>
         </Tooltip>
     );
 }

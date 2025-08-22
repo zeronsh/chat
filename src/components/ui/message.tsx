@@ -1,5 +1,11 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipPositioner,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { Markdown } from './markdown';
 
@@ -90,10 +96,10 @@ const MessageAction = ({
     return (
         <TooltipProvider>
             <Tooltip {...props}>
-                <TooltipTrigger asChild>{children}</TooltipTrigger>
-                <TooltipContent side={side} className={className}>
-                    {tooltip}
-                </TooltipContent>
+                <TooltipTrigger>{children}</TooltipTrigger>
+                <TooltipPositioner side={side}>
+                    <TooltipContent className={className}>{tooltip}</TooltipContent>
+                </TooltipPositioner>
             </Tooltip>
         </TooltipProvider>
     );

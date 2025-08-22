@@ -9,7 +9,12 @@ import {
     CommandSeparator,
 } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipPositioner,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { useDatabase } from '@/hooks/use-database';
 import { useSettings } from '@/hooks/use-database';
 import { cn } from '@/lib/utils';
@@ -59,7 +64,7 @@ export function ThemeSelector() {
     return (
         <Tooltip>
             <Popover open={open} onOpenChange={setOpen}>
-                <TooltipTrigger asChild>
+                <TooltipTrigger>
                     <PopoverTrigger asChild>
                         <Button variant="outline" size="icon" aria-expanded={open}>
                             <PaintBucket className="size-4" />
@@ -167,9 +172,11 @@ export function ThemeSelector() {
                     </Command>
                 </PopoverContent>
             </Popover>
-            <TooltipContent>
-                <p>Theme switcher</p>
-            </TooltipContent>
+            <TooltipPositioner>
+                <TooltipContent>
+                    <p>Theme switcher</p>
+                </TooltipContent>
+            </TooltipPositioner>
         </Tooltip>
     );
 }
