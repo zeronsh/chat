@@ -29,14 +29,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
                     const threads = Object.fromEntries(
                         data.map(thread => [
                             thread.id,
-                            {
+                            structuredClone({
                                 id: thread.id,
                                 title: thread.title!,
                                 status: thread.status!,
                                 messages: thread.messages.map(message => message.message),
                                 createdAt: thread.createdAt!,
                                 updatedAt: thread.updatedAt!,
-                            },
+                            }),
                         ])
                     );
                     setThreads(threads);
