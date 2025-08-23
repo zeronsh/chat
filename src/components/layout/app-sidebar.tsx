@@ -120,7 +120,10 @@ function AppSidebarThreads({
 
                 const nextThread = threads[nextIndex];
                 if (nextThread) {
-                    navigate({ to: '/$threadId', params: { threadId: nextThread.id } });
+                    navigate({
+                        to: '/$threadId',
+                        params: { threadId: nextThread.id },
+                    });
                 }
             }
         },
@@ -205,6 +208,7 @@ function ThreadItem({
     setThreadToEdit: (thread: Thread) => void;
     setThreadToDelete: (thread: Thread) => void;
 }) {
+    const navigate = useNavigate();
     return (
         <SidebarMenuItem>
             <SidebarMenuButton asChild>
@@ -215,6 +219,16 @@ function ThreadItem({
                         params={{ threadId: thread.id }}
                         activeOptions={{ exact: true }}
                         activeProps={{ className: 'bg-muted' }}
+                        onMouseDown={e => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            if (e.button === 0) {
+                                navigate({
+                                    to: '/$threadId',
+                                    params: { threadId: thread.id },
+                                });
+                            }
+                        }}
                     >
                         <span className="truncate flex-1">{thread.title}</span>
                         {(thread.status === 'streaming' || thread.status === 'submitted') && (
