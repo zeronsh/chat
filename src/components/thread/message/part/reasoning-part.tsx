@@ -1,5 +1,5 @@
 import { MessageContent } from '@/components/ui/message';
-import { usePart } from '@/context/thread';
+import { usePart, useThreadSelector } from '@/context/thread';
 import { cn, lexer } from '@/lib/utils';
 import { useDebounce } from '@uidotdev/usehooks';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -29,7 +29,7 @@ export const ReasoningBlock = memo(
         }
 
         return (
-            <MessageContent className="text-sm text-muted-foreground" markdown>
+            <MessageContent className="text-sm text-muted-foreground" markdown animated={true}>
                 {content}
             </MessageContent>
         );
@@ -43,11 +43,44 @@ export const ReasoningBlock = memo(
     }
 );
 
+export const FinishedReasoningBlock = memo(function PureFinishedReasoningBlock({
+    id,
+    index,
+}: {
+    id: string;
+    index: number;
+}) {
+    const content = usePart({
+        id,
+        index,
+        type: 'reasoning',
+        selector: part => part?.text ?? '',
+        equalityFn: (a, b) => a === b,
+    });
+
+    return (
+        <MessageContent className="text-sm text-muted-foreground" markdown>
+            {content}
+        </MessageContent>
+    );
+});
+
 export const ReasoningText = memo(
     function PureReasoningText({ id, index }: { id: string; index: number }) {
-        return Array.from({ length: 100 }, (_, i) => i).map(i => (
-            <ReasoningBlock key={`${id}-${index}-${i}`} id={id} index={index} blockIndex={i} />
-        ));
+        const shouldAnimate = useThreadSelector(state => {
+            const nextMessageIndex = state.messages.findIndex(msg => msg.id === id) + 1;
+            const nextMessage = state.messages[nextMessageIndex];
+
+            return nextMessage === undefined && state.status === 'streaming';
+        });
+
+        if (shouldAnimate) {
+            return Array.from({ length: 100 }, (_, i) => i).map(i => (
+                <ReasoningBlock key={`${id}-${index}-${i}`} id={id} index={index} blockIndex={i} />
+            ));
+        }
+
+        return <FinishedReasoningBlock id={id} index={index} />;
     },
     function propsAreEqual() {
         return true;
