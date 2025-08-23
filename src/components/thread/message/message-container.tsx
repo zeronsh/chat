@@ -16,6 +16,7 @@ export function MessageContainer({
 }) {
     const editingMessageId = useThreadSelector(state => state.editingMessageId);
     const { isPro, remainingCredits } = useAccess();
+
     return (
         <div
             className={cn(

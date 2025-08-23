@@ -162,9 +162,7 @@ function PromptInputAction({
 
     return (
         <Tooltip {...props}>
-            <TooltipTrigger disabled={disabled}>
-                <div>{children}</div>
-            </TooltipTrigger>
+            <TooltipTrigger disabled={disabled} render={<div>{children}</div>} />
             <TooltipPositioner side={side}>
                 <TooltipContent className={className}>{tooltip}</TooltipContent>
             </TooltipPositioner>

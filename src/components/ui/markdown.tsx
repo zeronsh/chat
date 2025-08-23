@@ -133,7 +133,7 @@ function Text({ children }: { children: React.ReactNode }) {
 
 const INITIAL_COMPONENTS: Partial<ReactRenderer> = {
     text: function TextComponent(children) {
-        return <Text>{children}</Text>;
+        return <Text key={generateKey()}>{children}</Text>;
     },
     code: function CodeComponent(children, language) {
         const id = generateKey();

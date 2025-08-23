@@ -155,7 +155,6 @@ export function ModelSelector() {
                                             </span>
                                             <CapabilityBadges
                                                 capabilities={model.capabilities ?? []}
-                                                variant="compact"
                                             />
                                         </CommandItem>
                                     ))}

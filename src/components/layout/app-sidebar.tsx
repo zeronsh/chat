@@ -224,31 +224,35 @@ function ThreadItem({
                     <div className="absolute top-0 right-0 bottom-0 pointer-events-none flex justify-end gap-2 px-4 items-center group-hover/thread-item:opacity-100 opacity-0 transition-all duration-100 bg-gradient-to-l from-sidebar to-transparent w-full rounded-r-md" />
                     <div className="absolute top-0 right-0 bottom-0 flex justify-end gap-2 px-2 items-center group-hover/thread-item:opacity-100 group-hover/thread-item:translate-x-0 translate-x-full opacity-0 transition-all duration-100 rounded-r-lg pointer-events-none group-hover/thread-item:pointer-events-auto">
                         <Tooltip>
-                            <TooltipTrigger>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="size-6 hover:text-primary hover:bg-transparent"
-                                    onClick={() => setThreadToEdit(thread)}
-                                >
-                                    <PencilIcon className="size-4" />
-                                </Button>
-                            </TooltipTrigger>
+                            <TooltipTrigger
+                                render={
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="size-6 hover:text-primary hover:bg-transparent"
+                                        onClick={() => setThreadToEdit(thread)}
+                                    >
+                                        <PencilIcon className="size-4" />
+                                    </Button>
+                                }
+                            />
                             <TooltipPositioner className="pointer-events-none">
                                 <TooltipContent>Edit Thread Title</TooltipContent>
                             </TooltipPositioner>
                         </Tooltip>
                         <Tooltip>
-                            <TooltipTrigger>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="size-6 hover:text-primary"
-                                    onClick={() => setThreadToDelete(thread)}
-                                >
-                                    <TrashIcon className="size-4" />
-                                </Button>
-                            </TooltipTrigger>
+                            <TooltipTrigger
+                                render={
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="size-6 hover:text-primary"
+                                        onClick={() => setThreadToDelete(thread)}
+                                    >
+                                        <TrashIcon className="size-4" />
+                                    </Button>
+                                }
+                            />
                             <TooltipPositioner className="pointer-events-none">
                                 <TooltipContent>Delete Thread</TooltipContent>
                             </TooltipPositioner>

@@ -64,13 +64,15 @@ export function ThemeSelector() {
     return (
         <Tooltip>
             <Popover open={open} onOpenChange={setOpen}>
-                <TooltipTrigger>
-                    <PopoverTrigger asChild>
-                        <Button variant="outline" size="icon" aria-expanded={open}>
-                            <PaintBucket className="size-4" />
-                        </Button>
-                    </PopoverTrigger>
-                </TooltipTrigger>
+                <TooltipTrigger
+                    render={
+                        <PopoverTrigger asChild>
+                            <Button variant="outline" size="icon" aria-expanded={open}>
+                                <PaintBucket className="size-4" />
+                            </Button>
+                        </PopoverTrigger>
+                    }
+                />
                 <PopoverContent
                     className="p-0 bg-background/50 border-foreground/10 backdrop-blur-md overflow-hidden w-[250px]"
                     align="end"

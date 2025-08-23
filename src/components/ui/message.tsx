@@ -96,7 +96,7 @@ const MessageAction = ({
     return (
         <TooltipProvider>
             <Tooltip {...props}>
-                <TooltipTrigger>{children}</TooltipTrigger>
+                <TooltipTrigger render={<div>{children}</div>} />
                 <TooltipPositioner side={side}>
                     <TooltipContent className={className}>{tooltip}</TooltipContent>
                 </TooltipPositioner>
