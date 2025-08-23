@@ -95,7 +95,8 @@ function extractDomain(url: string | undefined): string {
 }
 
 function StreamingText({ children }: { children: string }) {
-    const id = useId();
+    const id = useMemo(() => generateKey(), []);
+    // console.log(id);
     const words = children.split(/\s+/);
     const segments = words.reduce<string[]>((acc, cur, idx) => {
         if (idx % 10 === 0) {
@@ -107,25 +108,32 @@ function StreamingText({ children }: { children: string }) {
     }, []);
 
     return segments.map((segment, idx) => {
-        const isWhitespace = /^\s+$/.test(segment);
-        return (
-            <span
-                key={`${id}-${idx}`}
-                className={cn('fade-segment', isWhitespace && 'fade-segment-space')}
-                style={{
-                    animationDelay: `${idx * 1.5}ms`,
-                }}
-            >
-                {segment}
-            </span>
-        );
+        return <FadeSegment key={`${id}-${idx}`} delay={idx * 1.5} children={segment} />;
     });
 }
 
+const FadeSegment = memo(
+    function FadeSegment({ children, delay }: { children: string; delay: number }) {
+        const isWhitespace = /^\s+$/.test(children);
+        return (
+            <span
+                className={cn('fade-segment', isWhitespace && 'fade-segment-space')}
+                style={{
+                    animationDelay: `${delay}ms`,
+                }}
+            >
+                {children}
+            </span>
+        );
+    },
+    (prevProps, nextProps) => {
+        return prevProps.children === nextProps.children;
+    }
+);
+
 function Text({ children }: { children: React.ReactNode }) {
     const { animated } = useMarkdownContext();
-    const streaming = useThreadSelector(state => state.status === 'streaming');
-    if (typeof children === 'string' && streaming && animated) {
+    if (typeof children === 'string' && animated) {
         return <StreamingText children={children} />;
     }
     return children;
@@ -133,12 +141,13 @@ function Text({ children }: { children: React.ReactNode }) {
 
 const INITIAL_COMPONENTS: Partial<ReactRenderer> = {
     text: function TextComponent(children) {
-        return <Text key={generateKey()}>{children}</Text>;
+        const key = useMemo(() => generateKey(), []);
+        return <Text key={key}>{children}</Text>;
     },
     code: function CodeComponent(children, language) {
-        const id = generateKey();
+        const key = useMemo(() => generateKey(), []);
         return (
-            <CodeBlock key={`${id}-${language}`}>
+            <CodeBlock key={`${key}-${language}`}>
                 <CodeBlockCode
                     code={children as string}
                     language={language?.trim() || 'plaintext'}
@@ -147,9 +156,9 @@ const INITIAL_COMPONENTS: Partial<ReactRenderer> = {
         );
     },
     codespan: function CodeSpanComponent(children) {
-        const id = generateKey();
+        const key = useMemo(() => generateKey(), []);
         return (
-            <span key={`${id}}`} className={cn('bg-muted rounded-sm px-1 font-mono text-sm')}>
+            <span key={`${key}}`} className={cn('bg-muted rounded-sm px-1 font-mono text-sm')}>
                 {children}
             </span>
         );
@@ -157,12 +166,12 @@ const INITIAL_COMPONENTS: Partial<ReactRenderer> = {
     link: function LinkComponent(href, text) {
         const { citations } = useMarkdownContext();
         const citationIndex = citations.findIndex(citation => citation.link === href);
-        const id = generateKey();
+        const key = useMemo(() => generateKey(), []);
 
         if (citationIndex !== -1) {
             const domain = extractDomain(href);
             return (
-                <Tooltip key={`${id}}`}>
+                <Tooltip key={`${key}}`}>
                     <TooltipTrigger>
                         <a
                             href={href}
@@ -180,7 +189,7 @@ const INITIAL_COMPONENTS: Partial<ReactRenderer> = {
             );
         }
         return (
-            <a key={`${id}}`} href={href} target="_blank" rel="noopener noreferrer">
+            <a key={`${key}}`} href={href} target="_blank" rel="noopener noreferrer">
                 {text}
             </a>
         );
