@@ -11,6 +11,7 @@ import { nanoid } from 'nanoid';
 import { Effect, Layer } from 'effect';
 import { APIError } from '@/lib/error';
 import { reactStartCookies } from 'better-auth/react-start';
+import { setHeaders } from '@tanstack/react-start/server';
 
 export const auth = betterAuth({
     database: drizzleAdapter(db, {
@@ -116,9 +117,12 @@ const getSession = Effect.fn('getSession')(function* (request: Request) {
         const sessionToken = setCookieHeader?.match(/better-auth\.session_token=([^;]+)/)?.[1];
 
         const sessionHeaders = new Headers(request.headers);
+
         if (sessionToken) {
             sessionHeaders.set('Cookie', `better-auth.session_token=${sessionToken}`);
         }
+
+        setHeaders(Object.fromEntries(newUser.headers.entries()));
 
         session = yield* Effect.tryPromise(() => {
             return auth.api.getSession({
