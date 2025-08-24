@@ -14,6 +14,8 @@ import { useEffect, useRef } from 'react';
 import { useSettings } from '@/hooks/use-database';
 import { z } from 'zod';
 import { ProDialog } from '@/components/app/pro-dialog';
+import { AppSidebar } from '@/components/layout/app-sidebar';
+import { SidebarProvider } from '@/components/ui/sidebar';
 
 const GetContextSchema = z.object({
     threadId: z.string().optional(),
@@ -127,7 +129,10 @@ function RootComponent({ htmlRef }: { htmlRef: React.RefObject<HTMLHtmlElement |
 
     return (
         <div className="fixed inset-0 flex text-foreground">
-            <Outlet />
+            <SidebarProvider>
+                <AppSidebar />
+                <Outlet />
+            </SidebarProvider>
             <Toaster position="top-center" />
             <ProDialog />
         </div>

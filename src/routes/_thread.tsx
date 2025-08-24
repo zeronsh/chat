@@ -2,9 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { DefaultChatTransport } from 'ai';
 import { useParamsThreadId } from '@/hooks/use-params-thread-id';
 import { useDatabase, useThreadFromParams } from '@/hooks/use-database';
-import { useMemo } from 'react';
-import { SidebarProvider } from '@/components/ui/sidebar';
-import { AppSidebar } from '@/components/layout/app-sidebar';
+import { Fragment, useMemo } from 'react';
 import { Header } from '@/components/layout/header';
 import { Title } from '@/components/meta/title';
 import { ThreadProvider } from '@/context/thread';
@@ -26,11 +24,9 @@ function RouteComponent() {
     }, [thread]);
 
     return (
-        <SidebarProvider>
+        <Fragment>
             <Title title={thread?.title} />
-            <AppSidebar />
             <ThreadProvider
-                key={threadId}
                 id={threadId}
                 messages={messages}
                 transport={
@@ -59,6 +55,6 @@ function RouteComponent() {
                 </ThreadContainer>
                 <ToolSidebar />
             </ThreadProvider>
-        </SidebarProvider>
+        </Fragment>
     );
 }

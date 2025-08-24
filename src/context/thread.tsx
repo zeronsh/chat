@@ -25,7 +25,7 @@ export function ThreadProvider({
         return generateId();
     }, [init.id, generateId]);
 
-    const [thread] = useState(() => {
+    const thread = useMemo(() => {
         if (threads.has(id)) {
             return threads.get(id)!;
         }
@@ -35,7 +35,7 @@ export function ThreadProvider({
         threads.set(id, thread);
 
         return thread;
-    });
+    }, [id]);
 
     useEffect(() => {
         if (
@@ -45,13 +45,13 @@ export function ThreadProvider({
         ) {
             thread.store.getState().setMessages(init.messages);
         }
-    }, [init.messages]);
+    }, [init.messages, id]);
 
     useEffect(() => {
         if (thread.status === 'streaming') {
             thread.store.getState().setStatus('streaming');
         }
-    }, [thread.status]);
+    }, [thread.status, id]);
 
     return <ThreadContext.Provider value={thread}>{children}</ThreadContext.Provider>;
 }
