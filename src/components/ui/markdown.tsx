@@ -143,9 +143,8 @@ const FadeSegment = memo(
 const INITIAL_COMPONENTS: Partial<Components> = {
     p: function TextComponent({ children, className }) {
         const { animated } = useMarkdownContext();
-        const debouncedAnimated = useDebounce(animated, 1000);
 
-        if (typeof children === 'string' && debouncedAnimated) {
+        if (typeof children === 'string' && animated) {
             return (
                 <p className={className}>
                     <StreamingText children={children} />
