@@ -114,15 +114,10 @@ const getSession = Effect.fn('getSession')(function* (request: Request) {
         });
 
         const setCookieHeader = newUser.headers.get('set-cookie');
-        const sessionToken = setCookieHeader?.match(/better-auth\.session_token=([^;]+)/)?.[1];
 
-        const sessionHeaders = new Headers(request.headers);
+        const sessionHeaders = new Headers(newUser.headers);
 
-        if (sessionToken) {
-            sessionHeaders.set('Cookie', `better-auth.session_token=${sessionToken}`);
-        }
-
-        setHeaders(Object.fromEntries(newUser.headers.entries()));
+        setHeaders(Object.fromEntries(sessionHeaders.entries()));
 
         session = yield* Effect.tryPromise(() => {
             return auth.api.getSession({
