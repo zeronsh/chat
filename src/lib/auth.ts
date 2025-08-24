@@ -115,13 +115,41 @@ const getSession = Effect.fn('getSession')(function* (request: Request) {
 
         const setCookieHeader = newUser.headers.get('set-cookie');
 
-        const sessionHeaders = new Headers(newUser.headers);
+        if (setCookieHeader) {
+            setHeaders({
+                'set-cookie': setCookieHeader,
+            });
+        }
 
-        setHeaders(Object.fromEntries(sessionHeaders.entries()));
+        // Parse the set-cookie header to extract all cookie name=value pairs
+        const requestHeaders = new Headers(request.headers);
+
+        if (setCookieHeader) {
+            // Parse set-cookie header(s) - there might be multiple cookies
+            const cookies = setCookieHeader.split(',').map(cookie => cookie.trim());
+            const cookieValues: string[] = [];
+
+            // Extract existing cookies from request
+            const existingCookies = requestHeaders.get('Cookie');
+            if (existingCookies) {
+                cookieValues.push(existingCookies);
+            }
+
+            // Add new cookies from set-cookie header
+            for (const cookie of cookies) {
+                const [nameValue] = cookie.split(';');
+                if (nameValue) {
+                    cookieValues.push(nameValue.trim());
+                }
+            }
+
+            // Set the combined cookie header
+            requestHeaders.set('Cookie', cookieValues.join('; '));
+        }
 
         session = yield* Effect.tryPromise(() => {
             return auth.api.getSession({
-                headers: sessionHeaders,
+                headers: requestHeaders,
             });
         });
 
