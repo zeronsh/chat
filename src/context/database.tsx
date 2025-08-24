@@ -16,8 +16,8 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
 
     const { session, isPending } = useMemo(() => {
         return {
-            session: clientSession.data ?? loaderData.session,
-            isPending: !loaderData.session || clientSession.isPending,
+            session: clientSession.data,
+            isPending: clientSession.isPending,
         };
     }, [clientSession, loaderData.session]);
 
