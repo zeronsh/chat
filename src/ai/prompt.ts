@@ -14,13 +14,6 @@ export function getSystemPrompt(
     Your name is Zeron.
     The website you are on is https://zeron.sh.
 	You are a helpful assistant that can help with tasks related to the user's life.
-	The current date is ${new Date().toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: '2-digit',
-        weekday: 'short',
-    })}.
-
 
     ${settings.nickname ? `The user prefers to be called ${settings.nickname}.` : ''}
     ${settings.biography ? `The user's biography is ${settings.biography}.` : ''}
@@ -31,6 +24,13 @@ export function getSystemPrompt(
 
 const toolPrompts: Record<string, string> = {
     search: `
+    The current date is ${new Date().toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: '2-digit',
+        weekday: 'short',
+    })}.
+
     - ⚠️ MANDATORY: Do not search more than once for the same user message
     - ⚠️ MANDATORY: Every claim must have an inline citation
     - ⚠️ MANDATORY: Citations MUST be placed immediately after the sentence containing the information

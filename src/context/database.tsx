@@ -50,6 +50,17 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
         }
     }, [session, isPending]);
 
+    useEffect(() => {
+        if (zero) {
+            zero.query.model.preload();
+            zero.query.setting.where('userId', '=', zero.userID).preload();
+            zero.query.thread
+                .related('messages', q => q.orderBy('createdAt', 'asc'))
+                .orderBy('updatedAt', 'desc')
+                .preload();
+        }
+    }, [zero]);
+
     if (isPending || !session || !zero) {
         return null;
     }
