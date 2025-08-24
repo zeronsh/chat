@@ -7,7 +7,11 @@ import {
     TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
-import { Markdown } from './markdown';
+import { lazy } from 'react';
+
+const Markdown = import.meta.env.SSR
+    ? (_: { children: string }) => null
+    : lazy(() => import('./markdown').then(m => ({ default: m.Markdown })));
 
 export type MessageProps = {
     children: React.ReactNode;

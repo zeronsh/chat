@@ -49,24 +49,6 @@ export const MarkdownBlock = memo(
     }
 );
 
-export const FinishedMarkdownBlock = memo(function PureFinishedMarkdownBlock({
-    id,
-    index,
-}: {
-    id: string;
-    index: number;
-}) {
-    const content = usePart({
-        id,
-        index,
-        type: 'text',
-        selector: part => part.text,
-        equalityFn: (a, b) => a === b,
-    });
-
-    return <MessageContent markdown>{content}</MessageContent>;
-});
-
 export const TextPart = memo(
     function PureTextPart({ id, index }: { id: string; index: number }) {
         return Array.from({ length: 100 }, (_, i) => i).map(i => (
