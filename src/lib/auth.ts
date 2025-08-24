@@ -129,6 +129,8 @@ const getSession = Effect.fn('getSession')(function* (request: Request) {
                 headers: sessionHeaders,
             });
         });
+
+        console.log('session', session);
     }
 
     if (!session) {
