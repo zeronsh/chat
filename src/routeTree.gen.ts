@@ -11,16 +11,17 @@
 import { createServerRootRoute } from '@tanstack/react-start/server'
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as ThreadRouteImport } from './routes/_thread'
 import { Route as TeamRouteImport } from './routes/_team'
+import { Route as AppRouteImport } from './routes/_app'
 import { Route as AccountRouteImport } from './routes/_account'
-import { Route as ThreadIndexRouteImport } from './routes/_thread.index'
-import { Route as ThreadThreadIdRouteImport } from './routes/_thread.$threadId'
+import { Route as AppThreadRouteImport } from './routes/_app._thread'
 import { Route as AccountMagicLinkRouteImport } from './routes/_account.magic-link'
 import { Route as AccountLoggedOutRouteImport } from './routes/_account.logged-out'
 import { Route as AccountAccountRouteImport } from './routes/_account.account'
+import { Route as AppThreadIndexRouteImport } from './routes/_app._thread.index'
 import { Route as AccountLoginIndexRouteImport } from './routes/_account.login.index'
 import { Route as AccountAccountIndexRouteImport } from './routes/_account.account.index'
+import { Route as AppThreadThreadIdRouteImport } from './routes/_app._thread.$threadId'
 import { Route as AccountAccountSubscriptionRouteImport } from './routes/_account.account.subscription'
 import { Route as AccountAccountPreferencesRouteImport } from './routes/_account.account.preferences'
 import { Route as AccountAccountModelsRouteImport } from './routes/_account.account.models'
@@ -38,27 +39,21 @@ import { ServerRoute as ApiThreadThreadIdStopServerRouteImport } from './routes/
 
 const rootServerRouteImport = createServerRootRoute()
 
-const ThreadRoute = ThreadRouteImport.update({
-  id: '/_thread',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const TeamRoute = TeamRouteImport.update({
   id: '/_team',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AccountRoute = AccountRouteImport.update({
   id: '/_account',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ThreadIndexRoute = ThreadIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => ThreadRoute,
-} as any)
-const ThreadThreadIdRoute = ThreadThreadIdRouteImport.update({
-  id: '/$threadId',
-  path: '/$threadId',
-  getParentRoute: () => ThreadRoute,
+const AppThreadRoute = AppThreadRouteImport.update({
+  id: '/_thread',
+  getParentRoute: () => AppRoute,
 } as any)
 const AccountMagicLinkRoute = AccountMagicLinkRouteImport.update({
   id: '/magic-link',
@@ -75,6 +70,11 @@ const AccountAccountRoute = AccountAccountRouteImport.update({
   path: '/account',
   getParentRoute: () => AccountRoute,
 } as any)
+const AppThreadIndexRoute = AppThreadIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppThreadRoute,
+} as any)
 const AccountLoginIndexRoute = AccountLoginIndexRouteImport.update({
   id: '/login/',
   path: '/login/',
@@ -84,6 +84,11 @@ const AccountAccountIndexRoute = AccountAccountIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AccountAccountRoute,
+} as any)
+const AppThreadThreadIdRoute = AppThreadThreadIdRouteImport.update({
+  id: '/$threadId',
+  path: '/$threadId',
+  getParentRoute: () => AppThreadRoute,
 } as any)
 const AccountAccountSubscriptionRoute =
   AccountAccountSubscriptionRouteImport.update({
@@ -166,43 +171,44 @@ export interface FileRoutesByFullPath {
   '/account': typeof AccountAccountRouteWithChildren
   '/logged-out': typeof AccountLoggedOutRoute
   '/magic-link': typeof AccountMagicLinkRoute
-  '/$threadId': typeof ThreadThreadIdRoute
-  '/': typeof ThreadIndexRoute
   '/account/appearance': typeof AccountAccountAppearanceRoute
   '/account/models': typeof AccountAccountModelsRoute
   '/account/preferences': typeof AccountAccountPreferencesRoute
   '/account/subscription': typeof AccountAccountSubscriptionRoute
+  '/$threadId': typeof AppThreadThreadIdRoute
   '/account/': typeof AccountAccountIndexRoute
   '/login': typeof AccountLoginIndexRoute
+  '/': typeof AppThreadIndexRoute
 }
 export interface FileRoutesByTo {
   '/logged-out': typeof AccountLoggedOutRoute
   '/magic-link': typeof AccountMagicLinkRoute
-  '/$threadId': typeof ThreadThreadIdRoute
-  '/': typeof ThreadIndexRoute
   '/account/appearance': typeof AccountAccountAppearanceRoute
   '/account/models': typeof AccountAccountModelsRoute
   '/account/preferences': typeof AccountAccountPreferencesRoute
   '/account/subscription': typeof AccountAccountSubscriptionRoute
+  '/$threadId': typeof AppThreadThreadIdRoute
   '/account': typeof AccountAccountIndexRoute
   '/login': typeof AccountLoginIndexRoute
+  '/': typeof AppThreadIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_account': typeof AccountRouteWithChildren
+  '/_app': typeof AppRouteWithChildren
   '/_team': typeof TeamRoute
-  '/_thread': typeof ThreadRouteWithChildren
   '/_account/account': typeof AccountAccountRouteWithChildren
   '/_account/logged-out': typeof AccountLoggedOutRoute
   '/_account/magic-link': typeof AccountMagicLinkRoute
-  '/_thread/$threadId': typeof ThreadThreadIdRoute
-  '/_thread/': typeof ThreadIndexRoute
+  '/_app/_thread': typeof AppThreadRouteWithChildren
   '/_account/account/appearance': typeof AccountAccountAppearanceRoute
   '/_account/account/models': typeof AccountAccountModelsRoute
   '/_account/account/preferences': typeof AccountAccountPreferencesRoute
   '/_account/account/subscription': typeof AccountAccountSubscriptionRoute
+  '/_app/_thread/$threadId': typeof AppThreadThreadIdRoute
   '/_account/account/': typeof AccountAccountIndexRoute
   '/_account/login/': typeof AccountLoginIndexRoute
+  '/_app/_thread/': typeof AppThreadIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -210,48 +216,49 @@ export interface FileRouteTypes {
     | '/account'
     | '/logged-out'
     | '/magic-link'
-    | '/$threadId'
-    | '/'
     | '/account/appearance'
     | '/account/models'
     | '/account/preferences'
     | '/account/subscription'
+    | '/$threadId'
     | '/account/'
     | '/login'
+    | '/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/logged-out'
     | '/magic-link'
-    | '/$threadId'
-    | '/'
     | '/account/appearance'
     | '/account/models'
     | '/account/preferences'
     | '/account/subscription'
+    | '/$threadId'
     | '/account'
     | '/login'
+    | '/'
   id:
     | '__root__'
     | '/_account'
+    | '/_app'
     | '/_team'
-    | '/_thread'
     | '/_account/account'
     | '/_account/logged-out'
     | '/_account/magic-link'
-    | '/_thread/$threadId'
-    | '/_thread/'
+    | '/_app/_thread'
     | '/_account/account/appearance'
     | '/_account/account/models'
     | '/_account/account/preferences'
     | '/_account/account/subscription'
+    | '/_app/_thread/$threadId'
     | '/_account/account/'
     | '/_account/login/'
+    | '/_app/_thread/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AccountRoute: typeof AccountRouteWithChildren
+  AppRoute: typeof AppRouteWithChildren
   TeamRoute: typeof TeamRoute
-  ThreadRoute: typeof ThreadRouteWithChildren
 }
 export interface FileServerRoutesByFullPath {
   '/api/checkout': typeof ApiCheckoutServerRouteWithChildren
@@ -341,18 +348,18 @@ export interface RootServerRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/_thread': {
-      id: '/_thread'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof ThreadRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/_team': {
       id: '/_team'
       path: ''
       fullPath: ''
       preLoaderRoute: typeof TeamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_account': {
@@ -362,19 +369,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_thread/': {
-      id: '/_thread/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof ThreadIndexRouteImport
-      parentRoute: typeof ThreadRoute
-    }
-    '/_thread/$threadId': {
-      id: '/_thread/$threadId'
-      path: '/$threadId'
-      fullPath: '/$threadId'
-      preLoaderRoute: typeof ThreadThreadIdRouteImport
-      parentRoute: typeof ThreadRoute
+    '/_app/_thread': {
+      id: '/_app/_thread'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AppThreadRouteImport
+      parentRoute: typeof AppRoute
     }
     '/_account/magic-link': {
       id: '/_account/magic-link'
@@ -397,6 +397,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountAccountRouteImport
       parentRoute: typeof AccountRoute
     }
+    '/_app/_thread/': {
+      id: '/_app/_thread/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof AppThreadIndexRouteImport
+      parentRoute: typeof AppThreadRoute
+    }
     '/_account/login/': {
       id: '/_account/login/'
       path: '/login'
@@ -410,6 +417,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/account/'
       preLoaderRoute: typeof AccountAccountIndexRouteImport
       parentRoute: typeof AccountAccountRoute
+    }
+    '/_app/_thread/$threadId': {
+      id: '/_app/_thread/$threadId'
+      path: '/$threadId'
+      fullPath: '/$threadId'
+      preLoaderRoute: typeof AppThreadThreadIdRouteImport
+      parentRoute: typeof AppThreadRoute
     }
     '/_account/account/subscription': {
       id: '/_account/account/subscription'
@@ -553,18 +567,29 @@ const AccountRouteChildren: AccountRouteChildren = {
 const AccountRouteWithChildren =
   AccountRoute._addFileChildren(AccountRouteChildren)
 
-interface ThreadRouteChildren {
-  ThreadThreadIdRoute: typeof ThreadThreadIdRoute
-  ThreadIndexRoute: typeof ThreadIndexRoute
+interface AppThreadRouteChildren {
+  AppThreadThreadIdRoute: typeof AppThreadThreadIdRoute
+  AppThreadIndexRoute: typeof AppThreadIndexRoute
 }
 
-const ThreadRouteChildren: ThreadRouteChildren = {
-  ThreadThreadIdRoute: ThreadThreadIdRoute,
-  ThreadIndexRoute: ThreadIndexRoute,
+const AppThreadRouteChildren: AppThreadRouteChildren = {
+  AppThreadThreadIdRoute: AppThreadThreadIdRoute,
+  AppThreadIndexRoute: AppThreadIndexRoute,
 }
 
-const ThreadRouteWithChildren =
-  ThreadRoute._addFileChildren(ThreadRouteChildren)
+const AppThreadRouteWithChildren = AppThreadRoute._addFileChildren(
+  AppThreadRouteChildren,
+)
+
+interface AppRouteChildren {
+  AppThreadRoute: typeof AppThreadRouteWithChildren
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppThreadRoute: AppThreadRouteWithChildren,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 interface ApiCheckoutServerRouteChildren {
   ApiCheckoutSuccessServerRoute: typeof ApiCheckoutSuccessServerRoute
@@ -593,8 +618,8 @@ const ApiThreadServerRouteWithChildren = ApiThreadServerRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   AccountRoute: AccountRouteWithChildren,
+  AppRoute: AppRouteWithChildren,
   TeamRoute: TeamRoute,
-  ThreadRoute: ThreadRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

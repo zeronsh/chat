@@ -143,10 +143,7 @@ function RootComponent({ htmlRef }: { htmlRef: React.RefObject<HTMLHtmlElement |
 
     return (
         <div className="fixed inset-0 flex text-foreground">
-            <SidebarProvider>
-                <AppSidebar />
-                <Outlet />
-            </SidebarProvider>
+            <Outlet />
             <Toaster position="top-center" />
             <ProDialog />
         </div>

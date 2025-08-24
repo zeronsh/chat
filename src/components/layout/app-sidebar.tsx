@@ -96,7 +96,7 @@ function AppSidebarThreads({
     setThreadToDelete: (thread: Thread | null) => void;
 }) {
     const navigate = useNavigate();
-    const params = useParams({ from: '/_thread/$threadId', shouldThrow: false });
+    const params = useParams({ from: '/_app/_thread/$threadId', shouldThrow: false });
     const threads = useThreads();
     const groups = useThreadsByTimeRange(threads);
 
@@ -392,7 +392,7 @@ function DeleteThreadDialog({
     setThreadToDelete: (thread: Thread | null) => void;
 }) {
     const db = useDatabase();
-    const params = useParams({ from: '/_thread/$threadId', shouldThrow: false });
+    const params = useParams({ from: '/_app/_thread/$threadId', shouldThrow: false });
 
     const navigate = useNavigate();
 

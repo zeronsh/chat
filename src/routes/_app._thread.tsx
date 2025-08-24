@@ -10,7 +10,7 @@ import { MessageList } from '@/components/thread/message/message-list';
 import { ToolSidebar } from '@/components/layout/tool-sidebar';
 import { ThreadContainer } from '@/components/thread/thread-container';
 
-export const Route = createFileRoute('/_thread')({
+export const Route = createFileRoute('/_app/_thread')({
     component: RouteComponent,
 });
 

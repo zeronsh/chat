@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 
-export const Route = createFileRoute('/_thread/$threadId')({
+export const Route = createFileRoute('/_app/_thread/$threadId')({
     component: RouteComponent,
 });
 
