@@ -1,3 +1,4 @@
+import { Response } from '@/components/ai-elements/response';
 import { CodeBlock, CodeBlockCode } from '@/components/ui/code-block';
 import {
     Tooltip,
@@ -5,10 +6,9 @@ import {
     TooltipPositioner,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { useThreadSelector } from '@/context/thread';
 import { cn } from '@/lib/utils';
-import Marked, { ReactRenderer } from 'marked-react';
-import { createContext, memo, useContext, useId, useMemo } from 'react';
+import { createContext, memo, useContext, useMemo } from 'react';
+import { type Components } from 'react-markdown';
 
 const generateKey = () => {
     return (
@@ -20,7 +20,7 @@ export type MarkdownProps = {
     children: string;
     id?: string;
     className?: string;
-    components?: Partial<ReactRenderer>;
+    components?: Partial<Components>;
     animated?: boolean;
 };
 
@@ -94,6 +94,14 @@ function extractDomain(url: string | undefined): string {
     }
 }
 
+function extractLanguage(className?: string): string {
+    if (!className) return 'plaintext';
+
+    const match = className.match(/language-(\w+)/);
+
+    return match ? match[1] : 'plaintext';
+}
+
 function StreamingText({ children }: { children: string }) {
     const id = useMemo(() => generateKey(), []);
     // console.log(id);
@@ -131,39 +139,39 @@ const FadeSegment = memo(
     }
 );
 
-function Text({ children }: { children: React.ReactNode }) {
-    const { animated } = useMarkdownContext();
-    if (typeof children === 'string' && animated) {
-        return <StreamingText children={children} />;
-    }
-    return children;
-}
-
-const INITIAL_COMPONENTS: Partial<ReactRenderer> = {
-    text: function TextComponent(children) {
-        const key = useMemo(() => generateKey(), []);
-        return <Text key={key}>{children}</Text>;
+const INITIAL_COMPONENTS: Partial<Components> = {
+    p: function TextComponent({ children, className }) {
+        const { animated } = useMarkdownContext();
+        if (typeof children === 'string' && animated) {
+            return <StreamingText children={children} />;
+        }
+        return <p className={className}>{children}</p>;
     },
-    code: function CodeComponent(children, language) {
-        const key = useMemo(() => generateKey(), []);
+    code: function CodeComponent(props) {
+        const isInline =
+            !props.node?.position?.start.line ||
+            props.node?.position?.start.line === props.node?.position?.end.line;
+
+        if (isInline) {
+            return (
+                <span className={cn('bg-muted rounded-sm px-1 font-mono text-sm')}>
+                    {props.children}
+                </span>
+            );
+        }
+
+        const language = extractLanguage(props.className);
+
         return (
-            <CodeBlock key={`${key}-${language}`}>
+            <CodeBlock>
                 <CodeBlockCode
-                    code={children as string}
+                    code={props.children as string}
                     language={language?.trim() || 'plaintext'}
                 />
             </CodeBlock>
         );
     },
-    codespan: function CodeSpanComponent(children) {
-        const key = useMemo(() => generateKey(), []);
-        return (
-            <span key={`${key}}`} className={cn('bg-muted rounded-sm px-1 font-mono text-sm')}>
-                {children}
-            </span>
-        );
-    },
-    link: function LinkComponent(href, text) {
+    a: function LinkComponent({ href, children }) {
         const { citations } = useMarkdownContext();
         const citationIndex = citations.findIndex(citation => citation.link === href);
         const key = useMemo(() => generateKey(), []);
@@ -171,7 +179,7 @@ const INITIAL_COMPONENTS: Partial<ReactRenderer> = {
         if (citationIndex !== -1) {
             const domain = extractDomain(href);
             return (
-                <Tooltip key={`${key}}`}>
+                <Tooltip>
                     <TooltipTrigger>
                         <a
                             href={href}
@@ -189,8 +197,8 @@ const INITIAL_COMPONENTS: Partial<ReactRenderer> = {
             );
         }
         return (
-            <a key={`${key}}`} href={href} target="_blank" rel="noopener noreferrer">
-                {text}
+            <a href={href} target="_blank" rel="noopener noreferrer">
+                {children}
             </a>
         );
     },
@@ -202,9 +210,9 @@ const MemoizedMarkdownBlock = memo(
         components = INITIAL_COMPONENTS,
     }: {
         content: string;
-        components?: Partial<ReactRenderer>;
+        components?: Partial<Components>;
     }) {
-        return <Marked renderer={components}>{content}</Marked>;
+        return <Response components={components}>{content}</Response>;
     },
     function propsAreEqual(prevProps, nextProps) {
         return prevProps.content === nextProps.content;
