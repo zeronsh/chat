@@ -74,7 +74,9 @@ export const ReasoningText = memo(
             return nextMessage === undefined && state.status === 'streaming';
         });
 
-        if (shouldAnimate) {
+        const debouncedAnimated = useDebounce(shouldAnimate, 1000);
+
+        if (debouncedAnimated) {
             return Array.from({ length: 100 }, (_, i) => i).map(i => (
                 <ReasoningBlock key={`${id}-${index}-${i}`} id={id} index={index} blockIndex={i} />
             ));
