@@ -212,3 +212,5 @@ code {
 .fade-segment-space {
     white-space: pre;
 }
+
+/* no static class needed once we use display: contents */

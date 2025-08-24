@@ -22,7 +22,7 @@ export const MarkdownBlock = memo(
             equalityFn: (a, b) => a === b,
         });
 
-        if (content === undefined) {
+        if (content === undefined || content === '') {
             return null;
         }
 
@@ -41,42 +41,11 @@ export const MarkdownBlock = memo(
     }
 );
 
-export const FinishedMarkdownBlock = memo(function PureFinishedMarkdownBlock({
-    id,
-    index,
-}: {
-    id: string;
-    index: number;
-}) {
-    const content = usePart({
-        id,
-        index,
-        type: 'text',
-        selector: part => part.text,
-        equalityFn: (a, b) => a === b,
-    });
-
-    return <MessageContent markdown>{content}</MessageContent>;
-});
-
 export const TextPart = memo(
     function PureTextPart({ id, index }: { id: string; index: number }) {
-        const shouldAnimate = useThreadSelector(state => {
-            const nextMessageIndex = state.messages.findIndex(msg => msg.id === id) + 1;
-            const nextMessage = state.messages[nextMessageIndex];
-
-            return nextMessage === undefined && state.status === 'streaming';
-        });
-
-        const debouncedAnimated = useDebounce(shouldAnimate, 1000);
-
-        if (debouncedAnimated) {
-            return Array.from({ length: 100 }, (_, i) => i).map(i => (
-                <MarkdownBlock key={`${id}-${index}-${i}`} id={id} index={index} blockIndex={i} />
-            ));
-        }
-
-        return <FinishedMarkdownBlock id={id} index={index} />;
+        return Array.from({ length: 100 }, (_, i) => i).map(i => (
+            <MarkdownBlock key={`${id}-${index}-${i}`} id={id} index={index} blockIndex={i} />
+        ));
     },
     function propsAreEqual() {
         return true;
