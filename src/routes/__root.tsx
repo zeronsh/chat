@@ -120,12 +120,32 @@ export const Route = createRootRoute({
 
 function RootComponent({ htmlRef }: { htmlRef: React.RefObject<HTMLHtmlElement | null> }) {
     const settings = useSettings();
+    const mountedRef = useRef(false);
 
     useEffect(() => {
         if (htmlRef.current) {
             htmlRef.current.className = cn(settings?.mode ?? 'dark', settings?.theme ?? 'default');
         }
     }, [settings?.mode, settings?.theme]);
+
+    useEffect(() => {
+        if (!mountedRef.current) {
+            const loadMarkdown = () => {
+                import('@/components/ui/markdown').then(_ => {
+                    console.log('Markdown loaded');
+                });
+            };
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', loadMarkdown);
+            } else {
+                // DOM is already loaded, execute immediately
+                loadMarkdown();
+            }
+
+            mountedRef.current = true;
+        }
+    }, []);
 
     return (
         <div className="fixed inset-0 flex text-foreground">

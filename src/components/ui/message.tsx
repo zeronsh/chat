@@ -11,7 +11,7 @@ import { lazy } from 'react';
 
 const Markdown = import.meta.env.SSR
     ? (_: { children: string }) => null
-    : lazy(() => import('./markdown').then(m => ({ default: m.Markdown })));
+    : lazy(() => import('@/components/ui/markdown').then(m => ({ default: m.Markdown })));
 
 export type MessageProps = {
     children: React.ReactNode;
