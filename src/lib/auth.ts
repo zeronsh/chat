@@ -10,6 +10,7 @@ import { eq } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import { Effect, Layer } from 'effect';
 import { APIError } from '@/lib/error';
+import { reactStartCookies } from 'better-auth/react-start';
 
 export const auth = betterAuth({
     database: drizzleAdapter(db, {
@@ -52,6 +53,7 @@ export const auth = betterAuth({
         },
     },
     plugins: [
+        reactStartCookies(),
         organization(),
         jwt(),
         magicLink({
@@ -96,20 +98,34 @@ export const auth = betterAuth({
 });
 
 const getSession = Effect.fn('getSession')(function* (request: Request) {
-    const session = yield* Effect.tryPromise({
-        try: () => {
-            return auth.api.getSession({
+    let session = yield* Effect.tryPromise(() =>
+        auth.api.getSession({
+            headers: request.headers,
+        })
+    );
+
+    if (!session) {
+        const newUser = yield* Effect.tryPromise(() => {
+            return auth.api.signInAnonymous({
                 headers: request.headers,
+                returnHeaders: true,
             });
-        },
-        catch: error => {
-            return new APIError({
-                status: 500,
-                message: 'Failed to get session',
-                cause: error,
+        });
+
+        const setCookieHeader = newUser.headers.get('set-cookie');
+        const sessionToken = setCookieHeader?.match(/better-auth\.session_token=([^;]+)/)?.[1];
+
+        const sessionHeaders = new Headers(request.headers);
+        if (sessionToken) {
+            sessionHeaders.set('Cookie', `better-auth.session_token=${sessionToken}`);
+        }
+
+        session = yield* Effect.tryPromise(() => {
+            return auth.api.getSession({
+                headers: sessionHeaders,
             });
-        },
-    });
+        });
+    }
 
     if (!session) {
         return yield* new APIError({

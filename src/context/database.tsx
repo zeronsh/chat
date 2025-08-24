@@ -11,13 +11,12 @@ export const DatabaseContext = createContext<Zero<Schema> | undefined>(undefined
 
 export function DatabaseProvider({ children }: { children: React.ReactNode }) {
     const loaderData = Route.useLoaderData();
-
     const clientSession = useSession();
 
     const { session, isPending } = useMemo(() => {
         return {
-            session: clientSession.data,
-            isPending: clientSession.isPending,
+            session: clientSession.data ?? loaderData.session,
+            isPending: !!!loaderData.session || clientSession.isPending,
         };
     }, [clientSession, loaderData.session]);
 
