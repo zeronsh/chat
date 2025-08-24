@@ -1,6 +1,7 @@
 import { MessageContent } from '@/components/ui/message';
 import { usePart, useThreadSelector } from '@/context/thread';
 import { lexer } from '@/lib/utils';
+import { useDebounce } from '@uidotdev/usehooks';
 import { memo } from 'react';
 
 export const MarkdownBlock = memo(
@@ -67,7 +68,9 @@ export const TextPart = memo(
             return nextMessage === undefined && state.status === 'streaming';
         });
 
-        if (shouldAnimate) {
+        const debouncedAnimated = useDebounce(shouldAnimate, 1000);
+
+        if (debouncedAnimated) {
             return Array.from({ length: 100 }, (_, i) => i).map(i => (
                 <MarkdownBlock key={`${id}-${index}-${i}`} id={id} index={index} blockIndex={i} />
             ));

@@ -183,7 +183,9 @@ code {
     border-radius: 50%;
     opacity: 0.3;
     background: radial-gradient(circle, var(--background) 0%, var(--primary) 80%);
-    box-shadow: 0 0 60px 20px var(--primary), 0 0 80px 20px var(--primary) inset;
+    box-shadow:
+        0 0 60px 20px var(--primary),
+        0 0 80px 20px var(--primary) inset;
     position: absolute;
     bottom: -130%;
     left: 50%;

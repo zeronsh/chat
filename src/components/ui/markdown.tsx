@@ -7,6 +7,7 @@ import {
     TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
+import { useDebounce } from '@uidotdev/usehooks';
 import { createContext, memo, useContext, useMemo } from 'react';
 import { type Components } from 'react-markdown';
 
@@ -115,13 +116,9 @@ function StreamingText({ children }: { children: string }) {
         return acc;
     }, []);
 
-    return (
-        <p>
-            {segments.map((segment, idx) => {
-                return <FadeSegment key={`${id}-${idx}`} delay={idx * 1.5} children={segment} />;
-            })}
-        </p>
-    );
+    return segments.map((segment, idx) => {
+        return <FadeSegment key={`${id}-${idx}`} delay={idx * 1.5} children={segment} />;
+    });
 }
 
 const FadeSegment = memo(
@@ -146,8 +143,14 @@ const FadeSegment = memo(
 const INITIAL_COMPONENTS: Partial<Components> = {
     p: function TextComponent({ children, className }) {
         const { animated } = useMarkdownContext();
-        if (typeof children === 'string' && animated) {
-            return <StreamingText children={children} />;
+        const debouncedAnimated = useDebounce(animated, 1000);
+
+        if (typeof children === 'string' && debouncedAnimated) {
+            return (
+                <p className={className}>
+                    <StreamingText children={children} />
+                </p>
+            );
         }
         return <p className={className}>{children}</p>;
     },

@@ -52,10 +52,7 @@ const MessageContent = ({
     className,
     ...props
 }: MessageContentProps) => {
-    const classNames = cn(
-        'rounded-lg dark:prose-invert prose min-w-full break-words whitespace-normal',
-        className
-    );
+    const classNames = cn('rounded-lg min-w-full break-words whitespace-normal', className);
 
     return markdown ? (
         <Markdown className={classNames} {...props} animated={animated}>
