@@ -104,7 +104,7 @@ function extractLanguage(className?: string): string {
 
 function StreamingText({ children }: { children: string }) {
     const id = useMemo(() => generateKey(), []);
-    // console.log(id);
+
     const words = children.split(/\s+/);
     const segments = words.reduce<string[]>((acc, cur, idx) => {
         if (idx % 10 === 0) {
@@ -115,9 +115,13 @@ function StreamingText({ children }: { children: string }) {
         return acc;
     }, []);
 
-    return segments.map((segment, idx) => {
-        return <FadeSegment key={`${id}-${idx}`} delay={idx * 1.5} children={segment} />;
-    });
+    return (
+        <p>
+            {segments.map((segment, idx) => {
+                return <FadeSegment key={`${id}-${idx}`} delay={idx * 1.5} children={segment} />;
+            })}
+        </p>
+    );
 }
 
 const FadeSegment = memo(
