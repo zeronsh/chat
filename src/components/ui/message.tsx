@@ -7,11 +7,38 @@ import {
     TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
-import { lazy } from 'react';
+import { lazy, useState, useEffect } from 'react';
+
+const getPreloadedMarkdown = () => {
+    if (import.meta.env.SSR) return null;
+    return (window as any).__preload_markdown?.default || null;
+};
+
+const LazyMarkdown = import.meta.env.SSR
+    ? (_: { children: string }) => null
+    : lazy(async () => {
+          return import('@/components/ui/markdown').then(m => ({ default: m.Markdown }));
+      });
 
 const Markdown = import.meta.env.SSR
     ? (_: { children: string }) => null
-    : lazy(() => import('@/components/ui/markdown').then(m => ({ default: m.Markdown })));
+    : (props: any) => {
+          const [preloadedComponent, setPreloadedComponent] = useState(getPreloadedMarkdown);
+
+          useEffect(() => {
+              const preloaded = getPreloadedMarkdown();
+              if (preloaded && !preloadedComponent) {
+                  setPreloadedComponent(() => preloaded);
+              }
+          }, [preloadedComponent]);
+
+          if (preloadedComponent) {
+              const PreloadedMarkdown = preloadedComponent;
+              return <PreloadedMarkdown {...props} />;
+          }
+
+          return <LazyMarkdown {...props} />;
+      };
 
 export type MessageProps = {
     children: React.ReactNode;

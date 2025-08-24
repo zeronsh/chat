@@ -130,21 +130,15 @@ function RootComponent({ htmlRef }: { htmlRef: React.RefObject<HTMLHtmlElement |
 
     useEffect(() => {
         if (!mountedRef.current) {
-            const loadMarkdown = () => {
-                import('@/components/ui/markdown').then(_ => {
-                    console.log('Markdown loaded');
-                });
-            };
+            import('@/components/ui/markdown').then(module => {
+                console.log('Markdown loaded');
 
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', loadMarkdown);
-            } else {
-                // DOM is already loaded, execute immediately
-                loadMarkdown();
-            }
-
-            mountedRef.current = true;
+                (window as any).__preload_markdown = {
+                    default: module.Markdown,
+                };
+            });
         }
+        mountedRef.current = true;
     }, []);
 
     return (
