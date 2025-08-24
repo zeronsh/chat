@@ -67,8 +67,6 @@ export const Route = createRootRoute({
             data: params,
         });
 
-        console.log(context?.session);
-
         return {
             settings: context?.settings,
             session: context?.session,
