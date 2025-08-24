@@ -175,10 +175,12 @@ const INITIAL_COMPONENTS: Partial<Components> = {
             </CodeBlock>
         );
     },
+    pre: function PreComponent(props) {
+        return props.children;
+    },
     a: function LinkComponent({ href, children }) {
         const { citations } = useMarkdownContext();
         const citationIndex = citations.findIndex(citation => citation.link === href);
-        const key = useMemo(() => generateKey(), []);
 
         if (citationIndex !== -1) {
             const domain = extractDomain(href);
