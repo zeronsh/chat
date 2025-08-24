@@ -24,12 +24,25 @@ export const ReasoningBlock = memo(
             equalityFn: (a, b) => a === b,
         });
 
+        const shouldAnimate = useThreadSelector(state => {
+            const nextMessageIndex = state.messages.findIndex(msg => msg.id === id) + 1;
+            const nextMessage = state.messages[nextMessageIndex];
+
+            return nextMessage === undefined && state.status === 'streaming';
+        });
+
+        const debouncedAnimated = useDebounce(shouldAnimate, 1000);
+
         if (content === undefined || content === null) {
             return null;
         }
 
         return (
-            <MessageContent className="text-sm text-muted-foreground" markdown animated={true}>
+            <MessageContent
+                className="text-sm text-muted-foreground"
+                markdown
+                animated={debouncedAnimated}
+            >
                 {content}
             </MessageContent>
         );
