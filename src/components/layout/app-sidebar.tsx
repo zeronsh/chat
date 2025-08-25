@@ -160,7 +160,7 @@ function AppSidebarThreads({
         };
 
         if (!isFullyVisible()) {
-            activeEl.scrollIntoView({ block: 'start', inline: 'nearest', behavior: 'smooth' });
+            activeEl.scrollIntoView({ block: 'start', inline: 'nearest', behavior: 'instant' });
         }
     }, [params?.threadId, threads]);
 
