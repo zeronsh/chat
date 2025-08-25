@@ -134,8 +134,33 @@ function AppSidebarThreads({
         const activeEl = document.querySelector(
             '[data-thread-active="true"]'
         ) as HTMLElement | null;
-        if (activeEl) {
-            activeEl.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'instant' });
+        if (!activeEl) return;
+
+        const getScrollParent = (el: HTMLElement | null): HTMLElement | null => {
+            let parent = el?.parentElement;
+            while (parent) {
+                const style = window.getComputedStyle(parent);
+                const hasScrollableContent = parent.scrollHeight > parent.clientHeight;
+                const overflowY = style.overflowY;
+                if (hasScrollableContent && (overflowY === 'auto' || overflowY === 'scroll')) {
+                    return parent;
+                }
+                parent = parent.parentElement;
+            }
+            return (document.scrollingElement as HTMLElement) ?? null;
+        };
+
+        const container = getScrollParent(activeEl);
+        if (!container) return;
+
+        const isFullyVisible = () => {
+            const elRect = activeEl.getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
+            return elRect.top >= containerRect.top && elRect.bottom <= containerRect.bottom;
+        };
+
+        if (!isFullyVisible()) {
+            activeEl.scrollIntoView({ block: 'start', inline: 'nearest', behavior: 'smooth' });
         }
     }, [params?.threadId, threads]);
 
