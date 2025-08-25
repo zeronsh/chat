@@ -6,6 +6,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { useParamsThreadId } from '@/hooks/use-params-thread-id';
 import { cn } from '@/lib/utils';
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 
@@ -97,7 +98,7 @@ function PromptInputTextarea({
 }: PromptInputTextareaProps) {
     const { value, setValue, maxHeight, onSubmit, disabled } = usePromptInput();
     const textareaRef = useRef<HTMLTextAreaElement>(null);
-
+    const threadId = useParamsThreadId();
     useEffect(() => {
         if (disableAutosize) return;
 
@@ -116,6 +117,12 @@ function PromptInputTextarea({
         }
         onKeyDown?.(e);
     };
+
+    useEffect(() => {
+        if (textareaRef.current) {
+            textareaRef.current.focus();
+        }
+    }, [threadId]);
 
     return (
         <Textarea

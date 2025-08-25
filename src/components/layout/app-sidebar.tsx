@@ -102,6 +102,13 @@ function AppSidebarThreads({
 
     const onHandleKeyDown = useCallback(
         (e: KeyboardEvent) => {
+            const isMeta = navigator.platform.toLowerCase().includes('mac') ? e.metaKey : e.ctrlKey;
+            if (e.shiftKey && isMeta && (e.key === 'o' || e.key === 'O')) {
+                e.preventDefault();
+                e.stopPropagation();
+                navigate({ to: '/' });
+                return;
+            }
             if (e.shiftKey && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
                 e.preventDefault();
                 e.stopPropagation();
