@@ -135,7 +135,7 @@ function AppSidebarThreads({
             '[data-thread-active="true"]'
         ) as HTMLElement | null;
         if (activeEl) {
-            activeEl.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+            activeEl.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'instant' });
         }
     }, [params?.threadId, threads]);
 
