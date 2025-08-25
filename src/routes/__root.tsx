@@ -1,5 +1,4 @@
-// @ts-ignore
-import appCss from '@/global.css?url';
+import '@/global.css';
 import { HeadContent, Outlet, Scripts, createRootRoute } from '@tanstack/react-router';
 import { DatabaseProvider } from '@/context/database';
 import { cn } from '@/lib/utils';
@@ -14,8 +13,6 @@ import { useEffect, useRef } from 'react';
 import { useSettings } from '@/hooks/use-database';
 import { z } from 'zod';
 import { ProDialog } from '@/components/app/pro-dialog';
-import { AppSidebar } from '@/components/layout/app-sidebar';
-import { SidebarProvider } from '@/components/ui/sidebar';
 
 const GetContextSchema = z.object({
     threadId: z.string().optional(),
@@ -107,10 +104,6 @@ export const Route = createRootRoute({
             {
                 rel: 'stylesheet',
                 href: 'https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=IBM+Plex+Serif:wght@400;500;600;700&display=swap',
-            },
-            {
-                rel: 'stylesheet',
-                href: appCss,
             },
         ],
     }),
