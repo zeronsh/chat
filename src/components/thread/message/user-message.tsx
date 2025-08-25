@@ -30,7 +30,7 @@ export const UserMessage = memo(function PureUserMessage({
             .filter(part => part.type === 'text')
             .map(part => part.text)
             .join('\n')
-            .trim();
+            ?.trim();
 
         if (!text) {
             return;

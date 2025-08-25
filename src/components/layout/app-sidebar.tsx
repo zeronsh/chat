@@ -131,6 +131,15 @@ function AppSidebarThreads({
     );
 
     useEffect(() => {
+        const activeEl = document.querySelector(
+            '[data-thread-active="true"]'
+        ) as HTMLElement | null;
+        if (activeEl) {
+            activeEl.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+        }
+    }, [params?.threadId, threads]);
+
+    useEffect(() => {
         document.addEventListener('keydown', onHandleKeyDown);
         return () => document.removeEventListener('keydown', onHandleKeyDown);
     }, [onHandleKeyDown]);
@@ -218,7 +227,7 @@ function ThreadItem({
                         className="w-full flex absolute inset-0 items-center px-2 rounded-md gap-2"
                         params={{ threadId: thread.id }}
                         activeOptions={{ exact: true }}
-                        activeProps={{ className: 'bg-muted' }}
+                        activeProps={{ className: 'bg-muted', 'data-thread-active': 'true' }}
                         onMouseDown={e => {
                             e.preventDefault();
                             e.stopPropagation();

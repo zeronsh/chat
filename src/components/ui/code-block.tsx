@@ -57,7 +57,7 @@ function CodeBlockCode({
     const classNames = cn('w-full overflow-x-auto', className);
 
     const content = useMemo(() => {
-        if (!code.trim()) {
+        if (!code?.trim()) {
             return <pre className="px-4" />;
         }
 

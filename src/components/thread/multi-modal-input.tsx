@@ -87,7 +87,7 @@ export function MultiModalInput() {
     };
 
     const handleSubmit = async () => {
-        if (!input.trim()) return;
+        if (!input?.trim()) return;
 
         await navigate({
             to: '/$threadId',
