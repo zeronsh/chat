@@ -171,7 +171,7 @@ const INITIAL_COMPONENTS: Partial<Components> = {
         return (
             <CodeBlock>
                 <CodeBlockCode
-                    code={(props.children as string).replace('\n```*', '')}
+                    code={(props.children as string)?.replace('\n```*', '')}
                     language={language?.trim() || 'plaintext'}
                 />
             </CodeBlock>
