@@ -13,6 +13,21 @@ export function MessageList() {
     const instance = useStickToBottom({
         initial: 'instant',
         resize: 'instant',
+        targetScrollTop: (defaultTarget, { scrollElement }) => {
+            const v = ref.current;
+            const lastIndex = messageIds.length - 1;
+            if (!v || lastIndex < 0 || !scrollElement) return defaultTarget;
+
+            try {
+                const lastTop = v.getItemOffset(lastIndex);
+                const lastSize = v.getItemSize(lastIndex);
+                const desired = Math.max(0, lastTop + lastSize - scrollElement.clientHeight);
+                return Math.round(desired);
+            } catch (error) {
+                console.error(error);
+                return defaultTarget;
+            }
+        },
     });
 
     useAutoResume();
