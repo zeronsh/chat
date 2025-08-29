@@ -76,7 +76,7 @@
         "resumable-stream": "^2.2.1",
         "shiki": "^3.7.0",
         "sonner": "^2.0.6",
-        "streamdown": "^1.1.3",
+        "streamdown": "^1.1.6",
         "stripe": "^18.3.0",
         "tailwind-merge": "^3.3.1",
         "ts-pattern": "^5.7.1",

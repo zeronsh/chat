@@ -39,27 +39,30 @@ export function ProDialog() {
                                 <ZeronIcon className="size-8" />
                                 <span className="text-2xl font-bold">PRO</span>
                             </DialogTitle>
-                            <DialogDescription className="text-white/90">
-                                <div className="flex items-center gap-2">
-                                    <span className="text-2xl font-bold">$25</span>
-                                    <span className="text-sm text-white/80">/month</span>
-                                </div>
-                                <p className="text-sm text-white/70 text-left">
-                                    Upgrade to PRO to unlock all features and get access to premium
-                                    models and higher limits for research, search, and more.
-                                </p>
-                                <div className="flex items-center gap-2 mt-4">
-                                    <ModelIcon model="openai" className="size-4" />
-                                    <ModelIcon model="anthropic" className="size-4" />
-                                    <ModelIcon model="gemini" className="size-4" />
-                                    <ModelIcon model="grok" className="size-4" />
-                                    <ModelIcon model="deepseek" className="size-4" />
-                                    <span className="line-through text-white/70">$115.00</span>
-                                    <MoveRightIcon className="size-3" />
-                                    <span className="text-sm">$25.00</span>
-                                </div>
-                                <div className="text-xs text-white/70 mt-2 text-left">
-                                    Save over 70% on chat subscriptions by using Zeron
+                            <DialogDescription asChild className="text-white/90">
+                                <div>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-2xl font-bold">$25</span>
+                                        <span className="text-sm text-white/80">/month</span>
+                                    </div>
+                                    <p className="text-sm text-white/70 text-left">
+                                        Upgrade to PRO to unlock all features and get access to
+                                        premium models and higher limits for research, search, and
+                                        more.
+                                    </p>
+                                    <div className="flex items-center gap-2 mt-4">
+                                        <ModelIcon model="openai" className="size-4" />
+                                        <ModelIcon model="anthropic" className="size-4" />
+                                        <ModelIcon model="gemini" className="size-4" />
+                                        <ModelIcon model="grok" className="size-4" />
+                                        <ModelIcon model="deepseek" className="size-4" />
+                                        <span className="line-through text-white/70">$115.00</span>
+                                        <MoveRightIcon className="size-3" />
+                                        <span className="text-sm">$25.00</span>
+                                    </div>
+                                    <div className="text-xs text-white/70 mt-2 text-left">
+                                        Save over 70% on chat subscriptions by using Zeron
+                                    </div>
                                 </div>
                             </DialogDescription>
                             <Anonymous>
