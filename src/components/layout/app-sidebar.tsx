@@ -51,6 +51,7 @@ export function AppSidebar() {
                     setThreadToDelete={setThreadToDelete}
                 />
             </SidebarContent>
+            <AppSidebarKeyboardShortcuts />
             <EditThreadTitleDialog thread={threadToEdit} setThreadToEdit={setThreadToEdit} />
             <DeleteThreadDialog thread={threadToDelete} setThreadToDelete={setThreadToDelete} />
         </Sidebar>
@@ -88,17 +89,10 @@ function AppSidebarActions() {
     );
 }
 
-function AppSidebarThreads({
-    setThreadToEdit,
-    setThreadToDelete,
-}: {
-    setThreadToEdit: (thread: Thread | null) => void;
-    setThreadToDelete: (thread: Thread | null) => void;
-}) {
+function AppSidebarKeyboardShortcuts() {
     const navigate = useNavigate();
     const params = useParams({ from: '/_app/_thread/$threadId', shouldThrow: false });
     const threads = useThreads();
-    const groups = useThreadsByTimeRange(threads);
 
     const onHandleKeyDown = useCallback(
         (e: KeyboardEvent) => {
@@ -175,6 +169,19 @@ function AppSidebarThreads({
         document.addEventListener('keydown', onHandleKeyDown);
         return () => document.removeEventListener('keydown', onHandleKeyDown);
     }, [onHandleKeyDown]);
+
+    return null;
+}
+
+function AppSidebarThreads({
+    setThreadToEdit,
+    setThreadToDelete,
+}: {
+    setThreadToEdit: (thread: Thread | null) => void;
+    setThreadToDelete: (thread: Thread | null) => void;
+}) {
+    const threads = useThreads();
+    const groups = useThreadsByTimeRange(threads);
 
     return (
         <Fragment>
