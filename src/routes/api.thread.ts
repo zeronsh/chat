@@ -1,5 +1,5 @@
 import { createServerFileRoute } from '@tanstack/react-start/server';
-import { Effect, Layer } from 'effect';
+import { Effect, Layer, Deferred } from 'effect';
 import { SessionLive, Session } from '@/lib/auth';
 import { DatabaseLive } from '@/database/effect';
 import { APIError } from '@/lib/error';
@@ -18,12 +18,13 @@ import {
     saveMessageAndResetThreadStatus,
 } from '@/ai/service';
 import { Stream } from '@/ai/stream';
-import { listen, subscribe, unsubscribe } from '@/lib/redis';
+import { RedisLive } from '@/lib/redis';
 import { Database } from '@/database/effect';
 import type { OpenAIResponsesProviderOptions } from '@ai-sdk/openai';
 import type { GoogleGenerativeAIProviderOptions } from '@ai-sdk/google';
 import type { AnthropicProviderOptions } from '@ai-sdk/anthropic';
 import { gateway } from '@ai-sdk/gateway';
+import { RedisPubSub } from 'effect-redis';
 
 export const ServerRoute = createServerFileRoute('/api/thread').methods({
     async POST({ request }) {
@@ -64,6 +65,8 @@ const threadPostApiHandler = Effect.gen(function* () {
 
     const streamId = nanoid();
 
+    const controller = new AbortController();
+
     const context = yield* prepareThreadContext({
         isAnonymous: session.user.isAnonymous ?? false,
         userId: UserId(session.user.id),
@@ -81,18 +84,6 @@ const threadPostApiHandler = Effect.gen(function* () {
     });
 
     const activeTools = [body.tool].filter(tool => tool !== undefined);
-
-    const controller = new AbortController();
-
-    yield* subscribe(`abort:${body.id}`);
-    yield* listen((channel, message) => {
-        return Effect.gen(function* () {
-            if (channel === `abort:${body.id}` && message === 'abort') {
-                yield* Effect.log('Aborting stream');
-                controller.abort();
-            }
-        });
-    });
 
     const MODEL_REQUIRES_MIDDLEWARE = [
         'zai/glm-4.5-air',
@@ -180,7 +171,6 @@ const threadPostApiHandler = Effect.gen(function* () {
         }),
         Stream.onFinish(({ responseMessage }) => {
             return Effect.gen(function* () {
-                yield* unsubscribe(`abort:${body.id}`);
                 yield* saveMessageAndResetThreadStatus({
                     threadId: body.id,
                     userId: UserId(session.user.id),
@@ -192,6 +182,9 @@ const threadPostApiHandler = Effect.gen(function* () {
                     Effect.catchAll(() => Effect.succeed(null)),
                     latch.whenOpen
                 );
+
+                // Signal that streaming is complete so Redis can close
+                yield* Deferred.succeed(streamCompletionDeferred, undefined);
             });
         }),
         Stream.onMessageMetadata(({ part }) => {
@@ -214,12 +207,39 @@ const threadPostApiHandler = Effect.gen(function* () {
                     type: 'data-error',
                     data: 'Error generating response',
                 });
+
+                // Signal completion even on error so Redis can close
+                yield* Deferred.succeed(streamCompletionDeferred, undefined);
             });
         }),
         Stream.build
     );
 
     const resumableStream = yield* createResumableStream(streamId, stream);
+
+    const streamCompletionDeferred = yield* Deferred.make<void>();
+
+    yield* Effect.gen(function* () {
+        const pubsub = yield* RedisPubSub;
+
+        yield* pubsub.subscribe(`abort:${body.id}`, _ => {
+            controller.abort();
+        });
+
+        yield* Effect.race(
+            Effect.async<void>(resume => {
+                controller.signal.addEventListener('abort', () => {
+                    resume(Effect.succeed(undefined));
+                });
+            }),
+            Deferred.await(streamCompletionDeferred)
+        );
+    }).pipe(
+        Effect.tapError(error => Effect.logError('Error in daemon subscribing to abort', error)),
+        Effect.catchAll(() => Effect.succeed(null)),
+        Effect.provide(RedisLive),
+        Effect.forkDaemon
+    );
 
     if (!thread.title) {
         yield* generateThreadTitle(body.id, body.message, latch).pipe(Effect.forkDaemon);

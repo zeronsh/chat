@@ -5,8 +5,9 @@ import { DatabaseLive } from '@/database/effect';
 import { APIError } from '@/lib/error';
 import { z } from 'zod';
 import { nanoid } from 'nanoid';
-import { publish } from '@/lib/redis';
+import { RedisLive } from '@/lib/redis';
 import * as queries from '@/database/queries';
+import { RedisPubSub } from 'effect-redis';
 
 export const ServerRoute = createServerFileRoute('/api/thread/$threadId/stop').methods({
     async POST({ request, params }) {
@@ -20,6 +21,7 @@ export const ServerRoute = createServerFileRoute('/api/thread/$threadId/stop').m
             Effect.provide(SessionLive(request)),
             Effect.provide(ThreadStopPostParamsLive({ id: params.threadId })),
             Effect.provide(DatabaseLive),
+            Effect.provide(RedisLive),
             Effect.runPromise
         );
     },
@@ -57,7 +59,9 @@ const threadStopPostApiHandler = Effect.gen(function* () {
         });
     }
 
-    yield* publish(`abort:${params.id}`, 'abort');
+    const pubsub = yield* RedisPubSub;
+
+    yield* pubsub.publish(`abort:${params.id}`, 'abort');
 
     yield* queries.updateThread({
         threadId: params.id,
