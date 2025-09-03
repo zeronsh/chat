@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { DefaultChatTransport } from 'ai';
+import { type ChatStatus, DefaultChatTransport } from 'ai';
 import { useParamsThreadId } from '@/hooks/use-params-thread-id';
 import { useDatabase, useThreadFromParams } from '@/hooks/use-database';
 import { Fragment, useMemo } from 'react';
@@ -28,6 +28,7 @@ function RouteComponent() {
             <Title title={thread?.title} />
             <ThreadProvider
                 id={threadId}
+                dbStatus={thread?.status as ChatStatus}
                 messages={messages}
                 transport={
                     new DefaultChatTransport({
