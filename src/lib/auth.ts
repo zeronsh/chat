@@ -20,7 +20,7 @@ export const auth = betterAuth({
     }),
     trustedOrigins: ['https://zeron.sh', 'https://www.zeron.sh', 'http://localhost:5173'],
     session: {
-        expiresIn: 60 * 60 * 24 * 365 * 100,
+        expiresIn: 60 * 60 * 24 * 365,
         updateAge: 60 * 60 * 24,
     },
     socialProviders: {
