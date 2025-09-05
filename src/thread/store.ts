@@ -2,6 +2,7 @@ import { type ChatStatus, type UIMessage } from 'ai';
 import { createWithEqualityFn as create } from 'zustand/traditional';
 import { devtools, subscribeWithSelector } from 'zustand/middleware';
 import { ToolKeys } from '@/ai/types';
+import throttle from 'throttleit';
 
 export type ToolSidebar = {
     messageId: string;
@@ -52,6 +53,32 @@ export function createThreadStore<UI_MESSAGE extends UIMessage>(init: {
     return create<ThreadStoreImpl<UI_MESSAGE>>()(
         devtools(
             subscribeWithSelector((set, get) => {
+                const setMessages = (
+                    messagesOrUpdater: UI_MESSAGE[] | ((prev: UI_MESSAGE[]) => UI_MESSAGE[])
+                ) => {
+                    const { messageIds: oldMessageIds } = get();
+
+                    const messages =
+                        typeof messagesOrUpdater === 'function'
+                            ? messagesOrUpdater(get().messages)
+                            : messagesOrUpdater;
+
+                    const lastMessageId = messages[messages.length - 1]?.id;
+                    const lastOldMessageId = oldMessageIds[oldMessageIds.length - 1];
+                    const hasMessagesChanged = lastMessageId !== lastOldMessageId;
+                    const messageIds = hasMessagesChanged ? messages.map(m => m.id) : oldMessageIds;
+
+                    const update = {
+                        messages,
+                        messageIds,
+                        messageMap: Object.fromEntries(messages.map(m => [m.id, m])),
+                    };
+
+                    set(update, false, 'thread/setMessages');
+                };
+
+                const throttledSetMessages = throttle(setMessages, 100);
+
                 return {
                     id: init.id,
                     messageMap: Object.fromEntries(init.messages.map(m => [m.id, m])),
@@ -107,27 +134,11 @@ export function createThreadStore<UI_MESSAGE extends UIMessage>(init: {
                     setMessages: (
                         messagesOrUpdater: UI_MESSAGE[] | ((prev: UI_MESSAGE[]) => UI_MESSAGE[])
                     ) => {
-                        const { messageIds: oldMessageIds } = get();
-
-                        const messages =
-                            typeof messagesOrUpdater === 'function'
-                                ? messagesOrUpdater(get().messages)
-                                : messagesOrUpdater;
-
-                        const lastMessageId = messages[messages.length - 1]?.id;
-                        const lastOldMessageId = oldMessageIds[oldMessageIds.length - 1];
-                        const hasMessagesChanged = lastMessageId !== lastOldMessageId;
-                        const messageIds = hasMessagesChanged
-                            ? messages.map(m => m.id)
-                            : oldMessageIds;
-
-                        const update = {
-                            messages,
-                            messageIds,
-                            messageMap: Object.fromEntries(messages.map(m => [m.id, m])),
-                        };
-
-                        set(update, false, 'thread/setMessages');
+                        if (get().status === 'streaming') {
+                            throttledSetMessages(messagesOrUpdater);
+                            return;
+                        }
+                        setMessages(messagesOrUpdater);
                     },
                 };
             })

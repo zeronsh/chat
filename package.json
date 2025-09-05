@@ -80,6 +80,7 @@
         "streamdown": "^1.1.6",
         "stripe": "^18.3.0",
         "tailwind-merge": "^3.3.1",
+        "throttleit": "^2.1.0",
         "ts-pattern": "^5.7.1",
         "ua-parser-js": "^2.0.4",
         "uploadthing": "^7.7.3",
