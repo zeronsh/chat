@@ -1,11 +1,11 @@
 import { getResearchPrompt } from '@/ai/prompt';
-import { ToolContext } from '.';
 import { generateObject, generateText, NoSuchToolError, stepCountIs, tool } from 'ai';
 import z from 'zod';
 import { search, readSite } from '@/lib/exa';
 import { DataParts } from '@/ai/types';
 import { decrementUsage, incrementUsage } from '@/ai/service';
 import { Effect, Layer, Runtime } from 'effect';
+import { ToolContext } from '@/ai/tools';
 
 export const getResearchTool = Effect.gen(function* () {
     const ctx = yield* ToolContext;
