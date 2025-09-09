@@ -37,6 +37,7 @@ function RouteComponent() {
                                 .where('userId', '=', db.userID)
                                 .one()
                                 .materialize();
+
                             return {
                                 body: {
                                     id,
