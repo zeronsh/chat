@@ -4,6 +4,7 @@ import { ErrorPart } from '@/components/thread/message/part/error-part';
 import { TextPart } from '@/components/thread/message/part/text-part';
 import { SearchPart } from '@/components/thread/message/part/search-part';
 import { ResearchPart } from '@/components/thread/message/part/research-part';
+import { DeepSearchPart } from '@/components/thread/message/part/deep-search-part';
 
 export function Part({ id, index }: { id: string; index: number }) {
     const type = useThreadSelector(state => {
@@ -26,6 +27,8 @@ export function Part({ id, index }: { id: string; index: number }) {
             return <SearchPart id={id} index={index} />;
         case 'tool-research':
             return <ResearchPart id={id} index={index} />;
+        case 'tool-deepSearch':
+            return <DeepSearchPart id={id} index={index} />;
         case 'data-error':
             return <ErrorPart id={id} index={index} />;
         default:

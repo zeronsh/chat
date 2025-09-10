@@ -474,7 +474,7 @@ export function MultiModalInput() {
                                 type="button"
                                 className={cn(
                                     'h-8 w-16 rounded-full relative z-10 hover:text-primary',
-                                    tool === 'research' && 'text-primary',
+                                    tool === 'deepSearch' && 'text-primary',
                                     matcher
                                         .with({ canResearch: false }, () => 'opacity-50')
                                         .with({ canModelUseTools: false }, () => 'opacity-50')
@@ -483,7 +483,7 @@ export function MultiModalInput() {
                                 onClick={() => {
                                     matcher
                                         .with({ canResearch: true, canModelUseTools: true }, () => {
-                                            setTool('research');
+                                            setTool('deepSearch');
                                         })
                                         .with(
                                             {
@@ -509,7 +509,7 @@ export function MultiModalInput() {
                                         BETA
                                     </span>
                                 </div>
-                                {tool === 'research' && (
+                                {tool === 'deepSearch' && (
                                     <motion.div
                                         className="absolute inset-0 h-8 w-full rounded-full bg-background z-0"
                                         layoutId="toolThumb"

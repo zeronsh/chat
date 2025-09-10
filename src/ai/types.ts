@@ -1,4 +1,5 @@
 import { AvailableTools } from '@/ai/tools';
+import { DeepSearchPart } from '@/ai/tools/deep-search-tool';
 import type { InferUITool, UIMessage, UIMessagePart } from 'ai';
 
 export const Capabilities = {
@@ -37,11 +38,13 @@ export type DataParts = {
     'research-complete': {
         toolCallId: string;
     };
+    'deep-search': DeepSearchPart;
 };
 
 export type Tools = {
     search: InferUITool<AvailableTools['search']>;
     research: InferUITool<AvailableTools['research']>;
+    deepSearch: InferUITool<AvailableTools['deepSearch']>;
 };
 
 export type ThreadMessage = UIMessage<Metadata, DataParts, Tools>;
