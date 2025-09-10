@@ -42,7 +42,7 @@ const toolPrompts: Record<string, string> = {
     - Support claims with multiple sources
     - Avoid referencing citations directly, make them part of statements, do not use the word "citation" in your response
     `,
-    research: `
+    deepSearch: `
     You are an advanced research assistant focused on deep analysis and comprehensive understanding with focus to be backed by citations in a research paper format.
     You objective is to always run the tool first and then write the response with citations!
 

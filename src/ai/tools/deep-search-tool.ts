@@ -16,7 +16,13 @@ export type Plan = z.infer<typeof PlanSchema>['plan'];
 
 export type DeepSearchStart = {
     type: 'start';
+    timestamp: number;
     thoughts: string;
+};
+
+export type DeepSearchComplete = {
+    type: 'completed';
+    timestamp: number;
 };
 
 export type DeepSearchPlan = {
@@ -54,6 +60,7 @@ export type DeepSearchReadSiteResults = {
 
 export type DeepSearchPartUnion =
     | DeepSearchStart
+    | DeepSearchComplete
     | DeepSearchPlan
     | DeepSearchPlanResults
     | DeepSearchSearch
@@ -72,7 +79,7 @@ export const getDeepSearchTool = Effect.gen(function* () {
         name: 'Deep Search',
         description: 'Performs deep search on a given topic',
         inputSchema: z.object({
-            query: z.string().min(1).max(200).describe('The query to perform deep search on.'),
+            query: z.string().min(1).max(300).describe('The query to perform deep search on.'),
             thoughts: z
                 .string()
                 .min(1)
@@ -109,14 +116,14 @@ function deepSearchTool(args: { query: string; thoughts: string; toolCallId: str
             });
         }
 
-        commit({ type: 'start', thoughts: args.thoughts });
+        commit({ type: 'start', thoughts: args.thoughts, timestamp: Date.now() });
         commit({ type: 'plan' });
 
         const {
             object: { plan },
         } = yield* Effect.tryPromise(() =>
             generateObject({
-                model: 'moonshotai/kimi-k2-0905',
+                model: 'xai/grok-code-fast-1',
                 schema: PlanSchema,
                 prompt: getDeepSearchPlanPrompt(args.query),
             })
@@ -213,6 +220,8 @@ function deepSearchTool(args: { query: string; thoughts: string; toolCallId: str
             }),
             Effect.catchAll(e => Effect.die(e))
         );
+
+        commit({ type: 'completed', timestamp: Date.now() });
 
         return {
             steps,
