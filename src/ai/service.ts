@@ -14,9 +14,10 @@ import { Duration, Effect, Schedule } from 'effect';
 import { APIError } from '@/lib/error';
 import { AnonymousLimits, FreeLimits, ProLimits } from '@/lib/constants';
 import { match } from 'ts-pattern';
+import { waitUntil } from '@vercel/functions';
 
 export const streamContext = createResumableStreamContext({
-    waitUntil: promise => promise,
+    waitUntil,
 });
 
 export function prepareThreadContext(args: {
