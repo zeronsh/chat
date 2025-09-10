@@ -18,6 +18,6 @@ export const FreeLimits: Limits = {
 
 export const ProLimits: Limits = {
     SEARCH: 50,
-    RESEARCH: 5,
+    RESEARCH: 15,
     CREDITS: 200,
 };
