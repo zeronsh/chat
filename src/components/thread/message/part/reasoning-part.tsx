@@ -1,10 +1,11 @@
+import { ReasoningTimePart } from '@/ai/types';
 import { MessageContent } from '@/components/ui/message';
 import { usePart, useThreadSelector } from '@/context/thread';
 import { lexer } from '@/lib/utils';
 import { useDebounce } from '@uidotdev/usehooks';
 import { AnimatePresence, motion } from 'framer-motion';
 import { BrainIcon } from 'lucide-react';
-import { memo, useState, useCallback } from 'react';
+import { memo, useState, useCallback, useEffect, useMemo } from 'react';
 
 export const ReasoningBlock = memo(
     function PureReasoningBlock({
@@ -104,7 +105,10 @@ export const ReasoningPart = memo(function PureReasoningPart({
                 className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
             >
                 <BrainIcon className="size-4" />
-                <span>{done ? 'Reasoned' : 'Reasoning'}</span>
+                <span>
+                    {done ? 'Reasoned ' : 'Reasoning '}
+                    <ReasoningTime id={id} index={index} />
+                </span>
             </button>
 
             <AnimatePresence initial={false}>
@@ -122,4 +126,59 @@ export const ReasoningPart = memo(function PureReasoningPart({
             </AnimatePresence>
         </div>
     );
+});
+
+export const ReasoningTime = memo(function PureReasoningTime({
+    id,
+    index,
+}: {
+    id: string;
+    index: number;
+}) {
+    const { done } = usePart({
+        id,
+        index,
+        type: 'reasoning',
+        selector: part => ({
+            done: part?.state ? part?.state === 'done' : null,
+        }),
+    });
+
+    const { startPart, endPart } = useThreadSelector(state => ({
+        startPart: state.messageMap[id].parts[index - 1] as unknown as
+            | { data: ReasoningTimePart }
+            | undefined,
+        endPart: state.messageMap[id].parts[index + 1] as unknown as
+            | { data: ReasoningTimePart }
+            | undefined,
+    }));
+
+    const [currentTime, setCurrentTime] = useState(Date.now());
+
+    useEffect(() => {
+        if (!done) {
+            const interval = setInterval(() => {
+                setCurrentTime(Date.now());
+            }, 1000);
+            return () => clearInterval(interval);
+        }
+    }, [done]);
+
+    const timeElapsed = useMemo(() => {
+        const start = startPart?.data;
+        const end = endPart?.data;
+
+        if (!start) return null;
+
+        const startTime = start.timestamp;
+        const endTime = end ? end.timestamp : currentTime;
+
+        return Math.max(0, Math.ceil((endTime - startTime) / 1000));
+    }, [startPart, endPart, currentTime]);
+
+    if (timeElapsed === null) {
+        return null;
+    }
+
+    return `for ${timeElapsed}s`;
 });

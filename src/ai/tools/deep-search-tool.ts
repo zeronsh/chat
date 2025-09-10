@@ -126,6 +126,7 @@ function deepSearchTool(args: { query: string; thoughts: string; toolCallId: str
                 model: 'xai/grok-code-fast-1',
                 schema: PlanSchema,
                 prompt: getDeepSearchPlanPrompt(args.query),
+                abortSignal: ctx.signal,
             })
         ).pipe(
             Effect.tapError(e => {
@@ -144,6 +145,7 @@ function deepSearchTool(args: { query: string; thoughts: string; toolCallId: str
                 model: 'moonshotai/kimi-k2',
                 prompt: getDeepSearchPrompt(args.query, plan),
                 stopWhen: stepCountIs(50),
+                abortSignal: ctx.signal,
                 tools: {
                     search: tool({
                         description: 'Search the web for information',

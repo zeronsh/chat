@@ -16,23 +16,15 @@ export type StreamTextOptions = Omit<
     'onError' | 'onFinish' | 'tools'
 >;
 
-export type InferMessageToolSet<Message extends UIMessage> = Message extends UIMessage<
-    infer _,
-    infer __,
-    infer Tools
->
-    ? Tools extends ToolSet
-        ? Tools
-        : never
-    : {};
+export type InferMessageToolSet<Message extends UIMessage> =
+    Message extends UIMessage<infer _, infer __, infer Tools>
+        ? Tools extends ToolSet
+            ? Tools
+            : never
+        : {};
 
-export type InferMessageMetadata<Message extends UIMessage> = Message extends UIMessage<
-    infer Metadata,
-    infer _,
-    infer __
->
-    ? Metadata
-    : {};
+export type InferMessageMetadata<Message extends UIMessage> =
+    Message extends UIMessage<infer Metadata, infer _, infer __> ? Metadata : {};
 
 const createStreamSSEResponse = Effect.gen(function* () {
     const runtime = yield* Effect.runtime();
@@ -65,8 +57,11 @@ const createStreamSSEResponse = Effect.gen(function* () {
                 result.toUIMessageStream({
                     sendReasoning: true,
                     messageMetadata: ({ part }) => {
-                        // @ts-expect-error - TODO: fix this
-                        return Runtime.runSync(runtime, onMessageMetadataCallback({ part }));
+                        return Runtime.runSync(
+                            runtime,
+                            // @ts-expect-error - TODO: fix this
+                            onMessageMetadataCallback({ part, writer })
+                        );
                     },
                 })
             );
@@ -99,6 +94,7 @@ export class CreateStreamSSEResponseOnError extends Effect.Tag('CreateStreamSSER
 
 export type OnMessageMetadataCallback<A = void, E = never, R = never> = (options: {
     part: TextStreamPart<InferMessageToolSet<ThreadMessage>>;
+    writer: UIMessageStreamWriter<ThreadMessage>;
 }) => Effect.Effect<A, E, R>;
 
 export class CreateStreamSSEResponseOnMessageMetadata extends Effect.Tag(

@@ -164,6 +164,7 @@ const threadPostApiHandler = Effect.gen(function* () {
                             limits,
                             runtime,
                             tools: activeTools,
+                            signal: controller.signal,
                         })
                     )
                 )
@@ -187,8 +188,28 @@ const threadPostApiHandler = Effect.gen(function* () {
                 yield* Deferred.succeed(streamCompletionDeferred, undefined);
             });
         }),
-        Stream.onMessageMetadata(({ part }) => {
+        Stream.onMessageMetadata(({ part, writer }) => {
             return Effect.gen(function* () {
+                if (part.type === 'reasoning-start') {
+                    writer.write({
+                        type: 'data-reasoning-time',
+                        data: {
+                            id: part.id,
+                            type: 'start',
+                            timestamp: new Date().getTime(),
+                        },
+                    });
+                }
+                if (part.type === 'reasoning-end') {
+                    writer.write({
+                        type: 'data-reasoning-time',
+                        data: {
+                            id: part.id,
+                            type: 'end',
+                            timestamp: new Date().getTime(),
+                        },
+                    });
+                }
                 if (part.type === 'start') {
                     return {
                         model: {

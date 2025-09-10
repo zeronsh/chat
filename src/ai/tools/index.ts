@@ -28,6 +28,7 @@ export type ToolContextImpl = {
     limits: Limits;
     runtime: Runtime.Runtime<Database>;
     tools: string[];
+    signal: AbortSignal;
 };
 
 export class ToolContext extends Effect.Tag('ToolContext')<ToolContext, ToolContextImpl>() {}

@@ -19,6 +19,12 @@ export type Metadata = {
     };
 };
 
+export type ReasoningTimePart = {
+    id: string;
+    type: 'start' | 'end';
+    timestamp: number;
+};
+
 export type DataParts = {
     error: string;
     'research-start': {
@@ -39,6 +45,7 @@ export type DataParts = {
         toolCallId: string;
     };
     'deep-search': DeepSearchPart;
+    'reasoning-time': ReasoningTimePart;
 };
 
 export type Tools = {

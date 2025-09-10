@@ -98,24 +98,6 @@ export function usePart(options: any): any {
         if (part.type !== options.type) {
             throw new Error('Part type mismatch');
         }
-        if (part.type === 'reasoning') {
-            let i = options.index;
-            let nextPart = state.messageMap[options.id].parts[i + 1];
-            const prevPart = state.messageMap[options.id].parts[i - 1];
-
-            if (prevPart && prevPart.type === 'reasoning') {
-                return options.selector(null);
-            }
-
-            if (nextPart) {
-                while (nextPart && nextPart.type === 'reasoning') {
-                    part.text += '\n\n' + nextPart.text;
-                    part.state = nextPart.state;
-                    i++;
-                    nextPart = state.messageMap[options.id].parts[i + 1];
-                }
-            }
-        }
 
         return options.selector(part as any);
     }, options.equalityFn);
