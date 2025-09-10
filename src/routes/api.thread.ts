@@ -140,7 +140,7 @@ const threadPostApiHandler = Effect.gen(function* () {
             system: getSystemPrompt(settings, activeTools),
             experimental_transform: smoothStream({
                 chunking: 'word',
-                delayInMs: 1,
+                delayInMs: 3,
             }),
             abortSignal: controller.signal,
             providerOptions: {

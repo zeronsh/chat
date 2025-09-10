@@ -7,10 +7,12 @@ import { Limits } from '@/lib/constants';
 import { Effect, Runtime } from 'effect';
 import { getResearchTool } from '@/ai/tools/research-tool';
 import { Database } from '@/database/effect';
+import { getDeepSearchTool } from '@/ai/tools/deep-search-tool';
 
 const tools = {
     search: getSearchTool,
     research: getResearchTool,
+    deepSearch: getDeepSearchTool,
 } as const;
 
 type ExtractTool<T> = T extends Effect.Effect<infer U, any, any> ? U : never;

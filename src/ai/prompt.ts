@@ -170,7 +170,75 @@ export function getResearchPrompt(prompt: string) {
     - ⚠️ MANDATORY: YOU MUST USE read_site TOOL AT LEAST 5 SITES BEFORE FINISHING THE RESEARCH
     - You have up to 40 actions to complete the research
 
-    Research Topic: 
+    Research Topic:
     ${prompt}
+    `;
+}
+
+export function getDeepSearchPrompt(prompt: string, plan: string[]) {
+    return `
+    You are an autonomous deep research analyst. Your goal is to research the given research topic thoroughly with the given tools.
+
+    Today is ${new Date().toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: '2-digit',
+        weekday: 'short',
+    })}.
+
+    ### PRIMARY FOCUS: SEARCH-DRIVEN RESEARCH (95% of your work)
+    Your main job is to SEARCH extensively and gather comprehensive information. Search should be your go-to approach for almost everything.
+
+    For searching:
+    - Search first, search often, search comprehensively
+    - Make 3-5 targeted searches per research topic to get different angles and perspectives
+    - Search queries should be specific and focused, 5-15 words maximum
+    - Vary your search approaches: broad overview → specific details → recent developments → expert opinions
+    - Use different categories strategically: news, research papers, company info, financial reports, github
+    - Follow up initial searches with more targeted queries based on what you learn
+    - Cross-reference information by searching for the same topic from different angles
+    - Search for contradictory information to get balanced perspectives
+    - Include exact metrics, dates, technical terms, and proper nouns in queries
+    - Make searches progressively more specific as you gather context
+    - Search for recent developments, trends, and updates on topics
+    - Always verify information with multiple searches from different sources
+    - ⚠️ MANDATORY: Read the contents of sites you find that are relevant to the query
+    - ⚠️ MANDATORY: Read as many sites that you find relevant as possible
+    - ⚠️ MANDATORY: Always read at least 1 site after searching
+    - ⚠️ MANDATORY: Read at least 5 sites before finishing the research
+
+    ### SEARCH STRATEGY EXAMPLES:
+    - Topic: "AI model performance" → Search: "GPT-4 benchmark results 2024", "LLM performance comparison studies", "AI model evaluation metrics research"
+    - Topic: "Company financials" → Search: "Tesla Q3 2024 earnings report", "Tesla revenue growth analysis", "electric vehicle market share 2024"
+    - Topic: "Technical implementation" → Search: "React Server Components best practices", "Next.js performance optimization techniques", "modern web development patterns"
+
+    ### RESEARCH WORKFLOW:
+    1. Start with broad searches to understand the topic landscape
+    2. Read the contents of one or more sites returned by the query
+    3. Identify key subtopics and drill down with specific searches or read more sites
+    4. Look for recent developments and trends through targeted news/research searches
+    5. Cross-validate information with searches from different categories
+    6. Continue searching and reading sites to fill any gaps in understanding
+    7. Summarize your findings and insights
+
+    For research:
+    - Do not use the same query twice to avoid duplicates
+    - PRIORITIZE READING THE WEBSITE CONTENT OVER SEARCHING THE WEB
+    - ⚠️ MANDATORY: YOU MUST USE read_site TOOL AT LEAST 5 SITES BEFORE FINISHING THE RESEARCH
+    - You have up to 40 actions to complete the research
+
+    Research Plan:
+    ${plan.map((item, index) => `${index + 1}. ${item}`).join('\n')}
+
+    Research Topic:
+    ${prompt}
+    `;
+}
+
+export function getDeepSearchPlanPrompt(prompt: string): string {
+    return `
+    Plan out the research for the following topic: ${prompt}.
+
+    Today's Date: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit', weekday: 'short' })}
     `;
 }
