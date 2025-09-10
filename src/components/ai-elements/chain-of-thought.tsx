@@ -73,12 +73,6 @@ export const ChainOfThoughtHeader = memo(
                 >
                     <Icon className="size-4" />
                     <span className="flex-1 text-left">{children ?? 'Chain of Thought'}</span>
-                    {/* <ChevronDownIcon
-                        className={cn(
-                            'size-4 transition-transform',
-                            isOpen ? 'rotate-180' : 'rotate-0'
-                        )}
-                    /> */}
                 </CollapsibleTrigger>
             </Collapsible>
         );
@@ -142,18 +136,32 @@ export const ChainOfThoughtSearchResults = memo(
     )
 );
 
-export type ChainOfThoughtSearchResultProps = ComponentProps<typeof Badge>;
+export type ChainOfThoughtSearchResultProps = ComponentProps<typeof Badge> & {
+    url?: string;
+};
 
 export const ChainOfThoughtSearchResult = memo(
-    ({ className, children, ...props }: ChainOfThoughtSearchResultProps) => (
-        <Badge
-            className={cn('gap-1 px-2 py-0.5 font-normal text-xs', className)}
-            variant="secondary"
-            {...props}
-        >
-            {children}
-        </Badge>
-    )
+    ({ className, children, url, ...props }: ChainOfThoughtSearchResultProps) => {
+        return url ? (
+            <a href={url} target="_blank" rel="noopener noreferrer">
+                <Badge
+                    className={cn('gap-1 px-2 py-0.5 font-normal text-xs', className)}
+                    variant="secondary"
+                    {...props}
+                >
+                    {children}
+                </Badge>
+            </a>
+        ) : (
+            <Badge
+                className={cn('gap-1 px-2 py-0.5 font-normal text-xs', className)}
+                variant="secondary"
+                {...props}
+            >
+                {children}
+            </Badge>
+        );
+    }
 );
 
 export type ChainOfThoughtContentProps = ComponentProps<typeof CollapsibleContent>;

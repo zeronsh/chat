@@ -103,7 +103,7 @@ export const DeepSearchPart = memo(({ id, index }: { id: string; index: number }
                         status={status}
                     >
                         <ChainOfThoughtSearchResults>
-                            {part.results.slice(0, 5).map((result: any, resultIndex: number) => {
+                            {part.results.map((result: any, resultIndex: number) => {
                                 let hostname = 'example.com';
                                 try {
                                     const urlObj = new URL(result.url);
@@ -113,7 +113,10 @@ export const DeepSearchPart = memo(({ id, index }: { id: string; index: number }
                                 }
 
                                 return (
-                                    <ChainOfThoughtSearchResult key={`result-${resultIndex}`}>
+                                    <ChainOfThoughtSearchResult
+                                        key={`result-${resultIndex}`}
+                                        url={result.url}
+                                    >
                                         <img
                                             src={`https://www.google.com/s2/favicons?domain=${hostname}&sz=16`}
                                             alt={`${hostname} favicon`}
@@ -123,7 +126,7 @@ export const DeepSearchPart = memo(({ id, index }: { id: string; index: number }
                                                     "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3C/svg%3E";
                                             }}
                                         />
-                                        {result.title || hostname}
+                                        {result.title.slice(0, 50) || hostname}
                                     </ChainOfThoughtSearchResult>
                                 );
                             })}
@@ -151,7 +154,7 @@ export const DeepSearchPart = memo(({ id, index }: { id: string; index: number }
                                 }
 
                                 return (
-                                    <ChainOfThoughtSearchResult>
+                                    <ChainOfThoughtSearchResult url={part.url}>
                                         <img
                                             src={`https://www.google.com/s2/favicons?domain=${hostname}&sz=16`}
                                             alt={`${hostname} favicon`}
