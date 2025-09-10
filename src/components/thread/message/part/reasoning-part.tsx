@@ -1,9 +1,9 @@
 import { MessageContent } from '@/components/ui/message';
 import { usePart, useThreadSelector } from '@/context/thread';
-import { cn, lexer } from '@/lib/utils';
+import { lexer } from '@/lib/utils';
 import { useDebounce } from '@uidotdev/usehooks';
 import { AnimatePresence, motion } from 'framer-motion';
-import { BrainIcon, Loader2Icon } from 'lucide-react';
+import { BrainIcon } from 'lucide-react';
 import { memo, useState, useCallback } from 'react';
 
 export const ReasoningBlock = memo(
@@ -97,15 +97,14 @@ export const ReasoningPart = memo(function PureReasoningPart({
     }, [isOpen]);
 
     return (
-        <div className={cn('w-full', !done && 'animate-pulse')}>
+        <div className="w-full">
             <button
                 type="button"
                 onClick={toggle}
                 className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
             >
-                <BrainIcon className="size-3" />
+                <BrainIcon className="size-4" />
                 <span>{done ? 'Reasoned' : 'Reasoning'}</span>
-                {!done && <Loader2Icon className="size-3 animate-spin" />}
             </button>
 
             <AnimatePresence initial={false}>

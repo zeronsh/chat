@@ -4,7 +4,6 @@ import { ThreadMessage } from '@/ai/types';
 import { ChatInit } from 'ai';
 import { nanoid } from '@/lib/utils';
 import { ThreadStoreImpl } from '@/thread/store';
-import { type ChatStatus } from 'ai';
 
 const ThreadContext = createContext<Thread<ThreadMessage> | null>(null);
 
@@ -12,11 +11,9 @@ const threads = new Map<string, Thread<ThreadMessage>>();
 
 export function ThreadProvider({
     children,
-    dbStatus,
     ...init
 }: {
     children: React.ReactNode;
-    dbStatus: ChatStatus;
 } & ChatInit<ThreadMessage>) {
     const generateId = init.generateId ?? nanoid;
 
@@ -49,12 +46,6 @@ export function ThreadProvider({
             thread.store.getState().setMessages(init.messages);
         }
     }, [init.messages, id]);
-
-    useEffect(() => {
-        if (dbStatus === 'streaming' || dbStatus === 'submitted') {
-            thread.store.getState().setStatus(dbStatus);
-        }
-    }, [dbStatus, id]);
 
     return <ThreadContext.Provider value={thread}>{children}</ThreadContext.Provider>;
 }
