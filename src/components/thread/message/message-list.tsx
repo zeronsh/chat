@@ -1,6 +1,6 @@
 import { MessageItem } from '@/components/thread/message/message-item';
 import { MultiModalInput } from '@/components/thread/multi-modal-input';
-import { useThreadSelector } from '@/context/thread';
+import { MessageContext, useThreadSelector } from '@/context/thread';
 import { useAutoResume } from '@/hooks/use-auto-resume';
 import { StickToBottom, useStickToBottom } from 'use-stick-to-bottom';
 import { Virtualizer, VirtualizerHandle } from 'virtua';
@@ -10,9 +10,10 @@ export function MessageList() {
     const mounted = useRef(false);
     const ref = useRef<VirtualizerHandle>(null);
     const messageIds = useThreadSelector(state => state.messageIds);
+    const isStreaming = useThreadSelector(state => state.status === 'streaming');
     const instance = useStickToBottom({
         initial: 'instant',
-        resize: 'instant',
+        resize: isStreaming ? 'smooth' : 'instant',
     });
 
     useAutoResume();
@@ -43,7 +44,9 @@ export function MessageList() {
                 overscan={1}
             >
                 {messageIds.map(id => (
-                    <MessageItem key={id} id={id} />
+                    <MessageContext key={id} value={id}>
+                        <MessageItem id={id} />
+                    </MessageContext>
                 ))}
             </Virtualizer>
             <MultiModalInput />

@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo } from 'react';
 import { Thread } from '@/thread';
-import { ThreadMessage } from '@/ai/types';
+import { ThreadMessage, TransformedMessagePart } from '@/ai/types';
 import { ChatInit } from 'ai';
 import { nanoid } from '@/lib/utils';
 import { ThreadStoreImpl } from '@/thread/store';
@@ -71,9 +71,7 @@ export function usePart<Return, SelectReturn>(options: {
     id: string;
     index: number;
     type: 'reasoning';
-    selector: (
-        part: Extract<ThreadMessage['parts'][number], { type: 'reasoning' }> | null
-    ) => SelectReturn;
+    selector: (part: Extract<TransformedMessagePart, { type: 'reasoning' }> | null) => SelectReturn;
     equalityFn?: (a: Return | null, b: Return | null) => boolean;
 }): SelectReturn;
 
@@ -81,26 +79,107 @@ export function usePart<T extends Exclude<PartType, 'reasoning'>, Return, Select
     id: string;
     index: number;
     type: T;
-    selector: (part: Extract<ThreadMessage['parts'][number], { type: T }>) => SelectReturn;
+    selector: (part: Extract<TransformedMessagePart, { type: T }>) => SelectReturn;
     equalityFn?: (a: Return, b: Return) => boolean;
 }): SelectReturn;
 
 export function usePart(options: any): any {
-    const part = useThreadSelector<any>(state => {
-        const parts = state.messageMap[options.id].parts;
-        if (parts[1]?.type === 'text' && parts[2]?.type === 'reasoning') {
-            const reasoningPart = parts[2];
-            const textPart = parts[1];
-            parts[1] = reasoningPart;
-            parts[2] = textPart;
-        }
+    const part = usePartSelector<any>(parts => {
         const part = Object.assign({}, parts[options.index]);
         if (part.type !== options.type) {
             throw new Error('Part type mismatch');
         }
 
         return options.selector(part as any);
-    }, options.equalityFn);
+    });
 
     return part as any;
+}
+
+export const MessageContext = createContext<string | undefined>(undefined);
+
+const useMessageContext = () => {
+    const message = useContext(MessageContext);
+    if (!message) {
+        throw new Error('useMessageContext must be used within a MessageContext');
+    }
+    return message;
+};
+
+export function usePartSelector<T>(selector: (parts: TransformedMessagePart[]) => T) {
+    const id = useMessageContext();
+
+    return useThreadSelector(state => {
+        const parts = [...state.messageMap[id].parts];
+        const partsWithTimestamp = parts
+            .map((part, i) => {
+                if (part.type === 'reasoning') {
+                    // Search backwards from current position to find start timing part
+                    let startPart = null;
+                    for (let j = i - 1; j >= 0; j--) {
+                        const candidatePart = parts[j];
+                        if (
+                            candidatePart?.type === 'data-reasoning-time' &&
+                            'data' in candidatePart &&
+                            candidatePart.data.type === 'start'
+                        ) {
+                            startPart = candidatePart;
+                            break;
+                        }
+                    }
+
+                    if (!startPart) {
+                        return {
+                            ...part,
+                            startTime: null,
+                            endTime: null,
+                        };
+                    }
+
+                    // Search forwards from current position to find end timing part
+                    let endPart = null;
+                    for (let j = i + 1; j < parts.length; j++) {
+                        const candidatePart = parts[j];
+                        if (
+                            candidatePart?.type === 'data-reasoning-time' &&
+                            'data' in candidatePart &&
+                            candidatePart.data.type === 'end'
+                        ) {
+                            endPart = candidatePart;
+                            break;
+                        }
+                    }
+
+                    if (!endPart) {
+                        return {
+                            ...part,
+                            startTime: startPart.data.timestamp,
+                            endTime: null,
+                        };
+                    }
+
+                    return {
+                        ...part,
+                        startTime: startPart.data.timestamp,
+                        endTime: endPart.data.timestamp,
+                    };
+                }
+
+                return part;
+            })
+            .filter(part => part.type !== 'data-reasoning-time')
+            .reduce((acc, part, i) => {
+                const previousPart = acc.at(-1);
+                if (previousPart?.type === 'reasoning' && part.type === 'reasoning') {
+                    previousPart.text = `${previousPart.text}\n\n${part.text}`;
+                    previousPart.state = part.state;
+                    previousPart.endTime = part.endTime;
+                    return acc;
+                }
+                acc.push(part);
+                return acc;
+            }, [] as TransformedMessagePart[]);
+
+        return selector(partsWithTimestamp);
+    });
 }

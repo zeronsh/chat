@@ -135,23 +135,16 @@ export const ReasoningTime = memo(function PureReasoningTime({
     id: string;
     index: number;
 }) {
-    const { done } = usePart({
+    const { done, startTime, endTime } = usePart({
         id,
         index,
         type: 'reasoning',
         selector: part => ({
             done: part?.state ? part?.state === 'done' : null,
+            startTime: part?.startTime,
+            endTime: part?.endTime,
         }),
     });
-
-    const { startPart, endPart } = useThreadSelector(state => ({
-        startPart: state.messageMap[id].parts[index - 1] as unknown as
-            | { data: ReasoningTimePart }
-            | undefined,
-        endPart: state.messageMap[id].parts[index + 1] as unknown as
-            | { data: ReasoningTimePart }
-            | undefined,
-    }));
 
     const [currentTime, setCurrentTime] = useState(Date.now());
 
@@ -165,16 +158,10 @@ export const ReasoningTime = memo(function PureReasoningTime({
     }, [done]);
 
     const timeElapsed = useMemo(() => {
-        const start = startPart?.data;
-        const end = endPart?.data;
+        if (!startTime) return null;
 
-        if (!start) return null;
-
-        const startTime = start.timestamp;
-        const endTime = end ? end.timestamp : currentTime;
-
-        return Math.max(0, Math.ceil((endTime - startTime) / 1000));
-    }, [startPart, endPart, currentTime]);
+        return Math.max(0, Math.ceil(((endTime ?? currentTime) - startTime) / 1000));
+    }, [startTime, endTime, currentTime]);
 
     if (timeElapsed === null) {
         return null;

@@ -1,4 +1,4 @@
-import { useThreadSelector } from '@/context/thread';
+import { usePartSelector, useThreadSelector } from '@/context/thread';
 import { ReasoningPart } from '@/components/thread/message/part/reasoning-part';
 import { ErrorPart } from '@/components/thread/message/part/error-part';
 import { TextPart } from '@/components/thread/message/part/text-part';
@@ -7,14 +7,7 @@ import { ResearchPart } from '@/components/thread/message/part/research-part';
 import { DeepSearchPart } from '@/components/thread/message/part/deep-search-part';
 
 export function Part({ id, index }: { id: string; index: number }) {
-    const type = useThreadSelector(state => {
-        const parts = state.messageMap[id].parts;
-        if (parts[1]?.type === 'text' && parts[2]?.type === 'reasoning') {
-            const textPart = parts[1];
-            const reasoningPart = parts[2];
-            parts[1] = reasoningPart;
-            parts[2] = textPart;
-        }
+    const type = usePartSelector(parts => {
         return parts[index].type;
     });
 

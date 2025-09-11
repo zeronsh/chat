@@ -1,6 +1,6 @@
 import { AvailableTools } from '@/ai/tools';
 import { DeepSearchPart } from '@/ai/tools/deep-search-tool';
-import type { InferUITool, UIMessage, UIMessagePart } from 'ai';
+import type { InferUITool, ReasoningUIPart, UIMessage, UIMessagePart } from 'ai';
 
 export const Capabilities = {
     REASONING: 'reasoning',
@@ -57,6 +57,13 @@ export type Tools = {
 export type ThreadMessage = UIMessage<Metadata, DataParts, Tools>;
 
 export type MessagePart = UIMessagePart<DataParts, Tools>;
+
+export type CustomReasoningUIPart = ReasoningUIPart & {
+    startTime: number | null;
+    endTime: number | null;
+};
+
+export type TransformedMessagePart = Exclude<MessagePart, ReasoningUIPart> | CustomReasoningUIPart;
 
 export type DataKeys = Exclude<
     ThreadMessage['parts'][number]['type'],

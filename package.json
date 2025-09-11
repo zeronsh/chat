@@ -22,7 +22,7 @@
     },
     "dependencies": {
         "@ai-sdk/anthropic": "^2.0.1",
-        "@ai-sdk/gateway": "^1.0.4",
+        "@ai-sdk/gateway": "^1.0.21",
         "@ai-sdk/google": "^2.0.3",
         "@ai-sdk/openai": "^2.0.7",
         "@base-ui-components/react": "1.0.0-beta.2",
