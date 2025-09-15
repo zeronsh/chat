@@ -7,7 +7,7 @@ import {
     generateText,
     JsonToSseTransformStream,
 } from 'ai';
-import { createResumableStreamContext } from 'resumable-stream';
+import { createResumableStreamContext, ResumableStreamContext } from 'resumable-stream';
 import { UserId } from '@/database/types';
 import { Database } from '@/database/effect';
 import { Duration, Effect, Schedule } from 'effect';
@@ -16,9 +16,16 @@ import { AnonymousLimits, FreeLimits, ProLimits } from '@/lib/constants';
 import { match } from 'ts-pattern';
 import { waitUntil } from '@vercel/functions';
 
-export const streamContext = createResumableStreamContext({
-    waitUntil,
-});
+let streamContext: ResumableStreamContext | undefined = undefined;
+
+export function getStreamContext() {
+    if (!streamContext) {
+        streamContext = createResumableStreamContext({
+            waitUntil,
+        });
+    }
+    return streamContext;
+}
 
 export function prepareThreadContext(args: {
     isAnonymous: boolean;
@@ -212,7 +219,7 @@ export function convertUIMessagesToModelMessages(
 
 export function createResumableStream(streamId: string, stream: ReadableStream<string>) {
     return Effect.tryPromise(async () => {
-        return streamContext.createNewResumableStream(streamId, () => stream);
+        return getStreamContext().createNewResumableStream(streamId, () => stream);
     }).pipe(
         Effect.tapError(error => Effect.logError('Error creating resumable stream', error)),
         Effect.retry(
@@ -228,7 +235,7 @@ export function getResumableStream(streamId: string) {
             execute: () => {},
         });
         return yield* Effect.tryPromise(async () => {
-            return streamContext.resumableStream(streamId, () =>
+            return getStreamContext().resumableStream(streamId, () =>
                 emptyDataStream.pipeThrough(new JsonToSseTransformStream())
             );
         }).pipe(
