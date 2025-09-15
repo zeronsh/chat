@@ -23,7 +23,11 @@ function RouteComponent() {
     const db = useDatabase();
     const { data: session } = useSession();
 
-    const [activeSessions] = useQuery(db.query.session.where('userId', '=', db.userID));
+    const [activeSessions] = useQuery(
+        db.query.session
+            .where('userId', '=', db.userID)
+            .where('expiresAt', '>', new Date().getTime())
+    );
 
     const getDeviceIcon = (userAgent: string) => {
         const parser = new UAParser(userAgent);
