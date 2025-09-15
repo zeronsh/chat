@@ -4,18 +4,25 @@ import type { Capability, ThreadMessage } from '@/ai/types';
 import { member, organization, user } from '@/database/auth-schema';
 import { SubscriptionData } from '@/database/types';
 
-export const message = pgTable('message', {
-    id: text('id').primaryKey(),
-    message: jsonb('message').$type<ThreadMessage>().notNull(),
-    createdAt: timestamp('created_at').notNull().defaultNow(),
-    updatedAt: timestamp('updated_at').notNull().defaultNow(),
-    threadId: text('thread_id')
-        .notNull()
-        .references(() => thread.id, { onDelete: 'cascade' }),
-    userId: text('user_id')
-        .notNull()
-        .references(() => user.id, { onDelete: 'cascade' }),
-});
+export const message = pgTable(
+    'message',
+    {
+        id: text('id').primaryKey(),
+        message: jsonb('message').$type<ThreadMessage>().notNull(),
+        createdAt: timestamp('created_at').notNull().defaultNow(),
+        updatedAt: timestamp('updated_at').notNull().defaultNow(),
+        threadId: text('thread_id')
+            .notNull()
+            .references(() => thread.id, { onDelete: 'cascade' }),
+        userId: text('user_id')
+            .notNull()
+            .references(() => user.id, { onDelete: 'cascade' }),
+    },
+    table => [
+        index('message_thread_id_index').on(table.threadId),
+        index('message_user_id_index').on(table.userId),
+    ]
+);
 
 export const statusEnum = pgEnum('status', ['ready', 'streaming', 'submitted']);
 
@@ -32,7 +39,10 @@ export const thread = pgTable(
             .notNull()
             .references(() => user.id, { onDelete: 'cascade' }),
     },
-    table => [index('stream_id_index').on(table.streamId)]
+    table => [
+        index('stream_id_index').on(table.streamId),
+        index('thread_user_id_index').on(table.userId),
+    ]
 );
 
 export const modelAccessEnum = pgEnum('access', ['public', 'account_required', 'premium_required']);
@@ -71,49 +81,61 @@ export const model = pgTable('model', {
 
 export const modeEnum = pgEnum('mode', ['light', 'dark']);
 
-export const setting = pgTable('setting', {
-    id: text('id').primaryKey(),
-    mode: modeEnum('mode').notNull().default('dark'),
-    theme: text('theme'),
-    userId: text('user_id')
-        .notNull()
-        .references(() => user.id, { onDelete: 'cascade' }),
-    nickname: text('nickname'),
-    biography: text('biography'),
-    instructions: text('instructions'),
-    modelId: text('model_id').notNull().default('gpt-4o-mini'),
-    pinnedModels: jsonb('pinned_models')
-        .$type<string[]>()
-        .notNull()
-        .default([
-            'claude-4-sonnet',
-            'gpt-4o',
-            'gpt-4o-mini',
-            'gemini-2.5-flash',
-            'gemini-2.5-pro',
-            'gemini-2.0-flash',
-            'kimi-k2',
-        ]),
-});
+export const setting = pgTable(
+    'setting',
+    {
+        id: text('id').primaryKey(),
+        mode: modeEnum('mode').notNull().default('dark'),
+        theme: text('theme'),
+        userId: text('user_id')
+            .notNull()
+            .references(() => user.id, { onDelete: 'cascade' }),
+        nickname: text('nickname'),
+        biography: text('biography'),
+        instructions: text('instructions'),
+        modelId: text('model_id').notNull().default('gpt-4o-mini'),
+        pinnedModels: jsonb('pinned_models')
+            .$type<string[]>()
+            .notNull()
+            .default([
+                'claude-4-sonnet',
+                'gpt-4o',
+                'gpt-4o-mini',
+                'gemini-2.5-flash',
+                'gemini-2.5-pro',
+                'gemini-2.0-flash',
+                'kimi-k2',
+            ]),
+    },
+    table => [index('setting_user_id_index').on(table.userId)]
+);
 
-export const usage = pgTable('usage', {
-    id: text('id').primaryKey(),
-    userId: text('user_id')
-        .notNull()
-        .references(() => user.id, { onDelete: 'cascade' }),
-    credits: integer('credits').notNull().default(0),
-    search: integer('search').notNull().default(0),
-    research: integer('research').notNull().default(0),
-});
+export const usage = pgTable(
+    'usage',
+    {
+        id: text('id').primaryKey(),
+        userId: text('user_id')
+            .notNull()
+            .references(() => user.id, { onDelete: 'cascade' }),
+        credits: integer('credits').notNull().default(0),
+        search: integer('search').notNull().default(0),
+        research: integer('research').notNull().default(0),
+    },
+    table => [index('usage_user_id_index').on(table.userId)]
+);
 
-export const userCustomer = pgTable('user_customer', {
-    id: text('id').primaryKey().unique(),
-    userId: text('user_id')
-        .notNull()
-        .references(() => user.id, { onDelete: 'cascade' })
-        .unique(),
-    subscription: jsonb('subscription').$type<SubscriptionData>(),
-});
+export const userCustomer = pgTable(
+    'user_customer',
+    {
+        id: text('id').primaryKey().unique(),
+        userId: text('user_id')
+            .notNull()
+            .references(() => user.id, { onDelete: 'cascade' })
+            .unique(),
+        subscription: jsonb('subscription').$type<SubscriptionData>(),
+    },
+    table => [index('user_customer_user_id_index').on(table.userId)]
+);
 
 export const organizationCustomer = pgTable('organization_customer', {
     id: text('id').primaryKey().unique(),

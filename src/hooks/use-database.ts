@@ -31,6 +31,7 @@ export function useThreads() {
     const loaderData = Route.useLoaderData();
     const [threads, result] = useQuery(
         db.query.thread
+            .where('userId', '=', db.userID)
             .related('messages', q => q.orderBy('createdAt', 'desc'))
             .orderBy('updatedAt', 'desc'),
         {

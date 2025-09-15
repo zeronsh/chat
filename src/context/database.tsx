@@ -55,6 +55,7 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
             zero.query.model.preload();
             zero.query.setting.where('userId', '=', zero.userID).preload();
             zero.query.thread
+                .where('userId', '=', zero.userID)
                 .related('messages', q => q.orderBy('createdAt', 'asc'))
                 .orderBy('updatedAt', 'desc')
                 .preload();
