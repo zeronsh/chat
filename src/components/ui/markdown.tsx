@@ -7,8 +7,7 @@ import {
     TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
-import { useDebounce } from '@uidotdev/usehooks';
-import { createContext, memo, useContext, useMemo } from 'react';
+import { createContext, memo, useContext, useId, useMemo } from 'react';
 import { type Components } from 'react-markdown';
 
 const generateKey = () => {
@@ -103,55 +102,40 @@ function extractLanguage(className?: string): string {
     return match ? match[1] : 'plaintext';
 }
 
-function StreamingText({ children }: { children: string }) {
-    const id = useMemo(() => generateKey(), []);
-
-    const words = children.split(/\s+/);
-    const segments = words.reduce<string[]>((acc, cur, idx) => {
-        if (idx % 10 === 0) {
-            const segment = words.slice(idx, idx + 10).join(' ');
-            // Add trailing space except for the last segment
-            acc.push(idx + 10 >= words.length ? segment : segment + ' ');
-        }
-        return acc;
-    }, []);
-
-    return segments.map((segment, idx) => {
-        return <FadeSegment key={`${id}-${idx}`} delay={idx * 1.5} children={segment} />;
-    });
-}
-
-const FadeSegment = memo(
-    function FadeSegment({ children, delay }: { children: string; delay: number }) {
-        const isWhitespace = /^\s+$/.test(children);
-        return (
-            <span
-                className={cn('fade-segment', isWhitespace && 'fade-segment-space')}
-                style={{
-                    animationDelay: `${delay}ms`,
-                }}
-            >
-                {children}
-            </span>
-        );
-    },
-    (prevProps, nextProps) => {
-        return prevProps.children === nextProps.children;
-    }
-);
-
 const INITIAL_COMPONENTS: Partial<Components> = {
     p: function TextComponent({ children, className }) {
+        const id = useId();
         const { animated } = useMarkdownContext();
 
         if (typeof children === 'string' && animated) {
+            const words = children.split(/\s+/);
+            const segments = words.reduce<string[]>((acc, cur, idx) => {
+                if (idx % 10 === 0) {
+                    const segment = words.slice(idx, idx + 10).join(' ');
+                    // Add trailing space except for the last segment
+                    acc.push(idx + 10 >= words.length ? segment : segment + ' ');
+                }
+                return acc;
+            }, []);
             return (
-                <p className={className}>
-                    <StreamingText children={children} />
+                <p className={cn(className, 'w-full')}>
+                    {segments.map((segment, idx) => {
+                        return (
+                            <span
+                                key={`${id}-${idx}`}
+                                className="fade-segment"
+                                style={{
+                                    animationDelay: `${idx * 1.5}ms`,
+                                }}
+                            >
+                                {segment}
+                            </span>
+                        );
+                    })}
                 </p>
             );
         }
-        return <p className={className}>{children}</p>;
+        return <p className={cn(className, 'w-full')}>{children}</p>;
     },
     code: function CodeComponent(props) {
         const isInline =
@@ -211,23 +195,6 @@ const INITIAL_COMPONENTS: Partial<Components> = {
         );
     },
 };
-
-const MemoizedMarkdownBlock = memo(
-    function MarkdownBlock({
-        content,
-        components = INITIAL_COMPONENTS,
-    }: {
-        content: string;
-        components?: Partial<Components>;
-    }) {
-        return <Response components={components}>{content}</Response>;
-    },
-    function propsAreEqual(prevProps, nextProps) {
-        return prevProps.content === nextProps.content;
-    }
-);
-
-MemoizedMarkdownBlock.displayName = 'MemoizedMarkdownBlock';
 
 type MarkdownContextType = {
     citations: { text: string; link: string }[];
@@ -296,9 +263,9 @@ function MarkdownComponent({
 
     return (
         <MarkdownContext.Provider value={{ citations, animated }}>
-            <div className={className}>
-                <MemoizedMarkdownBlock content={children} components={components} />
-            </div>
+            <Response className={className} components={components}>
+                {children}
+            </Response>
         </MarkdownContext.Provider>
     );
 }
