@@ -131,6 +131,8 @@ const threadPostApiHandler = Effect.gen(function* () {
         disableParallelToolUse: true,
     };
 
+    yield* Effect.logInfo('Creating stream');
+
     const stream = yield* Stream.create.pipe(
         Stream.options({
             model: actualModel,
@@ -236,9 +238,13 @@ const threadPostApiHandler = Effect.gen(function* () {
         Stream.build
     );
 
+    yield* Effect.logInfo('Creating resumable stream');
+
     const resumableStream = yield* createResumableStream(streamId, stream);
 
     const streamCompletionDeferred = yield* Deferred.make<void>();
+
+    yield* Effect.logInfo('Creating daemon for listening to abort command');
 
     yield* Effect.gen(function* () {
         const pubsub = yield* RedisPubSub;
