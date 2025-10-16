@@ -120,6 +120,13 @@
       "when": 1759208078434,
       "tag": "0016_seed-claude-4.5",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1760635548854,
+      "tag": "0017_seed-new-models",
+      "breakpoints": true
     }
   ]
 }
