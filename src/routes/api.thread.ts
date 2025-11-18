@@ -112,7 +112,11 @@ const threadPostApiHandler = Effect.gen(function* () {
         openai.reasoningSummary = 'auto';
     }
 
-    const GOOGLE_MODELS_WITH_REASONING = ['google/gemini-2.5-flash', 'google/gemini-2.5-pro'];
+    const GOOGLE_MODELS_WITH_REASONING = [
+        'google/gemini-2.5-flash',
+        'google/gemini-2.5-pro',
+        'google/gemini-3-pro-preview',
+    ];
 
     const google: GoogleGenerativeAIProviderOptions = {};
 
@@ -150,7 +154,7 @@ const threadPostApiHandler = Effect.gen(function* () {
                 google,
                 anthropic,
                 gateway: {
-                    order: ['groq', 'cerebras'],
+                    order: ['groq', 'cerebras', 'fireworks'],
                 },
             },
         }),
