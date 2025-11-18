@@ -154,7 +154,7 @@ const threadPostApiHandler = Effect.gen(function* () {
                 google,
                 anthropic,
                 gateway: {
-                    order: ['groq', 'cerebras', 'fireworks'],
+                    order: ['groq', 'cerebras', 'baseten'],
                 },
             },
         }),
