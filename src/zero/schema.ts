@@ -15,892 +15,918 @@
  * ------------------------------------------------------------
  */
 
-import type { ZeroCustomType } from "drizzle-zero";
-import type { default as zeroSchema } from "../../drizzle-zero.config";
+import type { ZeroCustomType } from 'drizzle-zero';
+import type { default as zeroSchema } from '../../drizzle-zero.config';
 
 /**
  * The Zero schema object.
  * This type is auto-generated from your Drizzle schema definition.
  */
 export const schema = {
-  tables: {
-    member: {
-      name: "member",
-      columns: {
-        id: {
-          type: "string",
-          optional: false,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "member",
-            "id"
-          >,
+    tables: {
+        member: {
+            name: 'member',
+            columns: {
+                id: {
+                    type: 'string',
+                    optional: false,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'member',
+                        'id'
+                    >,
+                },
+                organizationId: {
+                    type: 'string',
+                    optional: false,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'member',
+                        'organizationId'
+                    >,
+                    serverName: 'organization_id',
+                },
+                userId: {
+                    type: 'string',
+                    optional: false,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'member',
+                        'userId'
+                    >,
+                    serverName: 'user_id',
+                },
+                role: {
+                    type: 'string',
+                    optional: true,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'member',
+                        'role'
+                    >,
+                },
+                createdAt: {
+                    type: 'number',
+                    optional: false,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'member',
+                        'createdAt'
+                    >,
+                    serverName: 'created_at',
+                },
+            },
+            primaryKey: ['id'],
         },
-        organizationId: {
-          type: "string",
-          optional: false,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "member",
-            "organizationId"
-          >,
-          serverName: "organization_id",
+        organization: {
+            name: 'organization',
+            columns: {
+                id: {
+                    type: 'string',
+                    optional: false,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'organization',
+                        'id'
+                    >,
+                },
+                name: {
+                    type: 'string',
+                    optional: false,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'organization',
+                        'name'
+                    >,
+                },
+                slug: {
+                    type: 'string',
+                    optional: true,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'organization',
+                        'slug'
+                    >,
+                },
+                logo: {
+                    type: 'string',
+                    optional: true,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'organization',
+                        'logo'
+                    >,
+                },
+                createdAt: {
+                    type: 'number',
+                    optional: false,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'organization',
+                        'createdAt'
+                    >,
+                    serverName: 'created_at',
+                },
+                metadata: {
+                    type: 'string',
+                    optional: true,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'organization',
+                        'metadata'
+                    >,
+                },
+            },
+            primaryKey: ['id'],
         },
-        userId: {
-          type: "string",
-          optional: false,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "member",
-            "userId"
-          >,
-          serverName: "user_id",
+        session: {
+            name: 'session',
+            columns: {
+                id: {
+                    type: 'string',
+                    optional: false,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'session',
+                        'id'
+                    >,
+                },
+                expiresAt: {
+                    type: 'number',
+                    optional: false,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'session',
+                        'expiresAt'
+                    >,
+                    serverName: 'expires_at',
+                },
+                token: {
+                    type: 'string',
+                    optional: false,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'session',
+                        'token'
+                    >,
+                },
+                createdAt: {
+                    type: 'number',
+                    optional: false,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'session',
+                        'createdAt'
+                    >,
+                    serverName: 'created_at',
+                },
+                updatedAt: {
+                    type: 'number',
+                    optional: false,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'session',
+                        'updatedAt'
+                    >,
+                    serverName: 'updated_at',
+                },
+                ipAddress: {
+                    type: 'string',
+                    optional: true,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'session',
+                        'ipAddress'
+                    >,
+                    serverName: 'ip_address',
+                },
+                userAgent: {
+                    type: 'string',
+                    optional: true,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'session',
+                        'userAgent'
+                    >,
+                    serverName: 'user_agent',
+                },
+                userId: {
+                    type: 'string',
+                    optional: false,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'session',
+                        'userId'
+                    >,
+                    serverName: 'user_id',
+                },
+                activeOrganizationId: {
+                    type: 'string',
+                    optional: true,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'session',
+                        'activeOrganizationId'
+                    >,
+                    serverName: 'active_organization_id',
+                },
+            },
+            primaryKey: ['id'],
         },
-        role: {
-          type: "string",
-          optional: true,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "member",
-            "role"
-          >,
-        },
-        createdAt: {
-          type: "number",
-          optional: false,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "member",
-            "createdAt"
-          >,
-          serverName: "created_at",
-        },
-      },
-      primaryKey: ["id"],
-    },
-    organization: {
-      name: "organization",
-      columns: {
-        id: {
-          type: "string",
-          optional: false,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "organization",
-            "id"
-          >,
-        },
-        name: {
-          type: "string",
-          optional: false,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "organization",
-            "name"
-          >,
-        },
-        slug: {
-          type: "string",
-          optional: true,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "organization",
-            "slug"
-          >,
-        },
-        logo: {
-          type: "string",
-          optional: true,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "organization",
-            "logo"
-          >,
-        },
-        createdAt: {
-          type: "number",
-          optional: false,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "organization",
-            "createdAt"
-          >,
-          serverName: "created_at",
-        },
-        metadata: {
-          type: "string",
-          optional: true,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "organization",
-            "metadata"
-          >,
-        },
-      },
-      primaryKey: ["id"],
-    },
-    session: {
-      name: "session",
-      columns: {
-        id: {
-          type: "string",
-          optional: false,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "session",
-            "id"
-          >,
-        },
-        expiresAt: {
-          type: "number",
-          optional: false,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "session",
-            "expiresAt"
-          >,
-          serverName: "expires_at",
-        },
-        token: {
-          type: "string",
-          optional: false,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "session",
-            "token"
-          >,
-        },
-        createdAt: {
-          type: "number",
-          optional: false,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "session",
-            "createdAt"
-          >,
-          serverName: "created_at",
-        },
-        updatedAt: {
-          type: "number",
-          optional: false,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "session",
-            "updatedAt"
-          >,
-          serverName: "updated_at",
-        },
-        ipAddress: {
-          type: "string",
-          optional: true,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "session",
-            "ipAddress"
-          >,
-          serverName: "ip_address",
-        },
-        userAgent: {
-          type: "string",
-          optional: true,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "session",
-            "userAgent"
-          >,
-          serverName: "user_agent",
-        },
-        userId: {
-          type: "string",
-          optional: false,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "session",
-            "userId"
-          >,
-          serverName: "user_id",
-        },
-        activeOrganizationId: {
-          type: "string",
-          optional: true,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "session",
-            "activeOrganizationId"
-          >,
-          serverName: "active_organization_id",
-        },
-      },
-      primaryKey: ["id"],
-    },
-    user: {
-      name: "user",
-      columns: {
-        id: {
-          type: "string",
-          optional: false,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "user",
-            "id"
-          >,
-        },
-        name: {
-          type: "string",
-          optional: false,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "user",
-            "name"
-          >,
-        },
-        email: {
-          type: "string",
-          optional: false,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "user",
-            "email"
-          >,
-        },
-        emailVerified: {
-          type: "boolean",
-          optional: false,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "user",
-            "emailVerified"
-          >,
-          serverName: "email_verified",
-        },
-        image: {
-          type: "string",
-          optional: true,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "user",
-            "image"
-          >,
-        },
-        createdAt: {
-          type: "number",
-          optional: false,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "user",
-            "createdAt"
-          >,
-          serverName: "created_at",
-        },
-        updatedAt: {
-          type: "number",
-          optional: false,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "user",
-            "updatedAt"
-          >,
-          serverName: "updated_at",
-        },
-        isAnonymous: {
-          type: "boolean",
-          optional: true,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "user",
-            "isAnonymous"
-          >,
-          serverName: "is_anonymous",
-        },
-      },
-      primaryKey: ["id"],
-    },
-    message: {
-      name: "message",
-      columns: {
-        id: {
-          type: "string",
-          optional: false,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "message",
-            "id"
-          >,
+        user: {
+            name: 'user',
+            columns: {
+                id: {
+                    type: 'string',
+                    optional: false,
+                    customType: null as unknown as ZeroCustomType<typeof zeroSchema, 'user', 'id'>,
+                },
+                name: {
+                    type: 'string',
+                    optional: false,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'user',
+                        'name'
+                    >,
+                },
+                email: {
+                    type: 'string',
+                    optional: false,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'user',
+                        'email'
+                    >,
+                },
+                emailVerified: {
+                    type: 'boolean',
+                    optional: false,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'user',
+                        'emailVerified'
+                    >,
+                    serverName: 'email_verified',
+                },
+                image: {
+                    type: 'string',
+                    optional: true,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'user',
+                        'image'
+                    >,
+                },
+                createdAt: {
+                    type: 'number',
+                    optional: false,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'user',
+                        'createdAt'
+                    >,
+                    serverName: 'created_at',
+                },
+                updatedAt: {
+                    type: 'number',
+                    optional: false,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'user',
+                        'updatedAt'
+                    >,
+                    serverName: 'updated_at',
+                },
+                isAnonymous: {
+                    type: 'boolean',
+                    optional: true,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'user',
+                        'isAnonymous'
+                    >,
+                    serverName: 'is_anonymous',
+                },
+            },
+            primaryKey: ['id'],
         },
         message: {
-          type: "json",
-          optional: false,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "message",
-            "message"
-          >,
-        },
-        createdAt: {
-          type: "number",
-          optional: true,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "message",
-            "createdAt"
-          >,
-          serverName: "created_at",
-        },
-        updatedAt: {
-          type: "number",
-          optional: true,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "message",
-            "updatedAt"
-          >,
-          serverName: "updated_at",
-        },
-        threadId: {
-          type: "string",
-          optional: false,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "message",
-            "threadId"
-          >,
-          serverName: "thread_id",
-        },
-        userId: {
-          type: "string",
-          optional: false,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "message",
-            "userId"
-          >,
-          serverName: "user_id",
-        },
-      },
-      primaryKey: ["id"],
-    },
-    model: {
-      name: "model",
-      columns: {
-        id: {
-          type: "string",
-          optional: false,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "model",
-            "id"
-          >,
-        },
-        name: {
-          type: "string",
-          optional: false,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "model",
-            "name"
-          >,
+            name: 'message',
+            columns: {
+                id: {
+                    type: 'string',
+                    optional: false,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'message',
+                        'id'
+                    >,
+                },
+                message: {
+                    type: 'json',
+                    optional: false,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'message',
+                        'message'
+                    >,
+                },
+                createdAt: {
+                    type: 'number',
+                    optional: true,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'message',
+                        'createdAt'
+                    >,
+                    serverName: 'created_at',
+                },
+                updatedAt: {
+                    type: 'number',
+                    optional: true,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'message',
+                        'updatedAt'
+                    >,
+                    serverName: 'updated_at',
+                },
+                threadId: {
+                    type: 'string',
+                    optional: false,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'message',
+                        'threadId'
+                    >,
+                    serverName: 'thread_id',
+                },
+                userId: {
+                    type: 'string',
+                    optional: false,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'message',
+                        'userId'
+                    >,
+                    serverName: 'user_id',
+                },
+            },
+            primaryKey: ['id'],
         },
         model: {
-          type: "string",
-          optional: false,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "model",
-            "model"
-          >,
+            name: 'model',
+            columns: {
+                id: {
+                    type: 'string',
+                    optional: false,
+                    customType: null as unknown as ZeroCustomType<typeof zeroSchema, 'model', 'id'>,
+                },
+                name: {
+                    type: 'string',
+                    optional: false,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'model',
+                        'name'
+                    >,
+                },
+                model: {
+                    type: 'string',
+                    optional: false,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'model',
+                        'model'
+                    >,
+                },
+                description: {
+                    type: 'string',
+                    optional: false,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'model',
+                        'description'
+                    >,
+                },
+                capabilities: {
+                    type: 'json',
+                    optional: true,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'model',
+                        'capabilities'
+                    >,
+                },
+                icon: {
+                    type: 'string',
+                    optional: false,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'model',
+                        'icon'
+                    >,
+                },
+                credits: {
+                    type: 'number',
+                    optional: true,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'model',
+                        'credits'
+                    >,
+                },
+                inputCost: {
+                    type: 'number',
+                    optional: true,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'model',
+                        'inputCost'
+                    >,
+                    serverName: 'input_cost',
+                },
+                outputCost: {
+                    type: 'number',
+                    optional: true,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'model',
+                        'outputCost'
+                    >,
+                    serverName: 'output_cost',
+                },
+                access: {
+                    type: 'string',
+                    optional: true,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'model',
+                        'access'
+                    >,
+                },
+                enabled: {
+                    type: 'boolean',
+                    optional: true,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'model',
+                        'enabled'
+                    >,
+                },
+                createdAt: {
+                    type: 'number',
+                    optional: true,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'model',
+                        'createdAt'
+                    >,
+                    serverName: 'created_at',
+                },
+                updatedAt: {
+                    type: 'number',
+                    optional: true,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'model',
+                        'updatedAt'
+                    >,
+                    serverName: 'updated_at',
+                },
+            },
+            primaryKey: ['id'],
         },
-        description: {
-          type: "string",
-          optional: false,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "model",
-            "description"
-          >,
+        organizationCustomer: {
+            name: 'organizationCustomer',
+            columns: {
+                id: {
+                    type: 'string',
+                    optional: false,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'organizationCustomer',
+                        'id'
+                    >,
+                },
+                organizationId: {
+                    type: 'string',
+                    optional: false,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'organizationCustomer',
+                        'organizationId'
+                    >,
+                    serverName: 'organization_id',
+                },
+                subscription: {
+                    type: 'json',
+                    optional: true,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'organizationCustomer',
+                        'subscription'
+                    >,
+                },
+            },
+            primaryKey: ['id'],
+            serverName: 'organization_customer',
         },
-        capabilities: {
-          type: "json",
-          optional: true,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "model",
-            "capabilities"
-          >,
+        setting: {
+            name: 'setting',
+            columns: {
+                id: {
+                    type: 'string',
+                    optional: false,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'setting',
+                        'id'
+                    >,
+                },
+                mode: {
+                    type: 'string',
+                    optional: true,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'setting',
+                        'mode'
+                    >,
+                },
+                theme: {
+                    type: 'string',
+                    optional: true,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'setting',
+                        'theme'
+                    >,
+                },
+                userId: {
+                    type: 'string',
+                    optional: false,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'setting',
+                        'userId'
+                    >,
+                    serverName: 'user_id',
+                },
+                nickname: {
+                    type: 'string',
+                    optional: true,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'setting',
+                        'nickname'
+                    >,
+                },
+                biography: {
+                    type: 'string',
+                    optional: true,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'setting',
+                        'biography'
+                    >,
+                },
+                instructions: {
+                    type: 'string',
+                    optional: true,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'setting',
+                        'instructions'
+                    >,
+                },
+                modelId: {
+                    type: 'string',
+                    optional: true,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'setting',
+                        'modelId'
+                    >,
+                    serverName: 'model_id',
+                },
+                pinnedModels: {
+                    type: 'json',
+                    optional: true,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'setting',
+                        'pinnedModels'
+                    >,
+                    serverName: 'pinned_models',
+                },
+            },
+            primaryKey: ['id'],
         },
-        icon: {
-          type: "string",
-          optional: false,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "model",
-            "icon"
-          >,
+        thread: {
+            name: 'thread',
+            columns: {
+                id: {
+                    type: 'string',
+                    optional: false,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'thread',
+                        'id'
+                    >,
+                },
+                title: {
+                    type: 'string',
+                    optional: true,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'thread',
+                        'title'
+                    >,
+                },
+                status: {
+                    type: 'string',
+                    optional: true,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'thread',
+                        'status'
+                    >,
+                },
+                streamId: {
+                    type: 'string',
+                    optional: true,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'thread',
+                        'streamId'
+                    >,
+                    serverName: 'stream_id',
+                },
+                createdAt: {
+                    type: 'number',
+                    optional: true,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'thread',
+                        'createdAt'
+                    >,
+                    serverName: 'created_at',
+                },
+                updatedAt: {
+                    type: 'number',
+                    optional: true,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'thread',
+                        'updatedAt'
+                    >,
+                    serverName: 'updated_at',
+                },
+                userId: {
+                    type: 'string',
+                    optional: false,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'thread',
+                        'userId'
+                    >,
+                    serverName: 'user_id',
+                },
+            },
+            primaryKey: ['id'],
         },
-        credits: {
-          type: "number",
-          optional: true,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "model",
-            "credits"
-          >,
+        usage: {
+            name: 'usage',
+            columns: {
+                id: {
+                    type: 'string',
+                    optional: false,
+                    customType: null as unknown as ZeroCustomType<typeof zeroSchema, 'usage', 'id'>,
+                },
+                userId: {
+                    type: 'string',
+                    optional: false,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'usage',
+                        'userId'
+                    >,
+                    serverName: 'user_id',
+                },
+                credits: {
+                    type: 'number',
+                    optional: true,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'usage',
+                        'credits'
+                    >,
+                },
+                search: {
+                    type: 'number',
+                    optional: true,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'usage',
+                        'search'
+                    >,
+                },
+                research: {
+                    type: 'number',
+                    optional: true,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'usage',
+                        'research'
+                    >,
+                },
+                cost: {
+                    type: 'number',
+                    optional: true,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'usage',
+                        'cost'
+                    >,
+                },
+            },
+            primaryKey: ['id'],
         },
-        access: {
-          type: "string",
-          optional: true,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "model",
-            "access"
-          >,
+        userCustomer: {
+            name: 'userCustomer',
+            columns: {
+                id: {
+                    type: 'string',
+                    optional: false,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'userCustomer',
+                        'id'
+                    >,
+                },
+                userId: {
+                    type: 'string',
+                    optional: false,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'userCustomer',
+                        'userId'
+                    >,
+                    serverName: 'user_id',
+                },
+                subscription: {
+                    type: 'json',
+                    optional: true,
+                    customType: null as unknown as ZeroCustomType<
+                        typeof zeroSchema,
+                        'userCustomer',
+                        'subscription'
+                    >,
+                },
+            },
+            primaryKey: ['id'],
+            serverName: 'user_customer',
         },
-        createdAt: {
-          type: "number",
-          optional: true,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "model",
-            "createdAt"
-          >,
-          serverName: "created_at",
-        },
-        updatedAt: {
-          type: "number",
-          optional: true,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "model",
-            "updatedAt"
-          >,
-          serverName: "updated_at",
-        },
-      },
-      primaryKey: ["id"],
     },
-    organizationCustomer: {
-      name: "organizationCustomer",
-      columns: {
-        id: {
-          type: "string",
-          optional: false,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "organizationCustomer",
-            "id"
-          >,
+    relationships: {
+        member: {
+            organization: [
+                {
+                    sourceField: ['organizationId'],
+                    destField: ['id'],
+                    destSchema: 'organization',
+                    cardinality: 'one',
+                },
+            ],
         },
-        organizationId: {
-          type: "string",
-          optional: false,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "organizationCustomer",
-            "organizationId"
-          >,
-          serverName: "organization_id",
+        message: {
+            thread: [
+                {
+                    sourceField: ['threadId'],
+                    destField: ['id'],
+                    destSchema: 'thread',
+                    cardinality: 'one',
+                },
+            ],
+            user: [
+                {
+                    sourceField: ['userId'],
+                    destField: ['id'],
+                    destSchema: 'user',
+                    cardinality: 'one',
+                },
+            ],
         },
-        subscription: {
-          type: "json",
-          optional: true,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "organizationCustomer",
-            "subscription"
-          >,
+        organizationCustomer: {
+            organization: [
+                {
+                    sourceField: ['organizationId'],
+                    destField: ['id'],
+                    destSchema: 'organization',
+                    cardinality: 'one',
+                },
+            ],
         },
-      },
-      primaryKey: ["id"],
-      serverName: "organization_customer",
+        organization: {
+            customer: [
+                {
+                    sourceField: ['id'],
+                    destField: ['organizationId'],
+                    destSchema: 'organizationCustomer',
+                    cardinality: 'one',
+                },
+            ],
+            members: [
+                {
+                    sourceField: ['id'],
+                    destField: ['organizationId'],
+                    destSchema: 'member',
+                    cardinality: 'many',
+                },
+            ],
+        },
+        setting: {
+            user: [
+                {
+                    sourceField: ['userId'],
+                    destField: ['id'],
+                    destSchema: 'user',
+                    cardinality: 'one',
+                },
+            ],
+            model: [
+                {
+                    sourceField: ['modelId'],
+                    destField: ['id'],
+                    destSchema: 'model',
+                    cardinality: 'one',
+                },
+            ],
+        },
+        thread: {
+            user: [
+                {
+                    sourceField: ['userId'],
+                    destField: ['id'],
+                    destSchema: 'user',
+                    cardinality: 'one',
+                },
+            ],
+            messages: [
+                {
+                    sourceField: ['id'],
+                    destField: ['threadId'],
+                    destSchema: 'message',
+                    cardinality: 'many',
+                },
+            ],
+        },
+        userCustomer: {
+            user: [
+                {
+                    sourceField: ['userId'],
+                    destField: ['id'],
+                    destSchema: 'user',
+                    cardinality: 'one',
+                },
+            ],
+        },
+        user: {
+            threads: [
+                {
+                    sourceField: ['id'],
+                    destField: ['userId'],
+                    destSchema: 'thread',
+                    cardinality: 'many',
+                },
+            ],
+            messages: [
+                {
+                    sourceField: ['id'],
+                    destField: ['userId'],
+                    destSchema: 'message',
+                    cardinality: 'many',
+                },
+            ],
+            settings: [
+                {
+                    sourceField: ['id'],
+                    destField: ['userId'],
+                    destSchema: 'setting',
+                    cardinality: 'one',
+                },
+            ],
+            customer: [
+                {
+                    sourceField: ['id'],
+                    destField: ['userId'],
+                    destSchema: 'userCustomer',
+                    cardinality: 'one',
+                },
+            ],
+        },
     },
-    setting: {
-      name: "setting",
-      columns: {
-        id: {
-          type: "string",
-          optional: false,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "setting",
-            "id"
-          >,
-        },
-        mode: {
-          type: "string",
-          optional: true,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "setting",
-            "mode"
-          >,
-        },
-        theme: {
-          type: "string",
-          optional: true,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "setting",
-            "theme"
-          >,
-        },
-        userId: {
-          type: "string",
-          optional: false,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "setting",
-            "userId"
-          >,
-          serverName: "user_id",
-        },
-        nickname: {
-          type: "string",
-          optional: true,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "setting",
-            "nickname"
-          >,
-        },
-        biography: {
-          type: "string",
-          optional: true,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "setting",
-            "biography"
-          >,
-        },
-        instructions: {
-          type: "string",
-          optional: true,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "setting",
-            "instructions"
-          >,
-        },
-        modelId: {
-          type: "string",
-          optional: true,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "setting",
-            "modelId"
-          >,
-          serverName: "model_id",
-        },
-        pinnedModels: {
-          type: "json",
-          optional: true,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "setting",
-            "pinnedModels"
-          >,
-          serverName: "pinned_models",
-        },
-      },
-      primaryKey: ["id"],
-    },
-    thread: {
-      name: "thread",
-      columns: {
-        id: {
-          type: "string",
-          optional: false,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "thread",
-            "id"
-          >,
-        },
-        title: {
-          type: "string",
-          optional: true,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "thread",
-            "title"
-          >,
-        },
-        status: {
-          type: "string",
-          optional: true,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "thread",
-            "status"
-          >,
-        },
-        streamId: {
-          type: "string",
-          optional: true,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "thread",
-            "streamId"
-          >,
-          serverName: "stream_id",
-        },
-        createdAt: {
-          type: "number",
-          optional: true,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "thread",
-            "createdAt"
-          >,
-          serverName: "created_at",
-        },
-        updatedAt: {
-          type: "number",
-          optional: true,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "thread",
-            "updatedAt"
-          >,
-          serverName: "updated_at",
-        },
-        userId: {
-          type: "string",
-          optional: false,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "thread",
-            "userId"
-          >,
-          serverName: "user_id",
-        },
-      },
-      primaryKey: ["id"],
-    },
-    usage: {
-      name: "usage",
-      columns: {
-        id: {
-          type: "string",
-          optional: false,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "usage",
-            "id"
-          >,
-        },
-        userId: {
-          type: "string",
-          optional: false,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "usage",
-            "userId"
-          >,
-          serverName: "user_id",
-        },
-        credits: {
-          type: "number",
-          optional: true,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "usage",
-            "credits"
-          >,
-        },
-        search: {
-          type: "number",
-          optional: true,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "usage",
-            "search"
-          >,
-        },
-        research: {
-          type: "number",
-          optional: true,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "usage",
-            "research"
-          >,
-        },
-      },
-      primaryKey: ["id"],
-    },
-    userCustomer: {
-      name: "userCustomer",
-      columns: {
-        id: {
-          type: "string",
-          optional: false,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "userCustomer",
-            "id"
-          >,
-        },
-        userId: {
-          type: "string",
-          optional: false,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "userCustomer",
-            "userId"
-          >,
-          serverName: "user_id",
-        },
-        subscription: {
-          type: "json",
-          optional: true,
-          customType: null as unknown as ZeroCustomType<
-            typeof zeroSchema,
-            "userCustomer",
-            "subscription"
-          >,
-        },
-      },
-      primaryKey: ["id"],
-      serverName: "user_customer",
-    },
-  },
-  relationships: {
-    member: {
-      organization: [
-        {
-          sourceField: ["organizationId"],
-          destField: ["id"],
-          destSchema: "organization",
-          cardinality: "one",
-        },
-      ],
-    },
-    message: {
-      thread: [
-        {
-          sourceField: ["threadId"],
-          destField: ["id"],
-          destSchema: "thread",
-          cardinality: "one",
-        },
-      ],
-      user: [
-        {
-          sourceField: ["userId"],
-          destField: ["id"],
-          destSchema: "user",
-          cardinality: "one",
-        },
-      ],
-    },
-    organizationCustomer: {
-      organization: [
-        {
-          sourceField: ["organizationId"],
-          destField: ["id"],
-          destSchema: "organization",
-          cardinality: "one",
-        },
-      ],
-    },
-    organization: {
-      customer: [
-        {
-          sourceField: ["id"],
-          destField: ["organizationId"],
-          destSchema: "organizationCustomer",
-          cardinality: "one",
-        },
-      ],
-      members: [
-        {
-          sourceField: ["id"],
-          destField: ["organizationId"],
-          destSchema: "member",
-          cardinality: "many",
-        },
-      ],
-    },
-    setting: {
-      user: [
-        {
-          sourceField: ["userId"],
-          destField: ["id"],
-          destSchema: "user",
-          cardinality: "one",
-        },
-      ],
-      model: [
-        {
-          sourceField: ["modelId"],
-          destField: ["id"],
-          destSchema: "model",
-          cardinality: "one",
-        },
-      ],
-    },
-    thread: {
-      user: [
-        {
-          sourceField: ["userId"],
-          destField: ["id"],
-          destSchema: "user",
-          cardinality: "one",
-        },
-      ],
-      messages: [
-        {
-          sourceField: ["id"],
-          destField: ["threadId"],
-          destSchema: "message",
-          cardinality: "many",
-        },
-      ],
-    },
-    userCustomer: {
-      user: [
-        {
-          sourceField: ["userId"],
-          destField: ["id"],
-          destSchema: "user",
-          cardinality: "one",
-        },
-      ],
-    },
-    user: {
-      threads: [
-        {
-          sourceField: ["id"],
-          destField: ["userId"],
-          destSchema: "thread",
-          cardinality: "many",
-        },
-      ],
-      messages: [
-        {
-          sourceField: ["id"],
-          destField: ["userId"],
-          destSchema: "message",
-          cardinality: "many",
-        },
-      ],
-      settings: [
-        {
-          sourceField: ["id"],
-          destField: ["userId"],
-          destSchema: "setting",
-          cardinality: "one",
-        },
-      ],
-      customer: [
-        {
-          sourceField: ["id"],
-          destField: ["userId"],
-          destSchema: "userCustomer",
-          cardinality: "one",
-        },
-      ],
-    },
-  },
 } as const;
 
 /**

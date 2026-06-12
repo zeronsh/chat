@@ -13,8 +13,7 @@ export const Route = createFileRoute('/_account/account/subscription')({
 
 function RouteComponent() {
     const { data: session } = useSession();
-    const { isPro, isExpiring, limits, remainingSearches, remainingResearches, remainingCredits } =
-        useAccess();
+    const { isPro, isExpiring, limits, remainingResearches, usagePercent } = useAccess();
 
     return (
         <div className="flex flex-col gap-8 w-full">
@@ -134,53 +133,19 @@ function RouteComponent() {
             <Separator />
             <Section title="Usage" description="Track your current usage and limits.">
                 <div className="space-y-4">
-                    {/* AI Credits Usage */}
+                    {/* Daily Usage */}
                     <div className="flex flex-col gap-4 bg-card p-4 rounded-lg border">
                         <div className="flex justify-between items-center">
-                            <h3 className="text-sm font-medium">Message Credits</h3>
+                            <h3 className="text-sm font-medium">Daily Usage</h3>
                             <span className="text-xs text-muted-foreground">
-                                {limits?.CREDITS ? limits.CREDITS - remainingCredits : 0} /{' '}
-                                {limits?.CREDITS || 0}
+                                {usagePercent}% used
                             </span>
                         </div>
                         <div className="w-full bg-secondary rounded-full h-2">
                             <div
                                 className="bg-primary rounded-full h-2 transition-all duration-300"
                                 style={{
-                                    width: limits?.CREDITS
-                                        ? `${Math.min(
-                                              100,
-                                              ((limits.CREDITS - remainingCredits) /
-                                                  limits.CREDITS) *
-                                                  100
-                                          )}%`
-                                        : '0%',
-                                }}
-                            ></div>
-                        </div>
-                        <p className="text-xs text-muted-foreground">Resets daily</p>
-                    </div>
-                    {/* Search Usage */}
-                    <div className="flex flex-col gap-4 bg-card p-4 rounded-lg border">
-                        <div className="flex justify-between items-center">
-                            <h3 className="text-sm font-medium">Search Queries</h3>
-                            <span className="text-xs text-muted-foreground">
-                                {limits?.SEARCH ? limits.SEARCH - remainingSearches : 0} /{' '}
-                                {limits?.SEARCH || 0}
-                            </span>
-                        </div>
-                        <div className="w-full bg-secondary rounded-full h-2">
-                            <div
-                                className="bg-primary rounded-full h-2 transition-all duration-300"
-                                style={{
-                                    width: limits?.SEARCH
-                                        ? `${Math.min(
-                                              100,
-                                              ((limits.SEARCH - remainingSearches) /
-                                                  limits.SEARCH) *
-                                                  100
-                                          )}%`
-                                        : '0%',
+                                    width: `${usagePercent}%`,
                                 }}
                             ></div>
                         </div>

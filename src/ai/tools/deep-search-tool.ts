@@ -2,6 +2,7 @@ import { Effect, Layer, Runtime } from 'effect';
 import { generateObject, generateText, NoSuchToolError, stepCountIs, tool } from 'ai';
 import z from 'zod';
 import { decrementUsage, incrementUsage } from '@/ai/service';
+import { RESEARCH_COST } from '@/lib/constants';
 import { ToolContext } from '@/ai/tools';
 import { getDeepSearchPlanPrompt, getDeepSearchPrompt } from '@/ai/prompt';
 import { readSite, search, SearchResults } from '@/lib/exa';
@@ -123,7 +124,7 @@ function deepSearchTool(args: { query: string; thoughts: string; toolCallId: str
             object: { plan },
         } = yield* Effect.tryPromise(() =>
             generateObject({
-                model: 'xai/grok-code-fast-1',
+                model: 'xai/grok-4.1-fast-non-reasoning',
                 schema: PlanSchema,
                 prompt: getDeepSearchPlanPrompt(args.query),
                 abortSignal: ctx.signal,
@@ -133,7 +134,10 @@ function deepSearchTool(args: { query: string; thoughts: string; toolCallId: str
                 return Effect.logError('Error generating plan', e);
             }),
             Effect.tapError(() => {
-                return decrementUsage(ctx.userId, 'research', 1);
+                return Effect.all([
+                    decrementUsage(ctx.userId, 'research', 1),
+                    decrementUsage(ctx.userId, 'cost', RESEARCH_COST),
+                ]);
             }),
             Effect.catchAll(e => Effect.die(e))
         );
@@ -218,7 +222,10 @@ function deepSearchTool(args: { query: string; thoughts: string; toolCallId: str
                 return Effect.logError('Error generating text', e);
             }),
             Effect.tapError(() => {
-                return decrementUsage(ctx.userId, 'research', 1);
+                return Effect.all([
+                    decrementUsage(ctx.userId, 'research', 1),
+                    decrementUsage(ctx.userId, 'cost', RESEARCH_COST),
+                ]);
             }),
             Effect.catchAll(e => Effect.die(e))
         );
@@ -241,7 +248,15 @@ function incrementResearchUsageOrDie() {
             return yield* Effect.die(null);
         }
 
-        yield* incrementUsage(ctx.userId, 'research', 1).pipe(
+        if (ctx.limits.BUDGET - (ctx.usage.cost || 0) <= 0) {
+            yield* Effect.logWarning('Daily usage limit reached');
+            return yield* Effect.die(null);
+        }
+
+        yield* Effect.all([
+            incrementUsage(ctx.userId, 'research', 1),
+            incrementUsage(ctx.userId, 'cost', RESEARCH_COST),
+        ]).pipe(
             Effect.tapError(() => {
                 return Effect.logError('Error incrementing usage');
             }),

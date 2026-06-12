@@ -27,13 +27,14 @@ import {
 } from '@/components/app/insufficient-dialog';
 import { dialogStore } from '@/stores/dialogs';
 import { CapabilityBadges } from '@/components/ui/capability-badges';
+import { getModelPriceTier } from '@/lib/cost';
 
 export function ModelSelector() {
     const [open, setOpen] = useState(false);
     const [showAll, setShowAll] = useState(false);
     const [hoveredModel, setHoveredModel] = useState<Model | null>(null);
     const db = useDatabase();
-    const [allModels] = useQuery(db.query.model);
+    const [allModels] = useQuery(db.query.model.where('enabled', true));
     const settings = useSettings();
     const pinnedModelIds = settings?.pinnedModels || [];
     const models = allModels.filter(model => pinnedModelIds.includes(model.id));
@@ -286,13 +287,9 @@ export function ModelSelector() {
                                     {hoveredModel.description}
                                 </div>
                                 <div className="flex items-center gap-2 text-sm text-muted-foreground justify-between px-2 border-t border-foreground/10 pt-4 pb-4">
-                                    <div>Cost</div>
-                                    <div>
-                                        <span className="font-semibold">
-                                            {hoveredModel.credits} credit
-                                            {Number(hoveredModel.credits ?? 0) > 1 ? 's' : ''}
-                                        </span>
-                                        /message
+                                    <div>Pricing</div>
+                                    <div className="font-semibold">
+                                        {getModelPriceTier(hoveredModel)}
                                     </div>
                                 </div>
                             </div>

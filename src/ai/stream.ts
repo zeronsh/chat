@@ -5,6 +5,7 @@ import {
     JsonToSseTransformStream,
     type UIMessage,
     type ToolSet,
+    type LanguageModelUsage,
     TextStreamPart,
     UIMessageStreamWriter,
     InferUIMessageChunk,
@@ -34,10 +35,13 @@ const createStreamSSEResponse = Effect.gen(function* () {
     const { onMessageMetadataCallback } = yield* CreateStreamSSEResponseOnMessageMetadata;
     const { getToolsCallback } = yield* CreateStreamSSEResponseGetTools;
 
+    let totalUsagePromise: Promise<LanguageModelUsage> | undefined;
+
     return createUIMessageStream<ThreadMessage>({
-        onFinish: ({ responseMessage }) => {
+        onFinish: async ({ responseMessage }) => {
+            const totalUsage = await totalUsagePromise?.catch(() => undefined);
             // @ts-expect-error - TODO: fix this
-            return Runtime.runPromise(runtime, onFinishCallback({ responseMessage }));
+            return Runtime.runPromise(runtime, onFinishCallback({ responseMessage, totalUsage }));
         },
         execute: ({ writer }) => {
             // @ts-expect-error - TODO: fix this
@@ -51,6 +55,8 @@ const createStreamSSEResponse = Effect.gen(function* () {
                     return Runtime.runPromise(runtime, onErrorCallback({ error, writer }));
                 },
             });
+
+            totalUsagePromise = result.totalUsage;
 
             result.consumeStream();
             writer.merge(
@@ -71,6 +77,7 @@ const createStreamSSEResponse = Effect.gen(function* () {
 
 export type OnFinishCallback<A = void, E = never, R = never> = (options: {
     responseMessage: ThreadMessage;
+    totalUsage: LanguageModelUsage | undefined;
 }) => Effect.Effect<A, E, R>;
 
 export class CreateStreamSSEResponseOnFinish extends Effect.Tag('CreateStreamSSEResponseOnFinish')<

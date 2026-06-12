@@ -299,7 +299,7 @@ export function getUsageByUserId(userId: string) {
 }
 
 export function incrementUsage(
-    values: { userId: string; type: 'search' | 'research' | 'credits' },
+    values: { userId: string; type: 'search' | 'research' | 'credits' | 'cost' },
     amount: number
 ) {
     return Effect.gen(function* () {
@@ -316,7 +316,7 @@ export function incrementUsage(
 }
 
 export function decrementUsage(
-    values: { userId: string; type: 'search' | 'research' | 'credits' },
+    values: { userId: string; type: 'search' | 'research' | 'credits' | 'cost' },
     amount: number
 ) {
     return Effect.gen(function* () {
@@ -342,6 +342,7 @@ export function resetUsage() {
                     credits: 0,
                     research: 0,
                     search: 0,
+                    cost: 0,
                 })
                 .execute()
         );

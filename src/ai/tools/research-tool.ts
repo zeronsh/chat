@@ -4,6 +4,7 @@ import z from 'zod';
 import { search, readSite } from '@/lib/exa';
 import { DataParts } from '@/ai/types';
 import { decrementUsage, incrementUsage } from '@/ai/service';
+import { RESEARCH_COST } from '@/lib/constants';
 import { Effect, Layer, Runtime } from 'effect';
 import { ToolContext } from '@/ai/tools';
 
@@ -44,7 +45,15 @@ function researchTool(thoughts: string, prompt: string, toolCallId: string) {
             return yield* Effect.die(null);
         }
 
-        yield* incrementUsage(ctx.userId, 'research', 1).pipe(
+        if (ctx.limits.BUDGET - (ctx.usage.cost || 0) <= 0) {
+            yield* Effect.logWarning('Daily usage limit reached');
+            return yield* Effect.die(null);
+        }
+
+        yield* Effect.all([
+            incrementUsage(ctx.userId, 'research', 1),
+            incrementUsage(ctx.userId, 'cost', RESEARCH_COST),
+        ]).pipe(
             Effect.tapError(() => {
                 return Effect.logError('Error incrementing usage');
             }),
@@ -158,7 +167,10 @@ function researchTool(thoughts: string, prompt: string, toolCallId: string) {
                 return Effect.logError('Error generating text', e);
             }),
             Effect.tapError(() => {
-                return decrementUsage(ctx.userId, 'research', 1);
+                return Effect.all([
+                    decrementUsage(ctx.userId, 'research', 1),
+                    decrementUsage(ctx.userId, 'cost', RESEARCH_COST),
+                ]);
             }),
             Effect.catchAll(e => Effect.die(e))
         );

@@ -1,0 +1,2 @@
+ALTER TABLE "setting" ALTER COLUMN "pinned_models" SET DEFAULT '["claude-4.6-sonnet","gpt-4o","gpt-4o-mini","gemini-2.5-flash","gemini-2.5-pro","gemini-3.5-flash","kimi-k2"]'::jsonb;--> statement-breakpoint
+ALTER TABLE "model" ADD COLUMN "enabled" boolean DEFAULT true NOT NULL;

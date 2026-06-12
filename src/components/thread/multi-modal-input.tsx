@@ -135,8 +135,8 @@ export function MultiModalInput() {
     const {
         isPro,
         isExpiring,
-        remainingCredits,
-        remainingSearches,
+        remainingBudget,
+        usagePercent,
         remainingResearches,
         canSearch,
         canResearch,
@@ -150,8 +150,8 @@ export function MultiModalInput() {
         return match({
             isPro,
             isExpiring,
-            remainingCredits,
-            remainingSearches,
+            remainingBudget,
+            usagePercent,
             remainingResearches,
             canSearch,
             canResearch,
@@ -167,8 +167,8 @@ export function MultiModalInput() {
     }, [
         isPro,
         isExpiring,
-        remainingCredits,
-        remainingSearches,
+        remainingBudget,
+        usagePercent,
         remainingResearches,
         canSearch,
         canResearch,
@@ -226,10 +226,10 @@ export function MultiModalInput() {
                 onValueChange={setInput}
                 onSubmit={handleSubmit}
             >
-                {match({ editingMessageId, remainingCredits, isPro })
+                {match({ editingMessageId, usagePercent, isPro })
                     .with(
                         {
-                            remainingCredits: P.number.lte(0),
+                            usagePercent: P.number.gte(100),
                             isPro: false,
                             editingMessageId: P.nullish,
                         },
@@ -237,7 +237,7 @@ export function MultiModalInput() {
                             <div className="flex justify-between items-center px-3 py-3 bg-sidebar/30 backdrop-blur-md text-xs text-muted-foreground border-b border-foreground/10">
                                 <div className="flex items-center gap-2">
                                     <AlertTriangleIcon className="size-4 " />
-                                    <p>You have no credits remaining.</p>
+                                    <p>You have reached your daily usage limit.</p>
                                 </div>
                                 <Button
                                     variant="link"
@@ -251,7 +251,7 @@ export function MultiModalInput() {
                     )
                     .with(
                         {
-                            remainingCredits: P.number.lt(10),
+                            usagePercent: P.number.gte(80),
                             isPro: false,
                             editingMessageId: P.nullish,
                         },
@@ -259,10 +259,7 @@ export function MultiModalInput() {
                             <div className="flex justify-between items-center px-3 py-3 bg-sidebar/30 backdrop-blur-md text-xs text-muted-foreground border-b border-foreground/10">
                                 <div className="flex items-center gap-2">
                                     <AlertTriangleIcon className="size-4 " />
-                                    <p>
-                                        You only have {remainingCredits} credit
-                                        {remainingCredits === 1 ? '' : 's'} remaining.
-                                    </p>
+                                    <p>You have used {usagePercent}% of your daily usage.</p>
                                 </div>
                                 <Button
                                     variant="link"
@@ -276,7 +273,7 @@ export function MultiModalInput() {
                     )
                     .with(
                         {
-                            remainingCredits: P.number.lte(0),
+                            usagePercent: P.number.gte(100),
                             isPro: true,
                             editingMessageId: P.nullish,
                         },
@@ -284,7 +281,7 @@ export function MultiModalInput() {
                             <div className="flex justify-between items-center px-3 py-3 bg-sidebar/30 backdrop-blur-md text-xs text-muted-foreground border-b border-foreground/10">
                                 <div className="flex items-center gap-2">
                                     <AlertTriangleIcon className="size-4 " />
-                                    <p>You have no credits remaining.</p>
+                                    <p>You have reached your daily usage limit.</p>
                                 </div>
                                 <p className="text-xs text-primary">Resets daily</p>
                             </div>
@@ -292,7 +289,7 @@ export function MultiModalInput() {
                     )
                     .with(
                         {
-                            remainingCredits: P.number.lt(10),
+                            usagePercent: P.number.gte(80),
                             isPro: true,
                             editingMessageId: P.nullish,
                         },
@@ -300,10 +297,7 @@ export function MultiModalInput() {
                             <div className="flex justify-between items-center px-3 py-3 bg-sidebar/30 backdrop-blur-md text-xs text-muted-foreground border-b border-foreground/10">
                                 <div className="flex items-center gap-2">
                                     <AlertTriangleIcon className="size-4 " />
-                                    <p>
-                                        You only have {remainingCredits} credit
-                                        {remainingCredits === 1 ? '' : 's'} remaining.
-                                    </p>
+                                    <p>You have used {usagePercent}% of your daily usage.</p>
                                 </div>
                                 <p className="text-xs text-primary">Resets daily</p>
                             </div>
@@ -394,9 +388,9 @@ export function MultiModalInput() {
                                 )
                                 .with(
                                     {
-                                        remainingSearches: P.number.lte(0),
+                                        remainingBudget: P.number.lte(0),
                                     },
-                                    () => 'You have reached your search limit'
+                                    () => 'You have reached your daily usage limit'
                                 )
                                 .otherwise(() => 'Search is not available')}
                         >
@@ -422,10 +416,10 @@ export function MultiModalInput() {
                                         })
                                         .with(
                                             {
-                                                remainingSearches: P.number.lte(0),
+                                                remainingBudget: P.number.lte(0),
                                             },
                                             () => {
-                                                toast('You have reached your search limit');
+                                                toast('You have reached your daily usage limit');
                                             }
                                         )
                                         .otherwise(() => {
@@ -555,7 +549,7 @@ export function MultiModalInput() {
                             .with(
                                 {
                                     input: P.string.maxLength(0),
-                                    remainingCredits: P.number.gt(0),
+                                    remainingBudget: P.number.gt(0),
                                     status: 'ready',
                                     canUseModel: true,
                                 },
@@ -563,10 +557,10 @@ export function MultiModalInput() {
                             )
                             .with(
                                 {
-                                    remainingCredits: 0,
+                                    remainingBudget: P.number.lte(0),
                                     status: 'ready',
                                 },
-                                () => 'You have reached your message limit.'
+                                () => 'You have reached your daily usage limit.'
                             )
                             .with(
                                 {
@@ -602,14 +596,14 @@ export function MultiModalInput() {
                                 .with(
                                     {
                                         input: P.string.maxLength(0),
-                                        remainingCredits: P.number.gt(0),
+                                        remainingBudget: P.number.gt(0),
                                         status: 'ready',
                                     },
                                     () => true
                                 )
                                 .with(
                                     {
-                                        remainingCredits: 0,
+                                        remainingBudget: P.number.lte(0),
                                     },
                                     () => true
                                 )

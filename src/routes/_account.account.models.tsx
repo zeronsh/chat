@@ -7,6 +7,7 @@ import { useQuery } from '@rocicorp/zero/react';
 import ModelIcon from '@/components/thread/model-icon';
 import { Badge } from '@/components/ui/badge';
 import { CapabilityBadges } from '@/components/ui/capability-badges';
+import { getModelPriceTier } from '@/lib/cost';
 
 export const Route = createFileRoute('/_account/account/models')({
     component: RouteComponent,
@@ -15,7 +16,7 @@ export const Route = createFileRoute('/_account/account/models')({
 function RouteComponent() {
     const settings = useSettings();
     const db = useDatabase();
-    const [allModels] = useQuery(db.query.model);
+    const [allModels] = useQuery(db.query.model.where('enabled', true));
 
     if (!settings) return null;
 
@@ -98,8 +99,7 @@ function RouteComponent() {
                                     </div>
 
                                     <div className="text-xs text-muted-foreground">
-                                        {model.credits} credit
-                                        {Number(model.credits ?? 0) > 1 ? 's' : ''}/message
+                                        {getModelPriceTier(model)}
                                     </div>
                                 </div>
                             </div>

@@ -101,10 +101,10 @@ export function prepareThreadContext(args: {
             isAnonymous: args.isAnonymous,
         });
 
-        if (limits.CREDITS - (usage.credits || 0) - model.credits < 0) {
+        if ((usage.cost || 0) >= limits.BUDGET) {
             return yield* new APIError({
                 status: 403,
-                message: 'You have reached your credit limit.',
+                message: 'You have reached your daily usage limit.',
             });
         }
 
@@ -293,7 +293,7 @@ export function generateThreadTitle(threadId: string, message: ThreadMessage, la
 
         const { text } = yield* Effect.tryPromise(() =>
             generateText({
-                model: 'google/gemini-2.0-flash-001',
+                model: 'google/gemini-2.5-flash-lite',
                 system: `\nc
                 - you will generate a short title based on the first message a user begins a conversation with
                 - ensure it is not more than 80 characters long
@@ -323,7 +323,7 @@ export function generateThreadTitle(threadId: string, message: ThreadMessage, la
 
 export function incrementUsage(
     userId: UserId,
-    type: 'search' | 'research' | 'credits',
+    type: 'search' | 'research' | 'credits' | 'cost',
     amount: number
 ) {
     return Effect.gen(function* () {
@@ -340,7 +340,7 @@ export function incrementUsage(
 
 export function decrementUsage(
     userId: UserId,
-    type: 'search' | 'research' | 'credits',
+    type: 'search' | 'research' | 'credits' | 'cost',
     amount: number
 ) {
     return Effect.gen(function* () {

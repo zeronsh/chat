@@ -29,6 +29,9 @@ export default drizzleZeroConfig(schema, {
             icon: true,
             access: true,
             credits: true,
+            inputCost: true,
+            outputCost: true,
+            enabled: true,
             createdAt: true,
             updatedAt: true,
         },
@@ -101,6 +104,7 @@ export default drizzleZeroConfig(schema, {
             credits: true,
             search: true,
             research: true,
+            cost: true,
         },
         organizationSubscription: {
             id: true,

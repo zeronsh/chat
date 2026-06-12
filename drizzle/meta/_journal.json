@@ -141,6 +141,34 @@
       "when": 1763487525126,
       "tag": "0019_seed-models-nov-18-2025",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1781303299215,
+      "tag": "0020_salty_blindfold",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1781303308915,
+      "tag": "0021_seed-models-jun-12-2026",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1781304627370,
+      "tag": "0022_steady_silverclaw",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1781304633785,
+      "tag": "0023_seed-model-pricing",
+      "breakpoints": true
     }
   ]
 }

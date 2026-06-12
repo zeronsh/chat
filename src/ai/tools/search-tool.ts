@@ -2,6 +2,7 @@ import { tool } from 'ai';
 import z from 'zod';
 import { search } from '@/lib/exa';
 import { decrementUsage, incrementUsage } from '@/ai/service';
+import { SEARCH_COST } from '@/lib/constants';
 import { Effect, Layer, Runtime } from 'effect';
 import { ToolContext } from '@/ai/tools';
 
@@ -28,13 +29,16 @@ function searchTool(query: string) {
     return Effect.gen(function* () {
         const ctx = yield* ToolContext;
 
-        if (ctx.limits.SEARCH - (ctx.usage.search || 0) <= 0) {
-            yield* Effect.logWarning('Search limit reached');
+        if (ctx.limits.BUDGET - (ctx.usage.cost || 0) <= 0) {
+            yield* Effect.logWarning('Daily usage limit reached');
             return yield* Effect.die(null);
         }
 
         yield* Effect.logInfo('Running search for: ' + query);
-        yield* incrementUsage(ctx.userId, 'search', 1).pipe(
+        yield* Effect.all([
+            incrementUsage(ctx.userId, 'search', 1),
+            incrementUsage(ctx.userId, 'cost', SEARCH_COST),
+        ]).pipe(
             Effect.tapError(() => {
                 return Effect.logError('Error incrementing usage');
             }),
@@ -46,7 +50,10 @@ function searchTool(query: string) {
                 return Effect.logError('Error running search');
             }),
             Effect.tapError(() => {
-                return decrementUsage(ctx.userId, 'search', 1);
+                return Effect.all([
+                    decrementUsage(ctx.userId, 'search', 1),
+                    decrementUsage(ctx.userId, 'cost', SEARCH_COST),
+                ]);
             }),
             Effect.catchAll(e => Effect.die(e))
         );

@@ -115,7 +115,9 @@ export function ProDialog() {
                     </div>
                     <div className="flex items-center gap-4">
                         <CheckIcon className="size-3" />
-                        <span className="text-sm text-foreground/70">200 Credits daily</span>
+                        <span className="text-sm text-foreground/70">
+                            10x daily usage allowance
+                        </span>
                     </div>
                     <Anonymous>
                         <div className="flex gap-2 w-full items-center">
@@ -129,7 +131,7 @@ export function ProDialog() {
                                 <Link to="/login" className="text-primary hover:underline">
                                     Create account
                                 </Link>{' '}
-                                to get 20 credits daily and access to more models.
+                                to get higher daily usage and access to more models.
                             </span>
                         </div>
                     </Anonymous>

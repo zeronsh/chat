@@ -15,7 +15,7 @@ export function MessageContainer({
     className?: string;
 }) {
     const editingMessageId = useThreadSelector(state => state.editingMessageId);
-    const { isPro, remainingCredits } = useAccess();
+    const { isPro, usagePercent } = useAccess();
 
     return (
         <div
@@ -24,10 +24,10 @@ export function MessageContainer({
                 className,
                 !hasPreviousMessage && 'pt-40',
                 !hasNextMessage &&
-                    match({ editingMessageId, remainingCredits, isPro })
+                    match({ editingMessageId, usagePercent, isPro })
                         .with(
                             {
-                                remainingCredits: P.number.lte(0),
+                                usagePercent: P.number.gte(100),
                                 isPro: false,
                                 editingMessageId: P.nullish,
                             },
@@ -35,7 +35,7 @@ export function MessageContainer({
                         )
                         .with(
                             {
-                                remainingCredits: P.number.lt(10),
+                                usagePercent: P.number.gte(80),
                                 isPro: false,
                                 editingMessageId: P.nullish,
                             },
@@ -43,7 +43,7 @@ export function MessageContainer({
                         )
                         .with(
                             {
-                                remainingCredits: P.number.lte(0),
+                                usagePercent: P.number.gte(100),
                                 isPro: true,
                                 editingMessageId: P.nullish,
                             },
@@ -51,7 +51,7 @@ export function MessageContainer({
                         )
                         .with(
                             {
-                                remainingCredits: P.number.lt(10),
+                                usagePercent: P.number.gte(80),
                                 isPro: true,
                                 editingMessageId: P.nullish,
                             },

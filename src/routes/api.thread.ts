@@ -18,6 +18,7 @@ import {
     saveMessageAndResetThreadStatus,
 } from '@/ai/service';
 import { Stream } from '@/ai/stream';
+import { calculateTokenCost } from '@/lib/cost';
 import { RedisLive } from '@/lib/redis';
 import { Database } from '@/database/effect';
 import type { OpenAIResponsesProviderOptions } from '@ai-sdk/openai';
@@ -101,7 +102,13 @@ const threadPostApiHandler = Effect.gen(function* () {
           })
         : model.model;
 
-    const OPENAI_MODELS_WITH_REASONING = ['openai/gpt-5', 'openai/gpt-5-mini', 'openai/gpt-5-nano'];
+    const OPENAI_MODELS_WITH_REASONING = [
+        'openai/gpt-5',
+        'openai/gpt-5-mini',
+        'openai/gpt-5-nano',
+        'openai/gpt-5.5',
+        'openai/gpt-5.5-pro',
+    ];
 
     const openai: OpenAIResponsesProviderOptions = {
         parallelToolCalls: false,
@@ -116,6 +123,8 @@ const threadPostApiHandler = Effect.gen(function* () {
         'google/gemini-2.5-flash',
         'google/gemini-2.5-pro',
         'google/gemini-3-pro-preview',
+        'google/gemini-3.1-pro-preview',
+        'google/gemini-3.5-flash',
     ];
 
     const google: GoogleGenerativeAIProviderOptions = {};
@@ -176,8 +185,18 @@ const threadPostApiHandler = Effect.gen(function* () {
                 )
             );
         }),
-        Stream.onFinish(({ responseMessage }) => {
+        Stream.onFinish(({ responseMessage, totalUsage }) => {
             return Effect.gen(function* () {
+                if (totalUsage) {
+                    const cost = calculateTokenCost(model, totalUsage);
+                    yield* incrementUsage(UserId(session.user.id), 'cost', cost).pipe(
+                        Effect.tapError(error =>
+                            Effect.logError('Error incrementing usage cost', error)
+                        ),
+                        Effect.catchAll(() => Effect.succeed(null))
+                    );
+                }
+
                 yield* saveMessageAndResetThreadStatus({
                     threadId: body.id,
                     userId: UserId(session.user.id),
@@ -275,10 +294,6 @@ const threadPostApiHandler = Effect.gen(function* () {
     if (!thread.title) {
         yield* generateThreadTitle(body.id, body.message, latch).pipe(Effect.forkDaemon);
     }
-
-    yield* incrementUsage(UserId(session.user.id), 'credits', model.credits).pipe(
-        Effect.forkDaemon
-    );
 
     return new Response(resumableStream);
 });

@@ -29,15 +29,15 @@ export function useAccess() {
         return customer.subscription.cancelAtPeriodEnd;
     }, [customer]);
 
-    const remainingCredits = useMemo(() => {
+    const remainingBudget = useMemo(() => {
         if (!usage) return 0;
 
-        return limits.CREDITS - (usage.credits ?? 0);
+        return limits.BUDGET - (usage.cost ?? 0);
     }, [usage, limits]);
 
-    const remainingSearches = useMemo(() => {
+    const usagePercent = useMemo(() => {
         if (!usage) return 0;
-        return limits.SEARCH - (usage.search ?? 0);
+        return Math.min(100, Math.round(((usage.cost ?? 0) / limits.BUDGET) * 100));
     }, [usage, limits]);
 
     const remainingResearches = useMemo(() => {
@@ -46,21 +46,20 @@ export function useAccess() {
     }, [usage, limits]);
 
     const canSearch = useMemo(() => {
-        return remainingSearches > 0;
-    }, [remainingSearches, limits]);
+        return remainingBudget > 0;
+    }, [remainingBudget]);
 
     const canResearch = useMemo(() => {
-        return remainingResearches > 0;
-    }, [remainingResearches, limits]);
+        return remainingResearches > 0 && remainingBudget > 0;
+    }, [remainingResearches, remainingBudget]);
 
     const canUseModel = useMemo(() => {
         if (!settings?.model) return false;
         if (settings.model.access === 'premium_required' && !isPro) return false;
         if (settings.model.access === 'account_required' && user?.isAnonymous) return false;
-        const cost = Number(settings.model.credits ?? 0);
-        if (cost > remainingCredits) return false;
+        if (remainingBudget <= 0) return false;
         return true;
-    }, [settings?.model, remainingCredits, user?.isAnonymous, isPro]);
+    }, [settings?.model, remainingBudget, user?.isAnonymous, isPro]);
 
     const cannotUseModelReason = useMemo(() => {
         if (!settings?.model) return 'No model selected';
@@ -68,19 +67,17 @@ export function useAccess() {
             return 'Premium required for this model';
         if (settings.model.access === 'account_required' && user?.isAnonymous)
             return 'Account required for this model';
-        const cost = Number(settings.model.credits ?? 0);
-        if (cost > remainingCredits) return 'Insufficient credits';
-    }, [settings?.model, remainingCredits, user?.isAnonymous, isPro]);
+        if (remainingBudget <= 0) return 'Daily usage limit reached';
+    }, [settings?.model, remainingBudget, user?.isAnonymous, isPro]);
 
     const checkCanUseModel = useCallback(
         (model: Model) => {
             if (model.access === 'premium_required' && !isPro) return false;
             if (model.access === 'account_required' && user?.isAnonymous) return false;
-            const cost = Number(model.credits ?? 0);
-            if (cost > remainingCredits) return false;
+            if (remainingBudget <= 0) return false;
             return true;
         },
-        [remainingCredits, user?.isAnonymous, isPro]
+        [remainingBudget, user?.isAnonymous, isPro]
     );
 
     const canModelUseTools = useMemo(() => {
@@ -111,15 +108,14 @@ export function useAccess() {
             }
         ) => {
             return match({
-                remainingCredits,
-                canAffordModel: Number(model.credits ?? 0) <= remainingCredits,
+                hasBudget: remainingBudget > 0,
                 isAnonymous: user?.isAnonymous,
                 isPro,
                 modelAccess: model.access,
             })
                 .with(
                     {
-                        remainingCredits: P.number.gt(0),
+                        hasBudget: true,
                         modelAccess: 'premium_required',
                         isPro: false,
                     },
@@ -127,7 +123,7 @@ export function useAccess() {
                 )
                 .with(
                     {
-                        remainingCredits: P.number.gt(0),
+                        hasBudget: true,
                         modelAccess: 'account_required',
                         isAnonymous: true,
                     },
@@ -135,7 +131,7 @@ export function useAccess() {
                 )
                 .with(
                     {
-                        canAffordModel: false,
+                        hasBudget: false,
                         isAnonymous: false,
                         isPro: false,
                     },
@@ -143,7 +139,7 @@ export function useAccess() {
                 )
                 .with(
                     {
-                        canAffordModel: false,
+                        hasBudget: false,
                         isAnonymous: false,
                         isPro: true,
                     },
@@ -151,7 +147,7 @@ export function useAccess() {
                 )
                 .with(
                     {
-                        canAffordModel: false,
+                        hasBudget: false,
                         isAnonymous: true,
                         isPro: false,
                     },
@@ -159,15 +155,15 @@ export function useAccess() {
                 )
                 .otherwise(() => null);
         },
-        [remainingCredits, user?.isAnonymous, isPro]
+        [remainingBudget, user?.isAnonymous, isPro]
     );
 
     return {
         isPro,
         limits,
         isExpiring,
-        remainingCredits,
-        remainingSearches,
+        remainingBudget,
+        usagePercent,
         remainingResearches,
         canSearch,
         canResearch,

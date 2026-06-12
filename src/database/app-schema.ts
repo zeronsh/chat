@@ -1,5 +1,14 @@
 import { relations } from 'drizzle-orm';
-import { index, integer, jsonb, pgEnum, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import {
+    boolean,
+    index,
+    integer,
+    jsonb,
+    pgEnum,
+    pgTable,
+    text,
+    timestamp,
+} from 'drizzle-orm/pg-core';
 import type { Capability, ThreadMessage } from '@/ai/types';
 import { member, organization, user } from '@/database/auth-schema';
 import { SubscriptionData } from '@/database/types';
@@ -74,7 +83,11 @@ export const model = pgTable('model', {
     capabilities: jsonb('capabilities').$type<Capability[]>().notNull().default([]),
     icon: modelIconEnum('icon').notNull(),
     credits: integer('credits').notNull().default(0),
+    // gateway price in micro-dollars per million tokens
+    inputCost: integer('input_cost').notNull().default(0),
+    outputCost: integer('output_cost').notNull().default(0),
     access: modelAccessEnum('access').notNull().default('public'),
+    enabled: boolean('enabled').notNull().default(true),
     createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at').notNull().defaultNow(),
 });
@@ -98,12 +111,12 @@ export const setting = pgTable(
             .$type<string[]>()
             .notNull()
             .default([
-                'claude-4-sonnet',
+                'claude-4.6-sonnet',
                 'gpt-4o',
                 'gpt-4o-mini',
                 'gemini-2.5-flash',
                 'gemini-2.5-pro',
-                'gemini-2.0-flash',
+                'gemini-3.5-flash',
                 'kimi-k2',
             ]),
     },
@@ -120,6 +133,8 @@ export const usage = pgTable(
         credits: integer('credits').notNull().default(0),
         search: integer('search').notNull().default(0),
         research: integer('research').notNull().default(0),
+        // spend in micro-dollars, reset daily
+        cost: integer('cost').notNull().default(0),
     },
     table => [index('usage_user_id_index').on(table.userId)]
 );
