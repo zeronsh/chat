@@ -135,12 +135,28 @@ const threadPostApiHandler = Effect.gen(function* () {
         };
     }
 
+    // Older Claude models use extended thinking with a fixed budget. Sonnet 4.6+,
+    // Opus 4.7+, and Fable 5 reject budget_tokens and sampling parameters (400)
+    // and use adaptive thinking instead.
+    const ANTHROPIC_LEGACY_THINKING_MODELS = [
+        'anthropic/claude-4-sonnet',
+        'anthropic/claude-sonnet-4.5',
+        'anthropic/claude-haiku-4.5',
+    ];
+
+    const usesAdaptiveThinking =
+        model.model.startsWith('anthropic/') &&
+        !ANTHROPIC_LEGACY_THINKING_MODELS.includes(model.model);
+
     const anthropic: AnthropicProviderOptions = {
         sendReasoning: true,
-        thinking: {
-            type: 'enabled',
-            budgetTokens: 3000,
-        },
+        thinking: usesAdaptiveThinking
+            ? // the installed provider types predate adaptive thinking; the
+              // gateway passes this through to the Anthropic API as-is
+              ({ type: 'adaptive', display: 'summarized' } as unknown as NonNullable<
+                  AnthropicProviderOptions['thinking']
+              >)
+            : { type: 'enabled', budgetTokens: 3000 },
         disableParallelToolUse: true,
     };
 
@@ -150,7 +166,9 @@ const threadPostApiHandler = Effect.gen(function* () {
         Stream.options({
             model: actualModel,
             messages,
-            temperature: 0.8,
+            // Fable 5 and Opus 4.8 reject temperature outright; the other
+            // adaptive-thinking Claude models don't accept it alongside thinking
+            temperature: usesAdaptiveThinking ? undefined : 0.8,
             stopWhen: stepCountIs(3),
             system: getSystemPrompt(settings, activeTools),
             experimental_transform: smoothStream({
