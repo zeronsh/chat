@@ -27,7 +27,7 @@ import {
 } from '@/components/app/insufficient-dialog';
 import { dialogStore } from '@/stores/dialogs';
 import { CapabilityBadges } from '@/components/ui/capability-badges';
-import { getModelPriceTier } from '@/lib/cost';
+import { formatTokenPrice } from '@/lib/cost';
 
 export function ModelSelector() {
     const [open, setOpen] = useState(false);
@@ -286,10 +286,24 @@ export function ModelSelector() {
                                 <div className="text-sm text-muted-foreground px-2">
                                     {hoveredModel.description}
                                 </div>
-                                <div className="flex items-center gap-2 text-sm text-muted-foreground justify-between px-2 border-t border-foreground/10 pt-4 pb-4">
-                                    <div>Pricing</div>
-                                    <div className="font-semibold">
-                                        {getModelPriceTier(hoveredModel)}
+                                <div className="flex flex-col gap-2 text-sm text-muted-foreground px-2 border-t border-foreground/10 pt-4 pb-4">
+                                    <div className="flex items-center justify-between">
+                                        <div>Input</div>
+                                        <div>
+                                            <span className="font-semibold">
+                                                {formatTokenPrice(hoveredModel.inputCost)}
+                                            </span>
+                                            /M tokens
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <div>Output</div>
+                                        <div>
+                                            <span className="font-semibold">
+                                                {formatTokenPrice(hoveredModel.outputCost)}
+                                            </span>
+                                            /M tokens
+                                        </div>
                                     </div>
                                 </div>
                             </div>

@@ -24,12 +24,13 @@ export function calculateTokenCost(pricing: ModelPricing, usage: LanguageModelUs
     );
 }
 
-export type PriceTier = '$' | '$$' | '$$$';
-
-/** Rough price tier for display, based on output token price. */
-export function getModelPriceTier(pricing: { outputCost?: number | null }): PriceTier {
-    const outputCost = pricing.outputCost ?? 0;
-    if (outputCost < 1_000_000) return '$'; // under $1/M output tokens
-    if (outputCost < 20_000_000) return '$$'; // under $20/M output tokens
-    return '$$$';
+/** Format a micro-dollars-per-million-tokens price as dollars, e.g. 3000000 -> "$3". */
+export function formatTokenPrice(microDollarsPerMillion: number | null | undefined): string {
+    const dollars = (microDollarsPerMillion ?? 0) / 1_000_000;
+    return dollars.toLocaleString('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+    });
 }

@@ -7,7 +7,7 @@ import { useQuery } from '@rocicorp/zero/react';
 import ModelIcon from '@/components/thread/model-icon';
 import { Badge } from '@/components/ui/badge';
 import { CapabilityBadges } from '@/components/ui/capability-badges';
-import { getModelPriceTier } from '@/lib/cost';
+import { formatTokenPrice } from '@/lib/cost';
 
 export const Route = createFileRoute('/_account/account/models')({
     component: RouteComponent,
@@ -99,7 +99,8 @@ function RouteComponent() {
                                     </div>
 
                                     <div className="text-xs text-muted-foreground">
-                                        {getModelPriceTier(model)}
+                                        {formatTokenPrice(model.inputCost)} in ·{' '}
+                                        {formatTokenPrice(model.outputCost)} out /M tokens
                                     </div>
                                 </div>
                             </div>
