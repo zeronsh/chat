@@ -187,13 +187,12 @@ export function MultiModalInput() {
 
     return (
         <motion.form
-            layoutId="multi-modal-input"
-            transition={{ type: 'spring', stiffness: 1000, damping: 40 }}
-            className={cn({
-                'absolute px-4 pt-4 flex flex-col gap-4': true,
-                'bottom-0 left-0 right-0': true,
-                'top-[25vh]': !threadId,
-            })}
+            layout="position"
+            transition={{ type: 'spring', stiffness: 500, damping: 40 }}
+            className={cn(
+                'absolute px-4 pt-4 flex flex-col gap-4 left-0 right-0',
+                threadId ? 'bottom-0' : 'top-[25vh]'
+            )}
             onSubmit={async e => {
                 e.preventDefault();
                 if (status === 'streaming' || status === 'submitted') {
@@ -348,7 +347,7 @@ export function MultiModalInput() {
                 <PromptInputTextarea className="px-6" placeholder="Ask me anything..." />
                 <PromptInputActions className="flex items-center px-3 pb-3">
                     {/* Switch-like tool selector */}
-                    <div className="flex items-center bg-primary/5 rounded-full p-1 relative h-10">
+                    <div className="flex items-center gap-0.5 bg-primary/5 rounded-full p-1 relative h-10">
                         {/* Chat icon - default tab */}
                         <PromptInputAction tooltip="Chat">
                             <Button
@@ -356,17 +355,27 @@ export function MultiModalInput() {
                                 size="icon"
                                 type="button"
                                 className={cn(
-                                    'h-8 w-8 rounded-full relative z-10 hover:text-primary',
-                                    tool === '' && 'text-primary'
+                                    'h-8 w-auto px-2 gap-1.5 rounded-full relative z-10 hover:text-primary',
+                                    tool === '' ? 'text-primary' : 'text-muted-foreground'
                                 )}
                                 onClick={() => setTool('')}
                             >
                                 <MessageCircleIcon className="size-4 z-1" />
                                 {tool === '' && (
+                                    <motion.span
+                                        initial={{ width: 0, opacity: 0 }}
+                                        animate={{ width: 'auto', opacity: 1 }}
+                                        transition={{ duration: 0.15 }}
+                                        className="z-1 overflow-hidden whitespace-nowrap text-xs font-medium"
+                                    >
+                                        Chat
+                                    </motion.span>
+                                )}
+                                {tool === '' && (
                                     <motion.div
-                                        className="absolute inset-0 h-8 w-full rounded-full bg-background z-0"
+                                        className="absolute inset-0 rounded-full bg-background border border-foreground/10 shadow-sm z-0"
                                         layoutId="toolThumb"
-                                        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                                        transition={{ type: 'spring', stiffness: 500, damping: 35 }}
                                     />
                                 )}
                             </Button>
@@ -396,8 +405,8 @@ export function MultiModalInput() {
                                 size="icon"
                                 type="button"
                                 className={cn(
-                                    'h-8 w-8 rounded-full relative z-10 hover:text-primary',
-                                    tool === 'search' && 'text-primary',
+                                    'h-8 w-auto px-2 gap-1.5 rounded-full relative z-10 hover:text-primary',
+                                    tool === 'search' ? 'text-primary' : 'text-muted-foreground',
                                     matcher
                                         .with({ canSearch: false }, () => 'opacity-50')
                                         .with({ canModelUseTools: false }, () => 'opacity-50')
@@ -426,10 +435,20 @@ export function MultiModalInput() {
                             >
                                 <GlobeIcon className="size-4 z-1" />
                                 {tool === 'search' && (
+                                    <motion.span
+                                        initial={{ width: 0, opacity: 0 }}
+                                        animate={{ width: 'auto', opacity: 1 }}
+                                        transition={{ duration: 0.15 }}
+                                        className="z-1 overflow-hidden whitespace-nowrap text-xs font-medium"
+                                    >
+                                        Search
+                                    </motion.span>
+                                )}
+                                {tool === 'search' && (
                                     <motion.div
-                                        className="absolute inset-0 h-8 w-full rounded-full bg-background z-0"
+                                        className="absolute inset-0 rounded-full bg-background border border-foreground/10 shadow-sm z-0"
                                         layoutId="toolThumb"
-                                        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                                        transition={{ type: 'spring', stiffness: 500, damping: 35 }}
                                     />
                                 )}
                             </Button>
@@ -464,8 +483,8 @@ export function MultiModalInput() {
                                 size="icon"
                                 type="button"
                                 className={cn(
-                                    'h-8 w-16 rounded-full relative z-10 hover:text-primary',
-                                    tool === 'deepSearch' && 'text-primary',
+                                    'h-8 w-auto px-2 gap-1.5 rounded-full relative z-10 hover:text-primary',
+                                    tool === 'deepSearch' ? 'text-primary' : 'text-muted-foreground',
                                     matcher
                                         .with({ canResearch: false }, () => 'opacity-50')
                                         .with({ canModelUseTools: false }, () => 'opacity-50')
@@ -494,17 +513,25 @@ export function MultiModalInput() {
                                         .otherwise(() => null);
                                 }}
                             >
-                                <div className="flex items-center gap-1">
-                                    <TelescopeIcon className="size-4 z-1" />
-                                    <span className="text-[8px] font-medium text-primary px-1 py-0.5 rounded-full z-1 bg-primary/10">
-                                        BETA
-                                    </span>
-                                </div>
+                                <TelescopeIcon className="size-4 z-1" />
+                                {tool === 'deepSearch' && (
+                                    <motion.span
+                                        initial={{ width: 0, opacity: 0 }}
+                                        animate={{ width: 'auto', opacity: 1 }}
+                                        transition={{ duration: 0.15 }}
+                                        className="z-1 overflow-hidden whitespace-nowrap text-xs font-medium flex items-center gap-1"
+                                    >
+                                        Research
+                                        <span className="text-[8px] font-medium text-primary px-1 py-0.5 rounded-full bg-primary/10">
+                                            BETA
+                                        </span>
+                                    </motion.span>
+                                )}
                                 {tool === 'deepSearch' && (
                                     <motion.div
-                                        className="absolute inset-0 h-8 w-full rounded-full bg-background z-0"
+                                        className="absolute inset-0 rounded-full bg-background border border-foreground/10 shadow-sm z-0"
                                         layoutId="toolThumb"
-                                        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                                        transition={{ type: 'spring', stiffness: 500, damping: 35 }}
                                     />
                                 )}
                             </Button>
