@@ -40,8 +40,8 @@ function researchTool(thoughts: string, prompt: string, toolCallId: string) {
     return Effect.gen(function* () {
         const ctx = yield* ToolContext;
 
-        if (ctx.limits.RESEARCH - (ctx.usage.research || 0) <= 0) {
-            yield* Effect.logWarning('Research limit reached');
+        if (!ctx.limits.RESEARCH_ENABLED) {
+            yield* Effect.logWarning('Research is not available');
             return yield* Effect.die(null);
         }
 
@@ -50,10 +50,7 @@ function researchTool(thoughts: string, prompt: string, toolCallId: string) {
             return yield* Effect.die(null);
         }
 
-        yield* Effect.all([
-            incrementUsage(ctx.userId, 'research', 1),
-            incrementUsage(ctx.userId, 'cost', RESEARCH_COST),
-        ]).pipe(
+        yield* incrementUsage(ctx.userId, 'cost', RESEARCH_COST).pipe(
             Effect.tapError(() => {
                 return Effect.logError('Error incrementing usage');
             }),
@@ -167,10 +164,7 @@ function researchTool(thoughts: string, prompt: string, toolCallId: string) {
                 return Effect.logError('Error generating text', e);
             }),
             Effect.tapError(() => {
-                return Effect.all([
-                    decrementUsage(ctx.userId, 'research', 1),
-                    decrementUsage(ctx.userId, 'cost', RESEARCH_COST),
-                ]);
+                return decrementUsage(ctx.userId, 'cost', RESEARCH_COST);
             }),
             Effect.catchAll(e => Effect.die(e))
         );

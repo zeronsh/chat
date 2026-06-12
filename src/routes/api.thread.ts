@@ -189,12 +189,17 @@ const threadPostApiHandler = Effect.gen(function* () {
             return Effect.gen(function* () {
                 if (totalUsage) {
                     const cost = calculateTokenCost(model, totalUsage);
+                    yield* Effect.logInfo(
+                        `Charging ${cost} micro-dollars for ${totalUsage.inputTokens} input / ${totalUsage.outputTokens} output tokens`
+                    );
                     yield* incrementUsage(UserId(session.user.id), 'cost', cost).pipe(
                         Effect.tapError(error =>
                             Effect.logError('Error incrementing usage cost', error)
                         ),
                         Effect.catchAll(() => Effect.succeed(null))
                     );
+                } else {
+                    yield* Effect.logWarning('No token usage reported for stream, nothing charged');
                 }
 
                 yield* saveMessageAndResetThreadStatus({

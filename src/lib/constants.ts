@@ -1,7 +1,8 @@
 export type Limits = {
     /** daily inference budget in micro-dollars */
     BUDGET: number;
-    RESEARCH: number;
+    /** whether the research tools are available */
+    RESEARCH_ENABLED: boolean;
 };
 
 export const MICRO_DOLLARS = 1_000_000;
@@ -14,15 +15,15 @@ export const RESEARCH_COST = 100_000;
 
 export const AnonymousLimits: Limits = {
     BUDGET: 0.25 * MICRO_DOLLARS,
-    RESEARCH: 0,
+    RESEARCH_ENABLED: false,
 };
 
 export const FreeLimits: Limits = {
     BUDGET: 1 * MICRO_DOLLARS,
-    RESEARCH: 0,
+    RESEARCH_ENABLED: false,
 };
 
 export const ProLimits: Limits = {
     BUDGET: 10 * MICRO_DOLLARS,
-    RESEARCH: 15,
+    RESEARCH_ENABLED: true,
 };

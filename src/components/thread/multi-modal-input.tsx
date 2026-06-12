@@ -137,7 +137,6 @@ export function MultiModalInput() {
         isExpiring,
         remainingBudget,
         usagePercent,
-        remainingResearches,
         canSearch,
         canResearch,
         canUseModel,
@@ -152,7 +151,6 @@ export function MultiModalInput() {
             isExpiring,
             remainingBudget,
             usagePercent,
-            remainingResearches,
             canSearch,
             canResearch,
             status,
@@ -169,7 +167,6 @@ export function MultiModalInput() {
         isExpiring,
         remainingBudget,
         usagePercent,
-        remainingResearches,
         canSearch,
         canResearch,
         status,
@@ -448,9 +445,9 @@ export function MultiModalInput() {
                                 .with(
                                     {
                                         isPro: true,
-                                        remainingResearches: P.number.lte(0),
+                                        remainingBudget: P.number.lte(0),
                                     },
-                                    () => 'You have reached your research limit'
+                                    () => 'You have reached your daily usage limit'
                                 )
                                 .with(
                                     { isPro: false },
@@ -482,10 +479,10 @@ export function MultiModalInput() {
                                         .with(
                                             {
                                                 isPro: true,
-                                                remainingResearches: P.number.lte(0),
+                                                remainingBudget: P.number.lte(0),
                                             },
                                             () => {
-                                                toast('You have reached your research limit');
+                                                toast('You have reached your daily usage limit');
                                             }
                                         )
                                         .with({ canModelUseTools: false }, () => {

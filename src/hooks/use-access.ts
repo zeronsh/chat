@@ -40,18 +40,13 @@ export function useAccess() {
         return Math.min(100, Math.round(((usage.cost ?? 0) / limits.BUDGET) * 100));
     }, [usage, limits]);
 
-    const remainingResearches = useMemo(() => {
-        if (!usage) return 0;
-        return limits.RESEARCH - (usage.research ?? 0);
-    }, [usage, limits]);
-
     const canSearch = useMemo(() => {
         return remainingBudget > 0;
     }, [remainingBudget]);
 
     const canResearch = useMemo(() => {
-        return remainingResearches > 0 && remainingBudget > 0;
-    }, [remainingResearches, remainingBudget]);
+        return limits.RESEARCH_ENABLED && remainingBudget > 0;
+    }, [limits, remainingBudget]);
 
     const canUseModel = useMemo(() => {
         if (!settings?.model) return false;
@@ -164,7 +159,6 @@ export function useAccess() {
         isExpiring,
         remainingBudget,
         usagePercent,
-        remainingResearches,
         canSearch,
         canResearch,
         canUseModel,

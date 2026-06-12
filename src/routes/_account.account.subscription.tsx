@@ -13,7 +13,7 @@ export const Route = createFileRoute('/_account/account/subscription')({
 
 function RouteComponent() {
     const { data: session } = useSession();
-    const { isPro, isExpiring, limits, remainingResearches, usagePercent } = useAccess();
+    const { isPro, isExpiring, usagePercent } = useAccess();
 
     return (
         <div className="flex flex-col gap-8 w-full">
@@ -146,33 +146,6 @@ function RouteComponent() {
                                 className="bg-primary rounded-full h-2 transition-all duration-300"
                                 style={{
                                     width: `${usagePercent}%`,
-                                }}
-                            ></div>
-                        </div>
-                        <p className="text-xs text-muted-foreground">Resets daily</p>
-                    </div>
-
-                    {/* Research Tools Usage */}
-                    <div className="flex flex-col gap-4 bg-card p-4 rounded-lg border">
-                        <div className="flex justify-between items-center">
-                            <h3 className="text-sm font-medium">Research Queries</h3>
-                            <span className="text-xs text-muted-foreground">
-                                {limits?.RESEARCH ? limits.RESEARCH - remainingResearches : 0} /{' '}
-                                {limits?.RESEARCH || 0}
-                            </span>
-                        </div>
-                        <div className="w-full bg-secondary rounded-full h-2">
-                            <div
-                                className="bg-primary rounded-full h-2 transition-all duration-300"
-                                style={{
-                                    width: limits?.RESEARCH
-                                        ? `${Math.min(
-                                              100,
-                                              ((limits.RESEARCH - remainingResearches) /
-                                                  limits.RESEARCH) *
-                                                  100
-                                          )}%`
-                                        : '0%',
                                 }}
                             ></div>
                         </div>
