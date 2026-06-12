@@ -355,22 +355,12 @@ export function MultiModalInput() {
                                 size="icon"
                                 type="button"
                                 className={cn(
-                                    'h-8 w-auto px-2 gap-1.5 rounded-full relative z-10 hover:text-primary',
+                                    'h-8 w-8 rounded-full relative z-10 hover:text-primary',
                                     tool === '' ? 'text-primary' : 'text-muted-foreground'
                                 )}
                                 onClick={() => setTool('')}
                             >
                                 <MessageCircleIcon className="size-4 z-1" />
-                                {tool === '' && (
-                                    <motion.span
-                                        initial={{ width: 0, opacity: 0 }}
-                                        animate={{ width: 'auto', opacity: 1 }}
-                                        transition={{ duration: 0.15 }}
-                                        className="z-1 overflow-hidden whitespace-nowrap text-xs font-medium"
-                                    >
-                                        Chat
-                                    </motion.span>
-                                )}
                                 {tool === '' && (
                                     <motion.div
                                         className="absolute inset-0 rounded-full bg-background border border-foreground/10 shadow-sm z-0"
@@ -405,7 +395,7 @@ export function MultiModalInput() {
                                 size="icon"
                                 type="button"
                                 className={cn(
-                                    'h-8 w-auto px-2 gap-1.5 rounded-full relative z-10 hover:text-primary',
+                                    'h-8 w-8 rounded-full relative z-10 hover:text-primary',
                                     tool === 'search' ? 'text-primary' : 'text-muted-foreground',
                                     matcher
                                         .with({ canSearch: false }, () => 'opacity-50')
@@ -435,16 +425,6 @@ export function MultiModalInput() {
                             >
                                 <GlobeIcon className="size-4 z-1" />
                                 {tool === 'search' && (
-                                    <motion.span
-                                        initial={{ width: 0, opacity: 0 }}
-                                        animate={{ width: 'auto', opacity: 1 }}
-                                        transition={{ duration: 0.15 }}
-                                        className="z-1 overflow-hidden whitespace-nowrap text-xs font-medium"
-                                    >
-                                        Search
-                                    </motion.span>
-                                )}
-                                {tool === 'search' && (
                                     <motion.div
                                         className="absolute inset-0 rounded-full bg-background border border-foreground/10 shadow-sm z-0"
                                         layoutId="toolThumb"
@@ -459,7 +439,7 @@ export function MultiModalInput() {
                             tooltip={matcher
                                 .with(
                                     { canResearch: true, canModelUseTools: true },
-                                    () => 'Deep research'
+                                    () => 'Deep research (beta)'
                                 )
                                 .with(
                                     {
@@ -483,7 +463,7 @@ export function MultiModalInput() {
                                 size="icon"
                                 type="button"
                                 className={cn(
-                                    'h-8 w-auto px-2 gap-1.5 rounded-full relative z-10 hover:text-primary',
+                                    'h-8 w-8 rounded-full relative z-10 hover:text-primary',
                                     tool === 'deepSearch' ? 'text-primary' : 'text-muted-foreground',
                                     matcher
                                         .with({ canResearch: false }, () => 'opacity-50')
@@ -514,19 +494,6 @@ export function MultiModalInput() {
                                 }}
                             >
                                 <TelescopeIcon className="size-4 z-1" />
-                                {tool === 'deepSearch' && (
-                                    <motion.span
-                                        initial={{ width: 0, opacity: 0 }}
-                                        animate={{ width: 'auto', opacity: 1 }}
-                                        transition={{ duration: 0.15 }}
-                                        className="z-1 overflow-hidden whitespace-nowrap text-xs font-medium flex items-center gap-1"
-                                    >
-                                        Research
-                                        <span className="text-[8px] font-medium text-primary px-1 py-0.5 rounded-full bg-primary/10">
-                                            BETA
-                                        </span>
-                                    </motion.span>
-                                )}
                                 {tool === 'deepSearch' && (
                                     <motion.div
                                         className="absolute inset-0 rounded-full bg-background border border-foreground/10 shadow-sm z-0"
