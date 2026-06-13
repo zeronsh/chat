@@ -183,6 +183,13 @@
       "when": 1781334419977,
       "tag": "0025_seed-kimi-k2.5-k2.7",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1781334586910,
+      "tag": "0026_seed-mistral-llama",
+      "breakpoints": true
     }
   ]
 }
