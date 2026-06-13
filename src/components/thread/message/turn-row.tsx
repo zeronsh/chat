@@ -53,6 +53,30 @@ const CHAT_MD_THEME = {
     list: { gap: 8, indent: 22, markerColor: INK.muted },
 } as const;
 
+// The reasoning trace is markdown too — same typesetting, muted and a step
+// smaller so it reads as an aside.
+const REASONING_MD_THEME = {
+    fontFamily: 'Geist',
+    monoFamily: "'Geist Mono', monospace",
+    fontSize: 14,
+    lineHeight: 24,
+    color: INK.muted,
+    blockGap: 10,
+    heading: { color: INK.muted, weight: 600 },
+    link: { color: INK.accent, underline: true },
+    inlineCode: { background: INK.wash, color: INK.muted, sizeScale: 0.9 },
+    code: {
+        background: INK.wash,
+        color: INK.muted,
+        padding: 12,
+        radius: 8,
+        fontSize: 12.5,
+        lineHeight: 19,
+    },
+    blockquote: { borderColor: INK.hairline, color: INK.muted, padding: 10, gap: 8, borderWidth: 2 },
+    list: { gap: 6, indent: 20, markerColor: INK.muted },
+} as const;
+
 /** Clickable disclosure header for the reasoning trace (a real <button>). */
 const Disclosure = definePrimitive('button', { name: 'Disclosure' });
 
@@ -190,14 +214,12 @@ function AssistantTurn({
                                         width={2}
                                         style={{ background: INK.hairline, borderRadius: 2 }}
                                     />
-                                    <Text
-                                        font={`14px ${SANS}`}
-                                        lineHeight={24}
-                                        color={INK.muted}
-                                        whiteSpace="pre-wrap"
-                                    >
-                                        {block.text}
-                                    </Text>
+                                    <VStack gap={10}>
+                                        <Markdown
+                                            source={block.text}
+                                            theme={REASONING_MD_THEME}
+                                        />
+                                    </VStack>
                                 </HStack>
                             ) : null}
                         </VStack>
