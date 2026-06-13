@@ -22,7 +22,7 @@ export function InsufficientCreditsProDialog(props: {
                         You do not have enough credits to use this model. Credits are reset daily.
                     </DialogDescription>
                 </DialogHeader>
-                <DialogFooter className="px-6 py-4 border-t border-foreground/10 bg-sidebar">
+                <DialogFooter className="px-6 py-4 border-t border-foreground/8 bg-sidebar">
                     <Button type="button" variant="outline" onClick={() => props.setOpen(false)}>
                         Close
                     </Button>
@@ -46,7 +46,7 @@ export function InsufficientCreditsDialog(props: {
                         credits.
                     </DialogDescription>
                 </DialogHeader>
-                <DialogFooter className="px-6 py-4 border-t border-foreground/10 bg-sidebar">
+                <DialogFooter className="px-6 py-4 border-t border-foreground/8 bg-sidebar">
                     <Button type="button" asChild>
                         <Link to="/account/subscription">Upgrade to PRO</Link>
                     </Button>

@@ -365,7 +365,7 @@ function EditThreadTitleDialog({
     return (
         <Dialog open={!!thread} onOpenChange={() => setThreadToEdit(null)}>
             <DialogContent className="p-0 overflow-hidden gap-0" showCloseButton={false}>
-                <DialogHeader className="p-6 bg-sidebar border-b border-foreground/10">
+                <DialogHeader className="p-6 bg-sidebar border-b border-foreground/8">
                     <DialogTitle>Edit Thread Title</DialogTitle>
                     <DialogDescription>Edit the title of the thread.</DialogDescription>
                 </DialogHeader>
@@ -406,7 +406,7 @@ function EditThreadTitleDialog({
                             </form.Field>
                         </div>
                     </div>
-                    <DialogFooter className="px-6 py-4 border-t border-foreground/10 bg-sidebar">
+                    <DialogFooter className="px-6 py-4 border-t border-foreground/8 bg-sidebar">
                         <Button
                             type="button"
                             variant="outline"
@@ -467,7 +467,7 @@ function DeleteThreadDialog({
                     </DialogDescription>
                 </DialogHeader>
 
-                <DialogFooter className="px-6 py-4 border-t border-foreground/10 bg-sidebar">
+                <DialogFooter className="px-6 py-4 border-t border-foreground/8 bg-sidebar">
                     <Button type="button" variant="outline" onClick={() => setThreadToDelete(null)}>
                         Cancel
                     </Button>

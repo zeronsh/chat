@@ -19,7 +19,7 @@ export function AccountDialog(props: { open: boolean; setOpen: (open: boolean) =
                         Create an account to gain access to additional models and reset your limits.
                     </DialogDescription>
                 </DialogHeader>
-                <DialogFooter className="px-6 py-4 border-t border-foreground/10 bg-sidebar">
+                <DialogFooter className="px-6 py-4 border-t border-foreground/8 bg-sidebar">
                     <Button type="button" asChild>
                         <Link to="/login">Create account</Link>
                     </Button>

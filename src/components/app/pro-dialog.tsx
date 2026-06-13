@@ -121,9 +121,9 @@ export function ProDialog() {
                     </div>
                     <Anonymous>
                         <div className="flex gap-2 w-full items-center">
-                            <div className="flex-1 border-b border-foreground/10" />
+                            <div className="flex-1 border-b border-foreground/8" />
                             <p className="text-sm text-foreground/50">OR</p>
-                            <div className="flex-1 border-b border-foreground/10" />
+                            <div className="flex-1 border-b border-foreground/8" />
                         </div>
                         <div className="flex gap-4 text-sm text-foreground/70 items-center">
                             <DiamondIcon className="size-3" />

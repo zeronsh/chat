@@ -42,7 +42,7 @@ export function UserMenu() {
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
-                className="bg-background/50 border-foreground/10 w-[200px] backdrop-blur-md"
+                className="bg-background/50 border-foreground/8 w-[200px] backdrop-blur-md"
                 align="end"
             >
                 <DropdownMenuLabel className="flex items-center gap-2">

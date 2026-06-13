@@ -82,7 +82,7 @@ function RouteComponent() {
                             'relative p-4 rounded-lg border cursor-pointer transition-all hover:border-foreground/20 text-left w-full bg-muted/50 backdrop-blur-md border-foreground/15',
                             settings.mode === 'light'
                                 ? 'border-primary/50 bg-primary/5'
-                                : 'border-foreground/10 hover:bg-muted/50'
+                                : 'border-foreground/8 hover:bg-muted/50'
                         )}
                         onClick={() => handleModeChange('light')}
                     >
@@ -110,7 +110,7 @@ function RouteComponent() {
                             'relative p-4 rounded-lg border cursor-pointer transition-all hover:border-foreground/20 text-left w-full bg-muted/50 backdrop-blur-md border-foreground/15',
                             settings.mode === 'dark'
                                 ? 'border-primary/50 bg-primary/5'
-                                : 'border-foreground/10 hover:bg-muted/50'
+                                : 'border-foreground/8 hover:bg-muted/50'
                         )}
                         onClick={() => handleModeChange('dark')}
                     >
@@ -144,7 +144,7 @@ function RouteComponent() {
                                 'relative p-4 rounded-lg border cursor-pointer transition-all hover:border-foreground/20 text-left w-full bg-background/10 backdrop-blur-md overflow-hidden',
                                 themeOption.value === settings.theme
                                     ? 'border-primary/50 bg-primary/5'
-                                    : 'border-foreground/10 hover:bg-muted/50'
+                                    : 'border-foreground/8 hover:bg-muted/50'
                             )}
                             onClick={() => handleThemeChange(themeOption.value)}
                         >

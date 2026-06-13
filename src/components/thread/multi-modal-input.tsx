@@ -216,7 +216,7 @@ export function MultiModalInput({ aboveInput }: { aboveInput?: React.ReactNode }
                             editingMessageId: P.nullish,
                         },
                         () => (
-                            <div className="flex justify-between items-center px-4 py-2.5 bg-sidebar/40 text-xs text-muted-foreground border-b border-foreground/10">
+                            <div className="flex justify-between items-center px-4 py-2.5 bg-sidebar/40 text-xs text-muted-foreground border-b border-foreground/8">
                                 <div className="flex items-center gap-2">
                                     <AlertTriangleIcon className="size-3.5" />
                                     <p>Daily usage limit reached</p>
@@ -238,7 +238,7 @@ export function MultiModalInput({ aboveInput }: { aboveInput?: React.ReactNode }
                             editingMessageId: P.nullish,
                         },
                         () => (
-                            <div className="flex justify-between items-center px-4 py-2.5 bg-sidebar/40 text-xs text-muted-foreground border-b border-foreground/10">
+                            <div className="flex justify-between items-center px-4 py-2.5 bg-sidebar/40 text-xs text-muted-foreground border-b border-foreground/8">
                                 <div className="flex items-center gap-2">
                                     <AlertTriangleIcon className="size-3.5" />
                                     <p>{usagePercent}% of daily usage used</p>
@@ -260,7 +260,7 @@ export function MultiModalInput({ aboveInput }: { aboveInput?: React.ReactNode }
                             editingMessageId: P.nullish,
                         },
                         () => (
-                            <div className="flex justify-between items-center px-4 py-2.5 bg-sidebar/40 text-xs text-muted-foreground border-b border-foreground/10">
+                            <div className="flex justify-between items-center px-4 py-2.5 bg-sidebar/40 text-xs text-muted-foreground border-b border-foreground/8">
                                 <div className="flex items-center gap-2">
                                     <AlertTriangleIcon className="size-3.5" />
                                     <p>
@@ -274,7 +274,7 @@ export function MultiModalInput({ aboveInput }: { aboveInput?: React.ReactNode }
                         )
                     )
                     .with({ editingMessageId: P.string }, () => (
-                        <div className="flex justify-between items-center px-4 py-2.5 bg-sidebar/40 text-xs text-muted-foreground border-b border-foreground/10">
+                        <div className="flex justify-between items-center px-4 py-2.5 bg-sidebar/40 text-xs text-muted-foreground border-b border-foreground/8">
                             <div className="flex items-center gap-2">
                                 <EditIcon className="size-3.5" />
                                 <p>Editing message</p>

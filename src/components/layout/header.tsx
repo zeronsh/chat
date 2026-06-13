@@ -10,7 +10,7 @@ export function Header() {
     return (
         <div
             className={cn(
-                threadId && 'border-b border-foreground/10 bg-background/60 backdrop-blur-md',
+                threadId && 'border-b border-foreground/8 bg-background/60 backdrop-blur-md',
                 'absolute top-0 left-0 right-0 z-10 flex justify-between'
             )}
         >

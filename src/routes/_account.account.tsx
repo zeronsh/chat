@@ -58,7 +58,7 @@ function RouteComponent() {
                                         exact: true,
                                     }}
                                     activeProps={{
-                                        className: 'bg-muted/50 border border-foreground/10',
+                                        className: 'bg-muted/50 border border-foreground/8',
                                     }}
                                 >
                                     {page.icon}

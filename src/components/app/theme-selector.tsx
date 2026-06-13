@@ -74,7 +74,7 @@ export function ThemeSelector() {
                     }
                 />
                 <PopoverContent
-                    className="p-0 bg-background/50 border-foreground/10 backdrop-blur-md overflow-hidden w-[250px]"
+                    className="p-0 bg-background/50 border-foreground/8 backdrop-blur-md overflow-hidden w-[250px]"
                     align="end"
                 >
                     <Command>
