@@ -103,7 +103,11 @@ export function ModelSelector() {
         <Fragment>
             <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>
-                    <Button variant="ghost" aria-expanded={open}>
+                    <Button
+                        variant="ghost"
+                        aria-expanded={open}
+                        className="h-9 rounded-xl px-3 border border-foreground/10 bg-sidebar/40 hover:bg-sidebar/70 font-normal"
+                    >
                         <div className="flex items-center gap-2 flex-1 ">
                             {settings?.model && (
                                 <ModelIcon
@@ -111,16 +115,16 @@ export function ModelSelector() {
                                     model={settings.model.icon as ModelType}
                                 />
                             )}
-                            <span className="truncate hidden md:block">
+                            <span className="truncate hidden md:block text-xs">
                                 {settings?.model?.name}
                             </span>
                             {settings?.model?.access === 'premium_required' && (
-                                <span className="text-[10px] font-medium text-primary px-2 py-0.5 rounded-full z-1 bg-primary/10">
+                                <span className="font-mono text-[9px] font-semibold tracking-wider text-primary px-1.5 py-0.5 rounded-full z-1 bg-primary/10">
                                     PRO
                                 </span>
                             )}
                         </div>
-                        <ChevronsUpDown className="opacity-50" />
+                        <ChevronsUpDown className="opacity-50 size-3.5" />
                     </Button>
                 </PopoverTrigger>
                 <PopoverContent className={cn('p-0 relative min-w-[350px]')} align="start">

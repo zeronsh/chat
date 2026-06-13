@@ -1,14 +1,7 @@
 import { type ChatStatus, type UIMessage } from 'ai';
 import { createWithEqualityFn as create } from 'zustand/traditional';
 import { devtools, subscribeWithSelector } from 'zustand/middleware';
-import { ToolKeys } from '@/ai/types';
 import throttle from 'throttleit';
-
-export type ToolSidebar = {
-    messageId: string;
-    tool: ToolKeys;
-    toolCallId: string;
-};
 
 export type FileAttachment = {
     type: 'file';
@@ -19,18 +12,12 @@ export type FileAttachment = {
 
 export interface ThreadStoreImpl<UI_MESSAGE extends UIMessage> {
     id?: string;
-    messageMap: Record<string, UI_MESSAGE>;
-    messageIds: string[];
     messages: UI_MESSAGE[];
     status: ChatStatus;
     error: Error | undefined;
 
-    toolSidebar: ToolSidebar | undefined;
-    setToolSidebar: (toolSidebar: ToolSidebar | undefined) => void;
     editingMessageId: string | undefined;
     setEditingMessageId: (editingMessageId: string | undefined) => void;
-    tool: ToolKeys | '';
-    setTool: (tool: ToolKeys | '') => void;
     input: string;
     setInput: (input: string) => void;
     pendingFileCount: number;
@@ -56,44 +43,26 @@ export function createThreadStore<UI_MESSAGE extends UIMessage>(init: {
                 const setMessages = (
                     messagesOrUpdater: UI_MESSAGE[] | ((prev: UI_MESSAGE[]) => UI_MESSAGE[])
                 ) => {
-                    const { messageIds: oldMessageIds } = get();
-
                     const messages =
                         typeof messagesOrUpdater === 'function'
                             ? messagesOrUpdater(get().messages)
                             : messagesOrUpdater;
 
-                    const lastMessageId = messages[messages.length - 1]?.id;
-                    const lastOldMessageId = oldMessageIds[oldMessageIds.length - 1];
-                    const hasMessagesChanged = lastMessageId !== lastOldMessageId;
-                    const messageIds = hasMessagesChanged ? messages.map(m => m.id) : oldMessageIds;
-
-                    const update = {
-                        messages,
-                        messageIds,
-                        messageMap: Object.fromEntries(messages.map(m => [m.id, m])),
-                    };
-
-                    set(update, false, 'thread/setMessages');
+                    set({ messages }, false, 'thread/setMessages');
                 };
 
                 const throttledSetMessages = throttle(setMessages, 100);
 
                 return {
                     id: init.id,
-                    messageMap: Object.fromEntries(init.messages.map(m => [m.id, m])),
-                    messageIds: init.messages.map(m => m.id),
                     messages: init.messages,
                     status: 'ready',
                     error: undefined,
-                    toolSidebar: undefined,
                     input: '',
-                    tool: '',
                     pendingFileCount: 0,
                     editingMessageId: undefined,
                     setEditingMessageId: (editingMessageId: string | undefined) =>
                         set({ editingMessageId }, false, 'thread/setEditingMessageId'),
-                    setTool: (tool: ToolKeys | '') => set({ tool }, false, 'thread/setTool'),
                     setInput: (input: string) => set({ input }, false, 'thread/setInput'),
                     setPendingFileCount: (
                         pendingFileCount: number | ((prev: number) => number)
@@ -113,8 +82,6 @@ export function createThreadStore<UI_MESSAGE extends UIMessage>(init: {
                     attachments: [],
                     setAttachments: (attachments: FileAttachment[]) =>
                         set({ attachments }, false, 'thread/setAttachments'),
-                    setToolSidebar: (toolSidebar: ToolSidebar | undefined) =>
-                        set({ toolSidebar }, false, 'thread/setToolSidebar'),
                     setStatus: (status: ChatStatus) => set({ status }, false, 'thread/setStatus'),
                     setError: (error: Error | undefined) =>
                         set({ error }, false, 'thread/setError'),

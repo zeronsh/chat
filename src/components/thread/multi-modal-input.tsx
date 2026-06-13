@@ -8,14 +8,11 @@ import {
 import {
     SquareIcon,
     ArrowUpIcon,
-    GlobeIcon,
     Paperclip,
     LoaderIcon,
-    TelescopeIcon,
     EditIcon,
     XIcon,
     AlertTriangleIcon,
-    MessageCircleIcon,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate } from '@tanstack/react-router';
@@ -29,22 +26,27 @@ import { useThreadContext, useThreadSelector } from '@/context/thread';
 import type { FileAttachment as FileAttachmentType } from '@/thread/store';
 import { useAccess } from '@/hooks/use-access';
 import { match, P } from 'ts-pattern';
-import { ScrollToBottomButton } from '@/components/thread/scroll-to-bottom-button';
 import { dialogStore } from '@/stores/dialogs';
 import { useUser } from '@/hooks/use-database';
 import { getUsername } from '@/lib/usernames';
+import { ModelSelector } from '@/components/app/model-selector';
+
+function greetingForHour(hour: number) {
+    if (hour < 5) return 'Up late';
+    if (hour < 12) return 'Good morning';
+    if (hour < 18) return 'Good afternoon';
+    return 'Good evening';
+}
 
 export function MultiModalInput() {
     const id = useThreadSelector(state => state.id!);
     const status = useThreadSelector(state => state.status);
     const input = useThreadSelector(state => state.input);
-    const tool = useThreadSelector(state => state.tool);
     const attachments = useThreadSelector(state => state.attachments);
     const pendingFileCount = useThreadSelector(state => state.pendingFileCount);
     const setPendingFileCount = useThreadSelector(state => state.setPendingFileCount);
     const setAttachments = useThreadSelector(state => state.setAttachments);
     const setInput = useThreadSelector(state => state.setInput);
-    const setTool = useThreadSelector(state => state.setTool);
     const setEditingMessageId = useThreadSelector(state => state.setEditingMessageId);
     const editingMessageId = useThreadSelector(state => state.editingMessageId);
     const setMessages = useThreadSelector(state => state.setMessages);
@@ -106,92 +108,64 @@ export function MultiModalInput() {
             );
         }
 
-        sendMessage(
-            {
-                id: editingMessageId,
-                role: 'user',
-                parts: [
-                    ...attachments,
-                    {
-                        type: 'text',
-                        text: input,
-                    },
-                ],
-            },
-            {
-                body: {
-                    tool: tool || undefined,
+        sendMessage({
+            id: editingMessageId,
+            role: 'user',
+            parts: [
+                ...attachments,
+                {
+                    type: 'text',
+                    text: input,
                 },
-            }
-        );
+            ],
+        });
 
         // Reset form state
         setInput('');
         setAttachments([]);
-        setTool('');
         setEditingMessageId(undefined);
     };
 
     const {
         isPro,
-        isExpiring,
         remainingBudget,
         usagePercent,
-        canSearch,
-        canResearch,
         canUseModel,
         cannotUseModelReason,
-        canModelUseTools,
         canModelViewFiles,
     } = useAccess();
 
     const matcher = useMemo(() => {
         return match({
             isPro,
-            isExpiring,
             remainingBudget,
             usagePercent,
-            canSearch,
-            canResearch,
             status,
             attachments,
-            tool,
             input,
             pendingFileCount,
             canUseModel,
-            canModelUseTools,
             canModelViewFiles,
         });
     }, [
         isPro,
-        isExpiring,
         remainingBudget,
         usagePercent,
-        canSearch,
-        canResearch,
         status,
         attachments,
-        tool,
         input,
         pendingFileCount,
         canUseModel,
-        canModelUseTools,
         canModelViewFiles,
     ]);
-
-    useEffect(() => {
-        if (!canModelUseTools) {
-            setTool('');
-        }
-    }, [canModelUseTools]);
 
     return (
         <motion.form
             layout="position"
             transition={{ type: 'spring', stiffness: 500, damping: 40 }}
             className={cn(
-                'absolute px-4 pt-4 flex flex-col gap-4 left-0 right-0',
-                threadId ? 'bottom-0' : 'top-[25vh]'
+                'absolute px-4 pt-4 flex flex-col gap-8 left-0 right-0',
+                threadId ? 'bottom-0' : 'top-[22vh]'
             )}
             onSubmit={async e => {
                 e.preventDefault();
@@ -207,17 +181,24 @@ export function MultiModalInput() {
         >
             {!threadId && (
                 <motion.div
-                    className="max-w-3xl mx-auto font-serif"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
+                    className="max-w-3xl mx-auto w-full"
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
                 >
-                    <h2 className="text-2xl">Hello, {getUsername(user)}</h2>
+                    <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary mb-3">
+                        Zeron
+                    </p>
+                    <h2 className="font-serif text-4xl italic text-foreground">
+                        {greetingForHour(new Date().getHours())}, {getUsername(user)}.
+                    </h2>
+                    <p className="mt-2 text-sm text-muted-foreground">
+                        Ask anything — the transcript starts when you do.
+                    </p>
                 </motion.div>
             )}
-            <ScrollToBottomButton variant="default" />
             <PromptInput
-                className="max-w-3xl mx-auto p-0 bg-muted/50 backdrop-blur-md w-full border-foreground/10 overflow-hidden"
+                className="max-w-3xl mx-auto p-0 w-full overflow-hidden rounded-2xl border border-foreground/15 bg-background/95 shadow-[0_8px_30px_-12px_color-mix(in_oklab,var(--color-foreground)_35%,transparent)] backdrop-blur-md focus-within:border-primary/40"
                 value={input}
                 onValueChange={setInput}
                 onSubmit={handleSubmit}
@@ -230,17 +211,19 @@ export function MultiModalInput() {
                             editingMessageId: P.nullish,
                         },
                         () => (
-                            <div className="flex justify-between items-center px-3 py-3 bg-sidebar/30 backdrop-blur-md text-xs text-muted-foreground border-b border-foreground/10">
+                            <div className="flex justify-between items-center px-4 py-2.5 bg-sidebar/40 text-xs text-muted-foreground border-b border-foreground/10">
                                 <div className="flex items-center gap-2">
-                                    <AlertTriangleIcon className="size-4 " />
-                                    <p>You have reached your daily usage limit.</p>
+                                    <AlertTriangleIcon className="size-3.5" />
+                                    <p className="font-mono uppercase tracking-wider text-[11px]">
+                                        Daily usage limit reached
+                                    </p>
                                 </div>
                                 <Button
                                     variant="link"
                                     className="h-6 underline font-normal cursor-pointer px-0 text-xs"
                                     onClick={() => setProDialogOpen(true)}
                                 >
-                                    Subscribe now to increase your limits
+                                    Upgrade for higher limits
                                 </Button>
                             </div>
                         )
@@ -252,34 +235,20 @@ export function MultiModalInput() {
                             editingMessageId: P.nullish,
                         },
                         () => (
-                            <div className="flex justify-between items-center px-3 py-3 bg-sidebar/30 backdrop-blur-md text-xs text-muted-foreground border-b border-foreground/10">
+                            <div className="flex justify-between items-center px-4 py-2.5 bg-sidebar/40 text-xs text-muted-foreground border-b border-foreground/10">
                                 <div className="flex items-center gap-2">
-                                    <AlertTriangleIcon className="size-4 " />
-                                    <p>You have used {usagePercent}% of your daily usage.</p>
+                                    <AlertTriangleIcon className="size-3.5" />
+                                    <p className="font-mono uppercase tracking-wider text-[11px]">
+                                        {usagePercent}% of daily usage
+                                    </p>
                                 </div>
                                 <Button
                                     variant="link"
                                     className="h-6 underline font-normal cursor-pointer px-0 text-xs"
                                     onClick={() => setProDialogOpen(true)}
                                 >
-                                    Subscribe now to increase your limits
+                                    Upgrade for higher limits
                                 </Button>
-                            </div>
-                        )
-                    )
-                    .with(
-                        {
-                            usagePercent: P.number.gte(100),
-                            isPro: true,
-                            editingMessageId: P.nullish,
-                        },
-                        () => (
-                            <div className="flex justify-between items-center px-3 py-3 bg-sidebar/30 backdrop-blur-md text-xs text-muted-foreground border-b border-foreground/10">
-                                <div className="flex items-center gap-2">
-                                    <AlertTriangleIcon className="size-4 " />
-                                    <p>You have reached your daily usage limit.</p>
-                                </div>
-                                <p className="text-xs text-primary">Resets daily</p>
                             </div>
                         )
                     )
@@ -290,20 +259,28 @@ export function MultiModalInput() {
                             editingMessageId: P.nullish,
                         },
                         () => (
-                            <div className="flex justify-between items-center px-3 py-3 bg-sidebar/30 backdrop-blur-md text-xs text-muted-foreground border-b border-foreground/10">
+                            <div className="flex justify-between items-center px-4 py-2.5 bg-sidebar/40 text-xs text-muted-foreground border-b border-foreground/10">
                                 <div className="flex items-center gap-2">
-                                    <AlertTriangleIcon className="size-4 " />
-                                    <p>You have used {usagePercent}% of your daily usage.</p>
+                                    <AlertTriangleIcon className="size-3.5" />
+                                    <p className="font-mono uppercase tracking-wider text-[11px]">
+                                        {usagePercent >= 100
+                                            ? 'Daily usage limit reached'
+                                            : `${usagePercent}% of daily usage`}
+                                    </p>
                                 </div>
-                                <p className="text-xs text-primary">Resets daily</p>
+                                <p className="font-mono text-[11px] uppercase tracking-wider text-primary">
+                                    Resets daily
+                                </p>
                             </div>
                         )
                     )
                     .with({ editingMessageId: P.string }, () => (
-                        <div className="flex justify-between items-center px-3 py-3 bg-sidebar/30 backdrop-blur-md text-xs text-muted-foreground border-b border-foreground/10">
+                        <div className="flex justify-between items-center px-4 py-2.5 bg-sidebar/40 text-xs text-muted-foreground border-b border-foreground/10">
                             <div className="flex items-center gap-2">
-                                <EditIcon className="size-4" />
-                                <p>Editing message</p>
+                                <EditIcon className="size-3.5" />
+                                <p className="font-mono uppercase tracking-wider text-[11px]">
+                                    Editing message
+                                </p>
                             </div>
                             <Button
                                 variant="ghost"
@@ -313,15 +290,18 @@ export function MultiModalInput() {
                                     setEditingMessageId(undefined);
                                     setInput('');
                                     setAttachments([]);
-                                    setTool('');
                                 }}
                             >
-                                <XIcon className="size-4" />
+                                <XIcon className="size-3.5" />
                             </Button>
                         </div>
                     ))
                     .otherwise(() => null)}
-                <div className="flex gap-2 px-3 pt-3">
+                <div
+                    className={cn('flex gap-2 px-4', {
+                        'pt-4': attachments.length > 0 || pendingFileCount > 0,
+                    })}
+                >
                     {attachments.map(attachment => (
                         <FileAttachment
                             key={attachment.url}
@@ -344,166 +324,9 @@ export function MultiModalInput() {
                         </div>
                     ))}
                 </div>
-                <PromptInputTextarea className="px-6" placeholder="Ask me anything..." />
-                <PromptInputActions className="flex items-center px-3 pb-3">
-                    {/* Switch-like tool selector */}
-                    <div className="flex items-center gap-0.5 bg-primary/5 rounded-full p-1 relative h-10">
-                        {/* Chat icon - default tab */}
-                        <PromptInputAction tooltip="Chat">
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                type="button"
-                                className={cn(
-                                    'h-8 w-8 rounded-full relative z-10 hover:text-primary',
-                                    tool === '' ? 'text-primary' : 'text-muted-foreground'
-                                )}
-                                onClick={() => setTool('')}
-                            >
-                                <MessageCircleIcon className="size-4 z-1" />
-                                {tool === '' && (
-                                    <motion.div
-                                        className="absolute inset-0 rounded-full bg-background border border-foreground/10 shadow-sm z-0"
-                                        layoutId="toolThumb"
-                                        transition={{ type: 'spring', stiffness: 500, damping: 35 }}
-                                    />
-                                )}
-                            </Button>
-                        </PromptInputAction>
-
-                        {/* Search icon */}
-                        <PromptInputAction
-                            tooltip={matcher
-                                .with(
-                                    { canSearch: true, canModelUseTools: true },
-                                    () => 'Search the web'
-                                )
-                                .with(
-                                    { canModelUseTools: false },
-                                    () => 'This model cannot use tools'
-                                )
-                                .with(
-                                    {
-                                        remainingBudget: P.number.lte(0),
-                                    },
-                                    () => 'You have reached your daily usage limit'
-                                )
-                                .otherwise(() => 'Search is not available')}
-                        >
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                type="button"
-                                className={cn(
-                                    'h-8 w-8 rounded-full relative z-10 hover:text-primary',
-                                    tool === 'search' ? 'text-primary' : 'text-muted-foreground',
-                                    matcher
-                                        .with({ canSearch: false }, () => 'opacity-50')
-                                        .with({ canModelUseTools: false }, () => 'opacity-50')
-                                        .otherwise(() => null)
-                                )}
-                                onClick={() => {
-                                    matcher
-                                        .with({ canSearch: true, canModelUseTools: true }, () => {
-                                            setTool('search');
-                                        })
-                                        .with({ canModelUseTools: false }, () => {
-                                            toast('This model cannot use tools');
-                                        })
-                                        .with(
-                                            {
-                                                remainingBudget: P.number.lte(0),
-                                            },
-                                            () => {
-                                                toast('You have reached your daily usage limit');
-                                            }
-                                        )
-                                        .otherwise(() => {
-                                            toast('Search is not available');
-                                        });
-                                }}
-                            >
-                                <GlobeIcon className="size-4 z-1" />
-                                {tool === 'search' && (
-                                    <motion.div
-                                        className="absolute inset-0 rounded-full bg-background border border-foreground/10 shadow-sm z-0"
-                                        layoutId="toolThumb"
-                                        transition={{ type: 'spring', stiffness: 500, damping: 35 }}
-                                    />
-                                )}
-                            </Button>
-                        </PromptInputAction>
-
-                        {/* Research icon */}
-                        <PromptInputAction
-                            tooltip={matcher
-                                .with(
-                                    { canResearch: true, canModelUseTools: true },
-                                    () => 'Deep research (beta)'
-                                )
-                                .with(
-                                    {
-                                        isPro: true,
-                                        remainingBudget: P.number.lte(0),
-                                    },
-                                    () => 'You have reached your daily usage limit'
-                                )
-                                .with(
-                                    { isPro: false },
-                                    () => 'Research is only available for Pro users'
-                                )
-                                .with(
-                                    { canModelUseTools: false },
-                                    () => 'This model cannot use tools'
-                                )
-                                .otherwise(() => 'Deep research is not available')}
-                        >
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                type="button"
-                                className={cn(
-                                    'h-8 w-8 rounded-full relative z-10 hover:text-primary',
-                                    tool === 'deepSearch' ? 'text-primary' : 'text-muted-foreground',
-                                    matcher
-                                        .with({ canResearch: false }, () => 'opacity-50')
-                                        .with({ canModelUseTools: false }, () => 'opacity-50')
-                                        .otherwise(() => null)
-                                )}
-                                onClick={() => {
-                                    matcher
-                                        .with({ canResearch: true, canModelUseTools: true }, () => {
-                                            setTool('deepSearch');
-                                        })
-                                        .with(
-                                            {
-                                                isPro: true,
-                                                remainingBudget: P.number.lte(0),
-                                            },
-                                            () => {
-                                                toast('You have reached your daily usage limit');
-                                            }
-                                        )
-                                        .with({ canModelUseTools: false }, () => {
-                                            toast('This model cannot use tools');
-                                        })
-                                        .with({ isPro: false }, () => {
-                                            setProDialogOpen(true);
-                                        })
-                                        .otherwise(() => null);
-                                }}
-                            >
-                                <TelescopeIcon className="size-4 z-1" />
-                                {tool === 'deepSearch' && (
-                                    <motion.div
-                                        className="absolute inset-0 rounded-full bg-background border border-foreground/10 shadow-sm z-0"
-                                        layoutId="toolThumb"
-                                        transition={{ type: 'spring', stiffness: 500, damping: 35 }}
-                                    />
-                                )}
-                            </Button>
-                        </PromptInputAction>
-                    </div>
+                <PromptInputTextarea className="px-5 pt-4" placeholder="Write to the model…" />
+                <PromptInputActions className="flex items-center px-3 pb-3 pt-1">
+                    <ModelSelector />
                     <div className="flex-1" />
                     <PromptInputAction
                         tooltip={matcher
@@ -515,16 +338,16 @@ export function MultiModalInput() {
                             .otherwise(() => 'Attach files')}
                     >
                         <Button
-                            variant="outline"
+                            variant="ghost"
                             size="icon"
-                            className="h-8 w-8 rounded-full"
                             type="button"
+                            className="h-9 w-9 rounded-xl text-muted-foreground hover:text-foreground"
                             onClick={handlePaperclipClick}
                             disabled={matcher
                                 .with({ canModelViewFiles: false }, () => true)
                                 .otherwise(() => false)}
                         >
-                            <Paperclip className="size-5" />
+                            <Paperclip className="size-4" />
                             <input
                                 ref={fileInputRef}
                                 type="file"
@@ -568,10 +391,7 @@ export function MultiModalInput() {
                                 },
                                 () => 'This model does not support file uploads'
                             )
-                            .with(
-                                { canUseModel: false, status: 'ready' },
-                                () => cannotUseModelReason
-                            )
+                            .with({ canUseModel: false, status: 'ready' }, () => cannotUseModelReason)
                             .with(
                                 { status: P.union('streaming', 'submitted') },
                                 () => 'Stop generation'
@@ -582,7 +402,7 @@ export function MultiModalInput() {
                             type="submit"
                             variant="default"
                             size="icon"
-                            className="h-8 w-8 rounded-full"
+                            className="h-9 w-9 rounded-xl"
                             disabled={matcher
                                 .with(
                                     {
@@ -617,9 +437,9 @@ export function MultiModalInput() {
                                 .otherwise(() => false)}
                         >
                             {status === 'streaming' || status === 'submitted' ? (
-                                <SquareIcon className="size-5 fill-current" />
+                                <SquareIcon className="size-4 fill-current" />
                             ) : (
-                                <ArrowUpIcon className="size-5" />
+                                <ArrowUpIcon className="size-4" />
                             )}
                         </Button>
                     </PromptInputAction>
