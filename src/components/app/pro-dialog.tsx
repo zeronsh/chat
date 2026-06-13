@@ -28,9 +28,9 @@ export function ProDialog() {
                 className="p-0 overflow-hidden gap-0 bg-background"
                 showCloseButton={false}
             >
-                <DialogHeader className="p-0">
-                    <div className="relative w-full p-6 text-white overflow-hidden">
-                        <div className="absolute inset-0 bg-[url('/paywall.png')] bg-cover bg-top scale-x-[-1]">
+                <DialogHeader className="p-2">
+                    <div className="relative w-full p-4 rounded-lg text-white overflow-hidden">
+                        <div className="absolute inset-0 bg-[url('/paywall.png')] bg-cover bg-top scale-x-[-1] rounded-lg overflow-hidden">
                             <div className="absolute inset-0 backdrop-blur-xs"></div>
                             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_theme(colors.yellow.300),_theme(colors.black),_theme(colors.black))] opacity-30"></div>
                         </div>
