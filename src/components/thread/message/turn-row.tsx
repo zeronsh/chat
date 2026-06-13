@@ -276,7 +276,7 @@ function UserActions({ turn }: { turn: Turn }): ReactNode {
     const setAttachments = useThreadSelector(state => state.setAttachments);
 
     return (
-        <div className="flex h-full items-center justify-end gap-0.5 opacity-0 transition-opacity duration-150 group-hover:opacity-100 focus-within:opacity-100">
+        <div className="flex h-full items-center justify-end gap-0.5 opacity-100 transition-opacity duration-150 md:opacity-0 md:group-hover:opacity-100 focus-within:opacity-100">
             <Button
                 variant="ghost"
                 size="icon"
@@ -320,7 +320,7 @@ function AssistantActions({ turn }: { turn: Turn }): ReactNode {
     );
 
     return (
-        <div className="flex h-full items-center gap-0.5 opacity-0 transition-opacity duration-150 group-hover:opacity-100 focus-within:opacity-100">
+        <div className="flex h-full items-center gap-0.5 opacity-100 transition-opacity duration-150 md:opacity-0 md:group-hover:opacity-100 focus-within:opacity-100">
             <Button
                 variant="ghost"
                 size="icon"
