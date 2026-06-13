@@ -169,6 +169,13 @@
       "when": 1781304633785,
       "tag": "0023_seed-model-pricing",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1781332147336,
+      "tag": "0024_disable-fable",
+      "breakpoints": true
     }
   ]
 }
