@@ -32,3 +32,6 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 
 # Million Lint
 .million
+
+.output
+.nitro
