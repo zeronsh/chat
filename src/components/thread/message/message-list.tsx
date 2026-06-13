@@ -53,8 +53,7 @@ export function MessageList() {
                 className="h-full"
             />
             <StreamFadeOverlay />
-            <ScrollToBottom list={list} />
-            <MultiModalInput />
+            <MultiModalInput aboveInput={<ScrollToBottom list={list} />} />
         </div>
     );
 }
@@ -67,7 +66,7 @@ function ScrollToBottom({ list }: { list: MugenInstance<Turn> }): ReactNode {
             type="button"
             data-hidden={!awayFromBottom}
             onClick={() => list.scrollToBottom({ behavior: 'smooth' })}
-            className="absolute bottom-[172px] left-1/2 z-20 inline-flex -translate-x-1/2 items-center gap-1.5 rounded-full border border-foreground/15 bg-background py-1.5 pl-2.5 pr-3.5 text-xs text-muted-foreground shadow-sm transition-all duration-200 hover:text-foreground data-[hidden=true]:pointer-events-none data-[hidden=true]:translate-y-2 data-[hidden=true]:opacity-0"
+            className="inline-flex items-center gap-1.5 rounded-full border border-foreground/15 bg-background py-1.5 pl-2.5 pr-3.5 text-xs text-muted-foreground shadow-sm transition-all duration-200 hover:text-foreground data-[hidden=true]:pointer-events-none data-[hidden=true]:translate-y-1 data-[hidden=true]:opacity-0"
         >
             <ArrowDownIcon className="size-3" />
             Scroll to bottom

@@ -38,7 +38,7 @@ function greetingForHour(hour: number) {
     return 'Good evening';
 }
 
-export function MultiModalInput() {
+export function MultiModalInput({ aboveInput }: { aboveInput?: React.ReactNode }) {
     const id = useThreadSelector(state => state.id!);
     const status = useThreadSelector(state => state.status);
     const input = useThreadSelector(state => state.input);
@@ -196,12 +196,18 @@ export function MultiModalInput() {
                     </p>
                 </motion.div>
             )}
-            <PromptInput
-                className="max-w-3xl mx-auto p-0 w-full overflow-hidden rounded-2xl border border-foreground/15 bg-background focus-within:border-foreground/25"
-                value={input}
-                onValueChange={setInput}
-                onSubmit={handleSubmit}
-            >
+            <div className="relative max-w-3xl mx-auto w-full">
+                {aboveInput ? (
+                    <div className="absolute bottom-full left-1/2 mb-3 -translate-x-1/2">
+                        {aboveInput}
+                    </div>
+                ) : null}
+                <PromptInput
+                    className="p-0 w-full overflow-hidden rounded-2xl border border-foreground/15 bg-background focus-within:border-foreground/25"
+                    value={input}
+                    onValueChange={setInput}
+                    onSubmit={handleSubmit}
+                >
                 {match({ editingMessageId, usagePercent, isPro })
                     .with(
                         {
@@ -435,7 +441,8 @@ export function MultiModalInput() {
                         </Button>
                     </PromptInputAction>
                 </PromptInputActions>
-            </PromptInput>
+                </PromptInput>
+            </div>
         </motion.form>
     );
 }
