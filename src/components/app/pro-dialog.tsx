@@ -25,14 +25,14 @@ export function ProDialog() {
     return (
         <Dialog open={proDialog.open} onOpenChange={proDialog.setOpen}>
             <DialogContent
-                className="p-0 overflow-hidden gap-0 bg-background"
+                className="p-0 overflow-hidden gap-0 bg-background rounded-2xl"
                 showCloseButton={false}
             >
                 <DialogHeader className="p-2">
-                    <div className="relative w-full p-4 rounded-[calc(var(--radius)-0.5rem)] text-white overflow-hidden">
-                        <div className="absolute inset-0 bg-[url('/paywall.png')] bg-cover bg-top scale-x-[-1] rounded-[calc(var(--radius)-0.5rem)] overflow-hidden">
-                            <div className="absolute inset-0 rounded-[calc(var(--radius)-0.5rem)] backdrop-blur-xs"></div>
-                            <div className="absolute inset-0 rounded-[calc(var(--radius)-0.5rem)] bg-[radial-gradient(ellipse_at_top_left,_theme(colors.yellow.300),_theme(colors.black),_theme(colors.black))] opacity-30"></div>
+                    <div className="relative w-full p-4 rounded-[8px] text-white overflow-hidden">
+                        <div className="absolute inset-0 bg-[url('/paywall.png')] bg-cover bg-top scale-x-[-1] rounded-[8px] overflow-hidden">
+                            <div className="absolute inset-0 rounded-[8px] backdrop-blur-xs"></div>
+                            <div className="absolute inset-0 rounded-[8px] bg-[radial-gradient(ellipse_at_top_left,_theme(colors.yellow.300),_theme(colors.black),_theme(colors.black))] opacity-30"></div>
                         </div>
                         <div className="relative z-10 flex flex-col gap-4">
                             <DialogTitle className="flex items-center gap-2">
