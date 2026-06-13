@@ -263,10 +263,13 @@ function ThreadItem({
                 <div className="group/thread-item relative">
                     <Link
                         to="/$threadId"
-                        className="w-full flex absolute inset-0 items-center px-2 rounded-md gap-2"
+                        className="w-full flex absolute inset-0 items-center px-2 rounded-lg gap-2 transition-colors hover:bg-accent"
                         params={{ threadId: thread.id }}
                         activeOptions={{ exact: true }}
-                        activeProps={{ className: 'bg-muted', 'data-thread-active': 'true' }}
+                        activeProps={{
+                            className: 'bg-accent text-foreground',
+                            'data-thread-active': 'true',
+                        }}
                         onMouseDown={e => {
                             e.preventDefault();
                             e.stopPropagation();
@@ -283,15 +286,16 @@ function ThreadItem({
                             <Loader2Icon className="size-4 animate-spin text-muted-foreground" />
                         )}
                     </Link>
-                    <div className="absolute top-0 right-0 bottom-0 pointer-events-none flex justify-end gap-2 px-4 items-center group-hover/thread-item:opacity-100 opacity-0 transition-all duration-100 bg-gradient-to-l from-sidebar to-transparent w-full rounded-r-md" />
-                    <div className="absolute top-0 right-0 bottom-0 flex justify-end gap-2 px-2 items-center group-hover/thread-item:opacity-100 group-hover/thread-item:translate-x-0 translate-x-full opacity-0 transition-all duration-100 rounded-r-lg pointer-events-none group-hover/thread-item:pointer-events-auto">
+                    {/* Action cluster fades in on hover (no slide); the gradient
+                        matches the hovered row bg so the title reads cleanly under it. */}
+                    <div className="absolute inset-y-0 right-0 flex items-center gap-0.5 rounded-r-lg pl-10 pr-1.5 opacity-0 transition-opacity duration-150 pointer-events-none bg-gradient-to-l from-accent from-55% to-transparent group-hover/thread-item:opacity-100 group-hover/thread-item:pointer-events-auto">
                         <Tooltip>
                             <TooltipTrigger
                                 render={
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        className="size-6 hover:text-primary hover:bg-transparent"
+                                        className="size-7 text-muted-foreground hover:text-foreground hover:bg-transparent"
                                         onClick={() => setThreadToEdit(thread)}
                                     >
                                         <PencilIcon className="size-4" />
@@ -308,7 +312,7 @@ function ThreadItem({
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        className="size-6 hover:text-primary"
+                                        className="size-7 text-muted-foreground hover:text-destructive hover:bg-transparent"
                                         onClick={() => setThreadToDelete(thread)}
                                     >
                                         <TrashIcon className="size-4" />
