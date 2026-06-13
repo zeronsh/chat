@@ -176,6 +176,13 @@
       "when": 1781332147336,
       "tag": "0024_disable-fable",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1781334419977,
+      "tag": "0025_seed-kimi-k2.5-k2.7",
+      "breakpoints": true
     }
   ]
 }
