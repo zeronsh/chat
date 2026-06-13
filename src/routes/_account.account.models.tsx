@@ -63,8 +63,8 @@ function RouteComponent() {
                                             model={model.icon}
                                         />
                                     </div>
-                                    <div className="flex gap-1 flex-1">
-                                        <div className="flex flex-col gap-2">
+                                    <div className="flex gap-3 flex-1 items-start">
+                                        <div className="flex flex-col gap-2 flex-1 min-w-0">
                                             <div className="flex items-center gap-2">
                                                 <span className="font-medium">{model.name}</span>
                                                 {model.access === 'premium_required' && (
@@ -78,6 +78,7 @@ function RouteComponent() {
                                             </p>
                                         </div>
                                         <Switch
+                                            className="shrink-0 mt-0.5"
                                             checked={isPinned}
                                             disabled={isPinned && activeModelCount <= 1}
                                             onCheckedChange={checked =>
