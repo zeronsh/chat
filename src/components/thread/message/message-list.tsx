@@ -54,10 +54,10 @@ function ScrollToBottom({ list }: { list: MugenInstance<Turn> }): ReactNode {
             type="button"
             data-hidden={!awayFromBottom}
             onClick={() => list.scrollToBottom({ behavior: 'smooth' })}
-            className="absolute bottom-40 left-1/2 z-10 inline-flex -translate-x-1/2 items-center gap-1.5 rounded-full border border-foreground/15 bg-background/90 py-1.5 pl-2.5 pr-3.5 text-xs text-muted-foreground shadow-sm backdrop-blur-md transition-all duration-200 hover:text-foreground data-[hidden=true]:pointer-events-none data-[hidden=true]:translate-y-2 data-[hidden=true]:opacity-0"
+            className="absolute bottom-[172px] left-1/2 z-20 inline-flex -translate-x-1/2 items-center gap-1.5 rounded-full border border-foreground/15 bg-background py-1.5 pl-2.5 pr-3.5 text-xs text-muted-foreground shadow-sm transition-all duration-200 hover:text-foreground data-[hidden=true]:pointer-events-none data-[hidden=true]:translate-y-2 data-[hidden=true]:opacity-0"
         >
             <ArrowDownIcon className="size-3" />
-            Scroll to latest
+            Scroll to bottom
         </button>
     );
 }

@@ -164,8 +164,10 @@ export function MultiModalInput() {
             layout="position"
             transition={{ type: 'spring', stiffness: 500, damping: 40 }}
             className={cn(
-                'absolute px-4 py-4 flex flex-col gap-8 left-0 right-0',
-                threadId ? 'bottom-0' : 'top-[22vh]'
+                'absolute px-4 pb-4 flex flex-col gap-8 left-0 right-0',
+                threadId
+                    ? 'bottom-0 pt-12 bg-gradient-to-t from-background from-60% via-background to-transparent'
+                    : 'top-[22vh] pt-4'
             )}
             onSubmit={async e => {
                 e.preventDefault();
@@ -195,7 +197,7 @@ export function MultiModalInput() {
                 </motion.div>
             )}
             <PromptInput
-                className="max-w-3xl mx-auto p-0 w-full overflow-hidden rounded-2xl border border-foreground/15 bg-background/95 backdrop-blur-md focus-within:border-foreground/25"
+                className="max-w-3xl mx-auto p-0 w-full overflow-hidden rounded-2xl border border-foreground/15 bg-background focus-within:border-foreground/25"
                 value={input}
                 onValueChange={setInput}
                 onSubmit={handleSubmit}
