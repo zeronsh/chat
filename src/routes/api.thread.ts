@@ -273,10 +273,16 @@ const threadPostApiHandler = Effect.gen(function* () {
         Stream.onError(({ error, writer }) => {
             return Effect.gen(function* () {
                 yield* Effect.logError('Error in stream', error);
-                writer.write({
-                    type: 'data-error',
-                    data: 'Error generating response',
-                });
+
+                // The writer is only present for errors raised mid-stream; when
+                // the UI message stream itself fails the SDK emits its own error
+                // part from the handler's return value instead.
+                if (writer) {
+                    writer.write({
+                        type: 'data-error',
+                        data: 'Error generating response',
+                    });
+                }
 
                 // Reset the thread to ready so the client doesn't hang in a
                 // permanent loading state when the stream fails.

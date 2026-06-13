@@ -43,6 +43,17 @@ const createStreamSSEResponse = Effect.gen(function* () {
             // @ts-expect-error - TODO: fix this
             return Runtime.runPromise(runtime, onFinishCallback({ responseMessage, totalUsage }));
         },
+        // Errors thrown in `execute` or the merged stream that streamText's own
+        // onError never sees land here. Run the same error handler (which
+        // resets the thread) and return a message that the SDK emits as an
+        // error part, so the client both unsticks and shows the failure.
+        onError: error => {
+            // No writer at this stage — the handler resets status; the returned
+            // string becomes the error part the SDK sends to the client.
+            // @ts-expect-error - TODO: fix this
+            Runtime.runPromise(runtime, onErrorCallback({ error }));
+            return 'Error generating response';
+        },
         execute: ({ writer }) => {
             // @ts-expect-error - TODO: fix this
             const tools = Runtime.runSync(runtime, getToolsCallback({ writer }));
@@ -89,7 +100,8 @@ export class CreateStreamSSEResponseOnFinish extends Effect.Tag('CreateStreamSSE
 
 export type OnErrorCallback<A = void, E = never, R = never> = (options: {
     error: unknown;
-    writer: UIMessageStreamWriter<ThreadMessage>;
+    /** Absent when the error surfaces from the UI message stream itself (writer already gone). */
+    writer?: UIMessageStreamWriter<ThreadMessage>;
 }) => Effect.Effect<A, E, R>;
 
 export class CreateStreamSSEResponseOnError extends Effect.Tag('CreateStreamSSEResponseOnError')<
