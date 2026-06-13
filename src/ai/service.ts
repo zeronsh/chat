@@ -8,11 +8,13 @@ import {
     JsonToSseTransformStream,
 } from 'ai';
 import { createResumableStreamContext, ResumableStreamContext } from 'resumable-stream';
+import { createClient } from 'redis';
 import { UserId } from '@/database/types';
 import { Database } from '@/database/effect';
 import { Duration, Effect, Schedule } from 'effect';
 import { APIError } from '@/lib/error';
 import { AnonymousLimits, FreeLimits, ProLimits } from '@/lib/constants';
+import { env } from '@/lib/env';
 import { match } from 'ts-pattern';
 import { waitUntil } from '@vercel/functions';
 
@@ -20,8 +22,35 @@ let streamContext: ResumableStreamContext | undefined = undefined;
 
 export function getStreamContext() {
     if (!streamContext) {
+        // Supply our own Redis clients instead of letting resumable-stream
+        // create unmanaged ones. A `redis` client with no 'error' listener
+        // rethrows socket errors ("Socket closed unexpectedly") as uncaught
+        // exceptions, which crash the serverless invocation mid-stream and
+        // leave the thread stuck in `streaming`. Attaching a listener turns
+        // those into logged, recoverable errors.
+        const publisher = createClient({ url: env.REDIS_URL });
+        const subscriber = createClient({ url: env.REDIS_URL });
+
+        publisher.on('error', error =>
+            console.error('resumable-stream redis publisher error', error)
+        );
+        subscriber.on('error', error =>
+            console.error('resumable-stream redis subscriber error', error)
+        );
+
+        publisher
+            .connect()
+            .catch(error => console.error('resumable-stream redis publisher connect error', error));
+        subscriber
+            .connect()
+            .catch(error =>
+                console.error('resumable-stream redis subscriber connect error', error)
+            );
+
         streamContext = createResumableStreamContext({
             waitUntil,
+            publisher,
+            subscriber,
         });
     }
     return streamContext;
@@ -382,6 +411,24 @@ export function saveMessageAndResetThreadStatus(args: {
             );
         })
     );
+}
+
+/**
+ * Reset a thread back to `ready` after a stream failure. Without this a stream
+ * that errors (or whose connection drops) leaves the thread stuck in
+ * `streaming`, and the client shows a permanent loading state.
+ */
+export function resetThreadStatus(threadId: string) {
+    return queries
+        .updateThread({
+            threadId,
+            status: 'ready',
+            streamId: null,
+        })
+        .pipe(
+            Effect.tapError(error => Effect.logError('Error resetting thread status', error)),
+            Effect.catchAll(() => Effect.succeed(null))
+        );
 }
 
 export function getLimits(args: {

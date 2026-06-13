@@ -15,6 +15,7 @@ import {
     generateThreadTitle,
     incrementUsage,
     prepareThreadContext,
+    resetThreadStatus,
     saveMessageAndResetThreadStatus,
 } from '@/ai/service';
 import { Stream } from '@/ai/stream';
@@ -276,6 +277,10 @@ const threadPostApiHandler = Effect.gen(function* () {
                     type: 'data-error',
                     data: 'Error generating response',
                 });
+
+                // Reset the thread to ready so the client doesn't hang in a
+                // permanent loading state when the stream fails.
+                yield* resetThreadStatus(body.id).pipe(latch.whenOpen);
 
                 // Signal completion even on error so Redis can close
                 yield* Deferred.succeed(streamCompletionDeferred, undefined);
