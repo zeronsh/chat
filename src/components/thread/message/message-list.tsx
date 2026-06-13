@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useMemo, type ReactNode } from 'react';
 import {
     MugenVList,
     VStack,
@@ -17,21 +17,8 @@ import { useAutoResume } from '@/hooks/use-auto-resume';
 export function MessageList() {
     const messages = useThreadSelector(state => state.messages);
     const status = useThreadSelector(state => state.status);
-    const threadId = useThreadSelector(state => state.id);
 
     useAutoResume();
-
-    // `initialScroll="bottom"` lands instant before paint, but markdown
-    // resolves after paint and grows rows — with a smooth stickToBottom the
-    // list visibly scroll-chases that settle on load. So keep stickToBottom
-    // snapping instantly through the initial settle, then switch to smooth for
-    // streaming. Reset the window whenever the thread changes.
-    const [settled, setSettled] = useState(false);
-    useEffect(() => {
-        setSettled(false);
-        const timer = setTimeout(() => setSettled(true), 500);
-        return () => clearTimeout(timer);
-    }, [threadId]);
 
     const items = useMemo(() => buildTurns(messages, status), [messages, status]);
     const list = useMugenVirtualizer({ items });
@@ -47,7 +34,7 @@ export function MessageList() {
                 maxW={768}
                 overscan={320}
                 initialScroll="bottom"
-                stickToBottom={{ behavior: settled ? 'smooth' : 'instant' }}
+                stickToBottom
                 renderTop={() => <VStack height={72} />}
                 renderBottom={() => <VStack height={176} />}
                 className="h-full"
