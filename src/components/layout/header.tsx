@@ -16,9 +16,6 @@ export function Header() {
         >
             <div className="flex items-center gap-3 p-3">
                 <SidebarTrigger />
-                <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.25em] text-muted-foreground select-none">
-                    Zeron
-                </span>
             </div>
             <div className="flex items-center gap-2 p-3">
                 <ThemeSelector />

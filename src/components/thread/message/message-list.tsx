@@ -8,6 +8,7 @@ import {
 } from '@wingleeio/mugen';
 import { ArrowDownIcon } from 'lucide-react';
 import { MultiModalInput } from '@/components/thread/multi-modal-input';
+import { StreamFadeOverlay } from '@/components/thread/stream-fade';
 import { TurnRow } from '@/components/thread/message/turn-row';
 import { buildTurns, type Turn } from '@/components/thread/turns';
 import { useThreadSelector } from '@/context/thread';
@@ -38,6 +39,7 @@ export function MessageList() {
                 renderBottom={() => <VStack height={176} />}
                 className="h-full"
             />
+            <StreamFadeOverlay />
             <ScrollToBottom list={list} />
             <MultiModalInput />
         </div>
@@ -52,10 +54,10 @@ function ScrollToBottom({ list }: { list: MugenInstance<Turn> }): ReactNode {
             type="button"
             data-hidden={!awayFromBottom}
             onClick={() => list.scrollToBottom({ behavior: 'smooth' })}
-            className="absolute bottom-44 left-1/2 z-10 inline-flex -translate-x-1/2 items-center gap-2 rounded-full border border-foreground/15 bg-background/90 py-1.5 pl-2.5 pr-3.5 font-mono text-[11px] font-medium uppercase tracking-wider text-muted-foreground shadow-lg backdrop-blur-md transition-all duration-200 hover:text-foreground data-[hidden=true]:pointer-events-none data-[hidden=true]:translate-y-2 data-[hidden=true]:opacity-0"
+            className="absolute bottom-40 left-1/2 z-10 inline-flex -translate-x-1/2 items-center gap-1.5 rounded-full border border-foreground/15 bg-background/90 py-1.5 pl-2.5 pr-3.5 text-xs text-muted-foreground shadow-sm backdrop-blur-md transition-all duration-200 hover:text-foreground data-[hidden=true]:pointer-events-none data-[hidden=true]:translate-y-2 data-[hidden=true]:opacity-0"
         >
             <ArrowDownIcon className="size-3" />
-            Latest
+            Scroll to latest
         </button>
     );
 }

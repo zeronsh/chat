@@ -7,6 +7,7 @@ import {
     VStack,
 } from '@wingleeio/mugen';
 import { Markdown } from '@wingleeio/mugen-markdown';
+import { STREAM_FADE_CLASS } from '@/components/thread/stream-fade';
 import type { ReactNode } from 'react';
 import { CopyIcon, EditIcon, RefreshCcwIcon } from 'lucide-react';
 import { toast } from 'sonner';
@@ -141,17 +142,6 @@ function AssistantTurn({
 }): ReactNode {
     return (
         <VStack gap={14} padding={16}>
-            <HStack gap={8} align="center">
-                <VStack
-                    width={6}
-                    height={6}
-                    style={{ background: INK.accent, borderRadius: 3 }}
-                />
-                <Text font={`600 10px ${MONO}`} lineHeight={14} letterSpacing={1.4} color={INK.muted}>
-                    {(turn.modelName ?? 'Assistant').toUpperCase()}
-                </Text>
-            </HStack>
-
             {turn.pending ? (
                 <Text
                     font={`600 15px ${SANS}`}
@@ -164,11 +154,16 @@ function AssistantTurn({
             ) : null}
 
             {turn.blocks.map((block, i) => {
+                // The newest block of the streaming turn gets the marker class
+                // the StreamFadeOverlay veils — appended text fades in without
+                // the row ever animating.
+                const fading = turn.streaming && i === turn.blocks.length - 1;
+
                 if (block.kind === 'reasoning') {
                     const open = openOverride ?? !block.done;
                     const label = block.done
-                        ? `THOUGHT${block.seconds ? ` FOR ${block.seconds}S` : ''}`
-                        : 'THINKING…';
+                        ? `Thought${block.seconds ? ` for ${block.seconds}s` : ''}`
+                        : 'Thinking…';
                     return (
                         <VStack key={i} gap={open ? 10 : 0}>
                             <Disclosure
@@ -177,21 +172,20 @@ function AssistantTurn({
                                 style={{ ...buttonReset, borderRadius: 6 }}
                             >
                                 <HStack gap={7} align="center">
-                                    <Text font={`600 10px ${MONO}`} lineHeight={14} color={INK.muted}>
+                                    <Text font={`11px ${MONO}`} lineHeight={16} color={INK.muted}>
                                         {open ? '▾' : '▸'}
                                     </Text>
-                                    <Text
-                                        font={`600 10px ${MONO}`}
-                                        lineHeight={14}
-                                        letterSpacing={1.4}
-                                        color={INK.muted}
-                                    >
+                                    <Text font={`500 12px ${MONO}`} lineHeight={16} color={INK.muted}>
                                         {label}
                                     </Text>
                                 </HStack>
                             </Disclosure>
                             {open ? (
-                                <HStack gap={13} align="stretch">
+                                <HStack
+                                    gap={13}
+                                    align="stretch"
+                                    className={fading && !block.done ? STREAM_FADE_CLASS : undefined}
+                                >
                                     <VStack
                                         width={2}
                                         style={{ background: INK.hairline, borderRadius: 2 }}
@@ -228,7 +222,11 @@ function AssistantTurn({
                     );
                 }
 
-                return <Markdown key={i} source={block.text} theme={CHAT_MD_THEME} />;
+                return (
+                    <VStack key={i} className={fading ? STREAM_FADE_CLASS : undefined}>
+                        <Markdown source={block.text} theme={CHAT_MD_THEME} />
+                    </VStack>
+                );
             })}
 
             {turn.streaming && !turn.pending ? (
@@ -329,9 +327,15 @@ function AssistantActions({ turn }: { turn: Turn }): ReactNode {
             >
                 <RefreshCcwIcon className="size-3" />
             </Button>
-            {turn.modelIcon ? (
+            {turn.modelName ? (
                 <span className="ml-1 flex items-center gap-1.5 text-muted-foreground">
-                    <ModelIcon className="size-3 fill-current" model={turn.modelIcon as ModelType} />
+                    {turn.modelIcon ? (
+                        <ModelIcon
+                            className="size-3 fill-current"
+                            model={turn.modelIcon as ModelType}
+                        />
+                    ) : null}
+                    <span className="text-xs">{turn.modelName}</span>
                 </span>
             ) : null}
         </div>

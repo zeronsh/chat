@@ -164,7 +164,7 @@ export function MultiModalInput() {
             layout="position"
             transition={{ type: 'spring', stiffness: 500, damping: 40 }}
             className={cn(
-                'absolute px-4 pt-4 flex flex-col gap-8 left-0 right-0',
+                'absolute px-4 py-4 flex flex-col gap-8 left-0 right-0',
                 threadId ? 'bottom-0' : 'top-[22vh]'
             )}
             onSubmit={async e => {
@@ -186,9 +186,6 @@ export function MultiModalInput() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
                 >
-                    <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary mb-3">
-                        Zeron
-                    </p>
                     <h2 className="font-serif text-4xl italic text-foreground">
                         {greetingForHour(new Date().getHours())}, {getUsername(user)}.
                     </h2>
@@ -198,7 +195,7 @@ export function MultiModalInput() {
                 </motion.div>
             )}
             <PromptInput
-                className="max-w-3xl mx-auto p-0 w-full overflow-hidden rounded-2xl border border-foreground/15 bg-background/95 shadow-[0_8px_30px_-12px_color-mix(in_oklab,var(--color-foreground)_35%,transparent)] backdrop-blur-md focus-within:border-primary/40"
+                className="max-w-3xl mx-auto p-0 w-full overflow-hidden rounded-2xl border border-foreground/15 bg-background/95 backdrop-blur-md focus-within:border-foreground/25"
                 value={input}
                 onValueChange={setInput}
                 onSubmit={handleSubmit}
@@ -214,9 +211,7 @@ export function MultiModalInput() {
                             <div className="flex justify-between items-center px-4 py-2.5 bg-sidebar/40 text-xs text-muted-foreground border-b border-foreground/10">
                                 <div className="flex items-center gap-2">
                                     <AlertTriangleIcon className="size-3.5" />
-                                    <p className="font-mono uppercase tracking-wider text-[11px]">
-                                        Daily usage limit reached
-                                    </p>
+                                    <p>Daily usage limit reached</p>
                                 </div>
                                 <Button
                                     variant="link"
@@ -238,9 +233,7 @@ export function MultiModalInput() {
                             <div className="flex justify-between items-center px-4 py-2.5 bg-sidebar/40 text-xs text-muted-foreground border-b border-foreground/10">
                                 <div className="flex items-center gap-2">
                                     <AlertTriangleIcon className="size-3.5" />
-                                    <p className="font-mono uppercase tracking-wider text-[11px]">
-                                        {usagePercent}% of daily usage
-                                    </p>
+                                    <p>{usagePercent}% of daily usage used</p>
                                 </div>
                                 <Button
                                     variant="link"
@@ -262,15 +255,13 @@ export function MultiModalInput() {
                             <div className="flex justify-between items-center px-4 py-2.5 bg-sidebar/40 text-xs text-muted-foreground border-b border-foreground/10">
                                 <div className="flex items-center gap-2">
                                     <AlertTriangleIcon className="size-3.5" />
-                                    <p className="font-mono uppercase tracking-wider text-[11px]">
+                                    <p>
                                         {usagePercent >= 100
                                             ? 'Daily usage limit reached'
-                                            : `${usagePercent}% of daily usage`}
+                                            : `${usagePercent}% of daily usage used`}
                                     </p>
                                 </div>
-                                <p className="font-mono text-[11px] uppercase tracking-wider text-primary">
-                                    Resets daily
-                                </p>
+                                <p className="text-xs text-primary">Resets daily</p>
                             </div>
                         )
                     )
@@ -278,9 +269,7 @@ export function MultiModalInput() {
                         <div className="flex justify-between items-center px-4 py-2.5 bg-sidebar/40 text-xs text-muted-foreground border-b border-foreground/10">
                             <div className="flex items-center gap-2">
                                 <EditIcon className="size-3.5" />
-                                <p className="font-mono uppercase tracking-wider text-[11px]">
-                                    Editing message
-                                </p>
+                                <p>Editing message</p>
                             </div>
                             <Button
                                 variant="ghost"
