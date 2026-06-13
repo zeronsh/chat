@@ -195,14 +195,9 @@ function AssistantTurn({
                                 onClick={() => setOpenOverride(!open)}
                                 style={{ ...buttonReset, borderRadius: 6 }}
                             >
-                                <HStack gap={7} align="center">
-                                    <Text font={`11px ${MONO}`} lineHeight={16} color={INK.muted}>
-                                        {open ? '▾' : '▸'}
-                                    </Text>
-                                    <Text font={`500 12px ${MONO}`} lineHeight={16} color={INK.muted}>
-                                        {label}
-                                    </Text>
-                                </HStack>
+                                <Text font={`500 12px ${MONO}`} lineHeight={16} color={INK.muted}>
+                                    {label}
+                                </Text>
                             </Disclosure>
                             {open ? (
                                 <HStack
