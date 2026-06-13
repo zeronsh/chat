@@ -65,10 +65,22 @@ const buttonReset = {
 } as const;
 
 export function TurnRow(turn: Turn): ReactNode {
+    // Mugen hooks may only be called directly inside the render function, so
+    // per-row state lives here and flows into the (hook-free) turn components.
+    // One disclosure per turn; null means "follow the stream" (open while
+    // reasoning, closed once done). Toggling re-measures just this row.
+    const [openOverride, setOpenOverride] = useMugenState<boolean | null>(null);
+
     if (turn.role === 'user') {
         return <UserTurn turn={turn} />;
     }
-    return <AssistantTurn turn={turn} />;
+    return (
+        <AssistantTurn
+            turn={turn}
+            openOverride={openOverride}
+            setOpenOverride={setOpenOverride}
+        />
+    );
 }
 
 function UserTurn({ turn }: { turn: Turn }): ReactNode {
@@ -118,11 +130,15 @@ function UserTurn({ turn }: { turn: Turn }): ReactNode {
     );
 }
 
-function AssistantTurn({ turn }: { turn: Turn }): ReactNode {
-    // One disclosure per turn; null means "follow the stream" (open while
-    // reasoning, closed once done). Toggling re-measures just this row.
-    const [openOverride, setOpenOverride] = useMugenState<boolean | null>(null);
-
+function AssistantTurn({
+    turn,
+    openOverride,
+    setOpenOverride,
+}: {
+    turn: Turn;
+    openOverride: boolean | null;
+    setOpenOverride: (open: boolean | null) => void;
+}): ReactNode {
     return (
         <VStack gap={14} padding={16}>
             <HStack gap={8} align="center">
