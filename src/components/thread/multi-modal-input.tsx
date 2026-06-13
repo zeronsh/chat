@@ -191,9 +191,6 @@ export function MultiModalInput({ aboveInput }: { aboveInput?: React.ReactNode }
                     <h2 className="font-serif text-4xl italic text-foreground">
                         {greetingForHour(new Date().getHours())}, {getUsername(user)}.
                     </h2>
-                    <p className="mt-2 text-sm text-muted-foreground">
-                        Ask anything — the transcript starts when you do.
-                    </p>
                 </motion.div>
             )}
             <div className="relative max-w-3xl mx-auto w-full">
