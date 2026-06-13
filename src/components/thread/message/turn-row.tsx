@@ -110,7 +110,8 @@ export function TurnRow(turn: Turn): ReactNode {
 
 function UserTurn({ turn }: { turn: Turn }): ReactNode {
     return (
-        <VStack gap={8} padding={16}>
+        <VStack gap={8} padding={16} className="group">
+
             {turn.files.length > 0 ? (
                 <HStack justify="flex-end">
                     <Escape height={100}>
@@ -165,7 +166,7 @@ function AssistantTurn({
     setOpenOverride: (open: boolean | null) => void;
 }): ReactNode {
     return (
-        <VStack gap={14} padding={16}>
+        <VStack gap={14} padding={16} className="group">
             {turn.pending ? (
                 <Text
                     font={`600 15px ${SANS}`}
@@ -275,7 +276,7 @@ function UserActions({ turn }: { turn: Turn }): ReactNode {
     const setAttachments = useThreadSelector(state => state.setAttachments);
 
     return (
-        <div className="flex h-full items-center justify-end gap-0.5 opacity-40 transition-opacity hover:opacity-100">
+        <div className="flex h-full items-center justify-end gap-0.5 opacity-0 transition-opacity duration-150 group-hover:opacity-100 focus-within:opacity-100">
             <Button
                 variant="ghost"
                 size="icon"
@@ -319,7 +320,7 @@ function AssistantActions({ turn }: { turn: Turn }): ReactNode {
     );
 
     return (
-        <div className="flex h-full items-center gap-0.5 opacity-40 transition-opacity hover:opacity-100">
+        <div className="flex h-full items-center gap-0.5 opacity-0 transition-opacity duration-150 group-hover:opacity-100 focus-within:opacity-100">
             <Button
                 variant="ghost"
                 size="icon"
