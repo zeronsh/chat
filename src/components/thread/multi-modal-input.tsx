@@ -166,7 +166,7 @@ export function MultiModalInput({ aboveInput }: { aboveInput?: React.ReactNode }
             className={cn(
                 'absolute px-4 pb-4 flex flex-col gap-8 left-0 right-0',
                 threadId
-                    ? 'bottom-0 pt-12 backdrop-blur-md bg-gradient-to-t from-background/85 via-background/45 to-transparent'
+                    ? 'bottom-0 pt-12 bg-gradient-to-t from-background from-60% via-background to-transparent'
                     : 'top-[22vh] pt-4'
             )}
             onSubmit={async e => {
@@ -203,7 +203,7 @@ export function MultiModalInput({ aboveInput }: { aboveInput?: React.ReactNode }
                     </div>
                 ) : null}
                 <PromptInput
-                    className="p-0 w-full overflow-hidden rounded-2xl border border-border bg-background/60 backdrop-blur-xl transition-colors focus-within:border-foreground/20"
+                    className="p-0 w-full overflow-hidden rounded-2xl border border-border bg-background transition-colors focus-within:border-foreground/20"
                     value={input}
                     onValueChange={setInput}
                     onSubmit={handleSubmit}
