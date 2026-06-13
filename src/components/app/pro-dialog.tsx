@@ -31,8 +31,8 @@ export function ProDialog() {
                 <DialogHeader className="p-2">
                     <div className="relative w-full p-4 rounded-lg text-white overflow-hidden">
                         <div className="absolute inset-0 bg-[url('/paywall.png')] bg-cover bg-top scale-x-[-1] rounded-lg overflow-hidden">
-                            <div className="absolute inset-0 backdrop-blur-xs"></div>
-                            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_theme(colors.yellow.300),_theme(colors.black),_theme(colors.black))] opacity-30"></div>
+                            <div className="absolute inset-0 rounded-lg backdrop-blur-xs"></div>
+                            <div className="absolute inset-0 rounded-lg bg-[radial-gradient(ellipse_at_top_left,_theme(colors.yellow.300),_theme(colors.black),_theme(colors.black))] opacity-30"></div>
                         </div>
                         <div className="relative z-10 flex flex-col gap-4">
                             <DialogTitle className="flex items-center gap-2">
