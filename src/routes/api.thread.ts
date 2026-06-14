@@ -149,6 +149,12 @@ const threadPostApiHandler = Effect.gen(function* () {
         model.model.startsWith('anthropic/') &&
         !ANTHROPIC_LEGACY_THINKING_MODELS.includes(model.model);
 
+    // Some models reject any non-default temperature (e.g. Kimi K2.7 Code only
+    // allows temperature 1), so we omit it entirely for them.
+    const MODELS_REJECTING_CUSTOM_TEMPERATURE = ['moonshotai/kimi-k2.7-code'];
+    const omitTemperature =
+        usesAdaptiveThinking || MODELS_REJECTING_CUSTOM_TEMPERATURE.includes(model.model);
+
     const anthropic: AnthropicProviderOptions = {
         sendReasoning: true,
         thinking: usesAdaptiveThinking
@@ -167,9 +173,10 @@ const threadPostApiHandler = Effect.gen(function* () {
         Stream.options({
             model: actualModel,
             messages,
-            // Fable 5 and Opus 4.8 reject temperature outright; the other
-            // adaptive-thinking Claude models don't accept it alongside thinking
-            temperature: usesAdaptiveThinking ? undefined : 0.8,
+            // Fable 5 / Opus 4.8 reject temperature outright, the other
+            // adaptive-thinking Claude models don't accept it alongside
+            // thinking, and some models (Kimi K2.7 Code) only allow the default.
+            temperature: omitTemperature ? undefined : 0.8,
             stopWhen: stepCountIs(3),
             system: getSystemPrompt(settings, activeTools),
             experimental_transform: smoothStream({
