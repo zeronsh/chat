@@ -7,7 +7,6 @@ import {
     VStack,
 } from '@wingleeio/mugen';
 import { Markdown } from '@wingleeio/mugen-markdown';
-import { STREAM_FADE_CLASS } from '@/components/thread/stream-fade';
 import type { ReactNode } from 'react';
 import { CopyIcon, EditIcon, RefreshCcwIcon } from 'lucide-react';
 import { toast } from 'sonner';
@@ -190,9 +189,8 @@ function AssistantTurn({
             ) : null}
 
             {turn.blocks.map((block, i) => {
-                // The newest block of the streaming turn gets the marker class
-                // the StreamFadeOverlay veils — appended text fades in without
-                // the row ever animating.
+                // The newest block of the streaming turn fades appended text in
+                // via <Markdown fade> — the row never animates, heights stay exact.
                 const fading = turn.streaming && i === turn.blocks.length - 1;
 
                 if (block.kind === 'reasoning') {
@@ -212,11 +210,7 @@ function AssistantTurn({
                                 </Text>
                             </Disclosure>
                             {open ? (
-                                <HStack
-                                    gap={13}
-                                    align="stretch"
-                                    className={fading && !block.done ? STREAM_FADE_CLASS : undefined}
-                                >
+                                <HStack gap={13} align="stretch">
                                     <VStack
                                         width={2}
                                         style={{ background: INK.hairline, borderRadius: 2 }}
@@ -225,6 +219,7 @@ function AssistantTurn({
                                         <Markdown
                                             source={block.text}
                                             theme={REASONING_MD_THEME}
+                                            fade={fading && !block.done}
                                         />
                                     </VStack>
                                 </HStack>
@@ -252,9 +247,7 @@ function AssistantTurn({
                 }
 
                 return (
-                    <VStack key={i} className={fading ? STREAM_FADE_CLASS : undefined}>
-                        <Markdown source={block.text} theme={CHAT_MD_THEME} />
-                    </VStack>
+                    <Markdown key={i} source={block.text} theme={CHAT_MD_THEME} fade={fading} />
                 );
             })}
 

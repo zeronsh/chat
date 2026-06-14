@@ -8,7 +8,6 @@ import {
 } from '@wingleeio/mugen';
 import { ArrowDownIcon } from 'lucide-react';
 import { MultiModalInput } from '@/components/thread/multi-modal-input';
-import { StreamFadeOverlay } from '@/components/thread/stream-fade';
 import { TurnRow } from '@/components/thread/message/turn-row';
 import { buildTurns, type Turn } from '@/components/thread/turns';
 import { useThreadSelector } from '@/context/thread';
@@ -39,7 +38,6 @@ export function MessageList() {
                 renderBottom={() => <VStack height={176} />}
                 className="h-full"
             />
-            <StreamFadeOverlay />
             <MultiModalInput aboveInput={<ScrollToBottom list={list} />} />
         </div>
     );
