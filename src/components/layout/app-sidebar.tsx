@@ -14,11 +14,14 @@ import {
     SidebarGroup,
     SidebarGroupContent,
     SidebarGroupLabel,
+    SidebarFooter,
     SidebarHeader,
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    SidebarTrigger,
 } from '@/components/ui/sidebar';
+import { UserMenu } from '@/components/app/user-menu';
 import {
     Tooltip,
     TooltipContent,
@@ -51,6 +54,9 @@ export function AppSidebar() {
                     setThreadToDelete={setThreadToDelete}
                 />
             </SidebarContent>
+            <SidebarFooter className="p-2">
+                <UserMenu />
+            </SidebarFooter>
             <AppSidebarKeyboardShortcuts />
             <EditThreadTitleDialog thread={threadToEdit} setThreadToEdit={setThreadToEdit} />
             <DeleteThreadDialog thread={threadToDelete} setThreadToDelete={setThreadToDelete} />
@@ -60,12 +66,13 @@ export function AppSidebar() {
 
 function AppSidebarHeader() {
     return (
-        <SidebarHeader className="p-3">
+        <SidebarHeader className="p-3 flex-row items-center justify-between">
             <Button variant="ghost" size="icon" asChild>
                 <Link to="/">
                     <ZeronIcon className="size-6" />
                 </Link>
             </Button>
+            <SidebarTrigger />
         </SidebarHeader>
     );
 }

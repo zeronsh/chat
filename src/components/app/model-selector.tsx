@@ -137,14 +137,14 @@ export function ModelSelector() {
                         aria-expanded={open}
                         className="h-9 rounded-xl px-3 border border-foreground/8 bg-sidebar/40 hover:bg-sidebar/70 font-normal"
                     >
-                        <div className="flex items-center gap-2 flex-1 ">
+                        <div className="flex items-center gap-2 flex-1 min-w-0">
                             {settings?.model && (
                                 <ModelIcon
-                                    className="fill-primary"
+                                    className="fill-primary shrink-0"
                                     model={settings.model.icon as ModelType}
                                 />
                             )}
-                            <span className="truncate hidden md:block text-xs">
+                            <span className="truncate text-xs max-w-[160px]">
                                 {settings?.model?.name}
                             </span>
                             {settings?.model?.access === 'premium_required' && (

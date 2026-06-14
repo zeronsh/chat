@@ -1,11 +1,9 @@
 import { Anonymous, NotAnonymous } from '@/components/app/auth';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
@@ -31,29 +29,31 @@ export function UserMenu() {
     const navigate = useNavigate();
     return (
         <DropdownMenu>
-            <DropdownMenuTrigger className="outline-none cursor-pointer" asChild>
-                <Button size="icon" variant="ghost" asChild>
-                    <Avatar className="rounded-md overflow-hidden">
+            <DropdownMenuTrigger asChild>
+                <button
+                    type="button"
+                    className="flex w-full items-center gap-2.5 rounded-lg p-2 text-left outline-none transition-colors hover:bg-accent cursor-pointer"
+                >
+                    <Avatar className="size-7 rounded-md overflow-hidden shrink-0">
                         <AvatarImage className="rounded-none" src={user?.image ?? undefined} />
                         <AvatarFallback className="rounded-none">
                             {getUsername(user).charAt(0)}
                         </AvatarFallback>
                     </Avatar>
-                </Button>
+                    <div className="flex min-w-0 flex-1 flex-col">
+                        <span className="truncate text-sm">{getUsername(user)}</span>
+                        <span className="truncate text-xs text-muted-foreground">
+                            {isPro ? 'Pro' : 'Free'}
+                        </span>
+                    </div>
+                </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
-                className="bg-background/50 border-foreground/8 w-[200px] backdrop-blur-md"
-                align="end"
+                className="bg-background/50 border-foreground/8 w-[220px] backdrop-blur-md"
+                side="top"
+                align="start"
+                sideOffset={8}
             >
-                <DropdownMenuLabel className="flex items-center gap-2">
-                    <div className="flex flex-col overflow-hidden">
-                        <div className="text-sm truncate">{getUsername(user)}</div>
-                        <div className="text-xs text-muted-foreground truncate">
-                            {isPro ? 'Pro' : 'Free'}
-                        </div>
-                    </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                     <Link to="/account">
                         <UserIcon className="size-4" />

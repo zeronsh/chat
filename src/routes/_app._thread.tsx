@@ -3,7 +3,6 @@ import { DefaultChatTransport } from 'ai';
 import { useParamsThreadId } from '@/hooks/use-params-thread-id';
 import { useDatabase, useThreadFromParams } from '@/hooks/use-database';
 import { Fragment, useMemo } from 'react';
-import { Header } from '@/components/layout/header';
 import { Title } from '@/components/meta/title';
 import { ThreadProvider } from '@/context/thread';
 import { MessageList } from '@/components/thread/message/message-list';
@@ -50,7 +49,6 @@ function RouteComponent() {
                 }
             >
                 <ThreadContainer>
-                    <Header />
                     <MessageList />
                 </ThreadContainer>
             </ThreadProvider>
