@@ -190,6 +190,13 @@
       "when": 1781334586910,
       "tag": "0026_seed-mistral-llama",
       "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1781398482906,
+      "tag": "0027_seed-glm-4.7",
+      "breakpoints": true
     }
   ]
 }
