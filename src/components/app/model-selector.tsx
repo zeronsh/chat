@@ -12,7 +12,7 @@ import { useSettings } from '@/hooks/use-database';
 import { Fragment, useEffect, useMemo, useState } from 'react';
 
 import ModelIcon, { type ModelType } from '@/components/thread/model-icon';
-import { ChevronsUpDown, Pin, PinOff } from 'lucide-react';
+import { ChevronsUpDown, Pin } from 'lucide-react';
 import { useDatabase } from '@/hooks/use-database';
 import { useQuery } from '@rocicorp/zero/react';
 import { Model } from '@/zero/types';
@@ -157,7 +157,7 @@ export function ModelSelector() {
                     </Button>
                 </PopoverTrigger>
                 <PopoverContent
-                    className="p-0 relative w-[420px]"
+                    className="p-0 relative w-[420px] before:bg-popover"
                     align="start"
                     side="top"
                     sideOffset={8}
@@ -187,7 +187,7 @@ export function ModelSelector() {
                             ))}
                         </div>
 
-                        <Command className="flex-1" shouldFilter={searching}>
+                        <Command className="flex-1">
                             <CommandInput
                                 value={search}
                                 onValueChange={setSearch}
@@ -238,7 +238,12 @@ export function ModelSelector() {
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
-                                                    className="size-5 shrink-0 opacity-0 group-hover:opacity-100 group-data-[selected=true]:opacity-100"
+                                                    className={cn(
+                                                        'size-5 shrink-0 transition-colors',
+                                                        isPinned
+                                                            ? 'text-primary hover:text-primary'
+                                                            : 'text-muted-foreground/60 hover:text-foreground'
+                                                    )}
                                                     onClick={e => {
                                                         e.stopPropagation();
                                                         handleTogglePin(model.id, !isPinned);
@@ -246,9 +251,9 @@ export function ModelSelector() {
                                                     aria-label={isPinned ? 'Unpin model' : 'Pin model'}
                                                 >
                                                     {isPinned ? (
-                                                        <PinOff className="size-3 opacity-70" />
+                                                        <Pin className="size-3 fill-current" />
                                                     ) : (
-                                                        <Pin className="size-3 opacity-70" />
+                                                        <Pin className="size-3" />
                                                     )}
                                                 </Button>
                                             </CommandItem>
