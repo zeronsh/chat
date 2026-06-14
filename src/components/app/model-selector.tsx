@@ -157,7 +157,7 @@ export function ModelSelector() {
                     </Button>
                 </PopoverTrigger>
                 <PopoverContent
-                    className="p-0 relative w-[420px] before:bg-popover"
+                    className="p-0 relative w-[420px]"
                     align="start"
                     side="top"
                     sideOffset={8}
@@ -195,16 +195,23 @@ export function ModelSelector() {
                                 className="h-9"
                             />
                             <CommandList className="max-h-[360px]">
-                                <CommandEmpty>No model found.</CommandEmpty>
-                                <CommandGroup
-                                    heading={
-                                        searching
-                                            ? 'All models'
-                                            : filter === PINNED_FILTER
-                                              ? 'Pinned'
-                                              : undefined
-                                    }
-                                >
+                                <CommandEmpty>
+                                    <div className="flex flex-col items-center gap-2 px-6 py-10 text-center">
+                                        <Pin className="size-5 text-muted-foreground/40" />
+                                        <p className="text-sm text-muted-foreground">
+                                            {searching
+                                                ? 'No models match your search.'
+                                                : 'No pinned models yet.'}
+                                        </p>
+                                        {!searching && (
+                                            <p className="text-xs text-muted-foreground/60">
+                                                Pick a provider on the left, then pin models to keep
+                                                them here.
+                                            </p>
+                                        )}
+                                    </div>
+                                </CommandEmpty>
+                                <CommandGroup>
                                     {visibleModels.map(model => {
                                         const isPinned = pinnedModelIds.includes(model.id);
                                         return (
