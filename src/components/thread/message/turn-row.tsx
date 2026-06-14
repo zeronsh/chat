@@ -102,20 +102,15 @@ const buttonReset = {
 export function TurnRow(turn: Turn): ReactNode {
     // Mugen hooks may only be called directly inside the render function, so
     // per-row state lives here and flows into the (hook-free) turn components.
-    // One disclosure per turn; null means "follow the stream" (open while
-    // reasoning, closed once done). Toggling re-measures just this row.
-    const [openOverride, setOpenOverride] = useMugenState<boolean | null>(null);
+    // Per-reasoning-block open state, keyed by block index; a missing entry
+    // means "follow the stream" (open while reasoning, closed once done).
+    // Toggling re-measures just this row.
+    const [openMap, setOpenMap] = useMugenState<Record<number, boolean>>({});
 
     if (turn.role === 'user') {
         return <UserTurn turn={turn} />;
     }
-    return (
-        <AssistantTurn
-            turn={turn}
-            openOverride={openOverride}
-            setOpenOverride={setOpenOverride}
-        />
-    );
+    return <AssistantTurn turn={turn} openMap={openMap} setOpenMap={setOpenMap} />;
 }
 
 function UserTurn({ turn }: { turn: Turn }): ReactNode {
@@ -168,12 +163,12 @@ function UserTurn({ turn }: { turn: Turn }): ReactNode {
 
 function AssistantTurn({
     turn,
-    openOverride,
-    setOpenOverride,
+    openMap,
+    setOpenMap,
 }: {
     turn: Turn;
-    openOverride: boolean | null;
-    setOpenOverride: (open: boolean | null) => void;
+    openMap: Record<number, boolean>;
+    setOpenMap: (next: Record<number, boolean>) => void;
 }): ReactNode {
     return (
         <VStack gap={14} padding={16} className="group">
@@ -194,7 +189,7 @@ function AssistantTurn({
                 const fading = turn.streaming && i === turn.blocks.length - 1;
 
                 if (block.kind === 'reasoning') {
-                    const open = openOverride ?? !block.done;
+                    const open = openMap[i] ?? !block.done;
                     const label = block.done
                         ? `Thought${block.seconds ? ` for ${block.seconds}s` : ''}`
                         : 'Thinking…';
@@ -202,7 +197,7 @@ function AssistantTurn({
                         <VStack key={i} gap={open ? 10 : 0}>
                             <Disclosure
                                 padding={2}
-                                onClick={() => setOpenOverride(!open)}
+                                onClick={() => setOpenMap({ ...openMap, [i]: !open })}
                                 style={{ ...buttonReset, borderRadius: 6 }}
                             >
                                 <Text font={`500 12px ${MONO}`} lineHeight={16} color={INK.muted}>
