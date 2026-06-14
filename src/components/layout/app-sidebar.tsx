@@ -237,7 +237,7 @@ function ThreadGroup({
     if (threads.length === 0) return null;
     return (
         <SidebarGroup>
-            <SidebarGroupLabel>{label}</SidebarGroupLabel>
+            <SidebarGroupLabel className="text-primary/80 font-medium">{label}</SidebarGroupLabel>
             <SidebarGroupContent>
                 <SidebarMenu>
                     {threads.map(thread => (

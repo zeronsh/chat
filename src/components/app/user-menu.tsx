@@ -52,7 +52,7 @@ export function UserMenu() {
                 className="bg-background/50 border-foreground/8 w-[220px] backdrop-blur-md"
                 side="right"
                 align="end"
-                sideOffset={8}
+                sideOffset={14}
             >
                 <DropdownMenuItem asChild>
                     <Link to="/account">
