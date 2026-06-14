@@ -47,7 +47,7 @@ export function AppSidebar() {
     return (
         <Sidebar>
             <AppSidebarHeader />
-            <SidebarContent>
+            <SidebarContent className="fade-y-edges">
                 <AppSidebarActions />
                 <AppSidebarThreads
                     setThreadToEdit={setThreadToEdit}

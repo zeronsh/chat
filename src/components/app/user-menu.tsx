@@ -50,8 +50,8 @@ export function UserMenu() {
             </DropdownMenuTrigger>
             <DropdownMenuContent
                 className="bg-background/50 border-foreground/8 w-[220px] backdrop-blur-md"
-                side="top"
-                align="start"
+                side="right"
+                align="end"
                 sideOffset={8}
             >
                 <DropdownMenuItem asChild>

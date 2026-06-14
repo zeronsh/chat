@@ -214,3 +214,22 @@ code {
 }
 
 /* no static class needed once we use display: contents */
+
+/* Soft top/bottom fade for scrollable lists, so overflow dissolves
+   instead of being hard-cut at the container edges. */
+.fade-y-edges {
+    mask-image: linear-gradient(
+        to bottom,
+        transparent 0,
+        #000 16px,
+        #000 calc(100% - 16px),
+        transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+        to bottom,
+        transparent 0,
+        #000 16px,
+        #000 calc(100% - 16px),
+        transparent 100%
+    );
+}
