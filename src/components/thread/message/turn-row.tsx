@@ -48,6 +48,17 @@ const CHAT_MD_THEME = {
         radius: 8,
         fontSize: 13,
         lineHeight: 21,
+        // Chrome bar with the language label + copy button. Its height is
+        // folded into the measured height, so heights stay exact.
+        header: {
+            show: true,
+            height: 36,
+            fontSize: 12,
+            background: 'color-mix(in oklab, var(--color-foreground) 8%, transparent)',
+            color: INK.muted,
+            borderColor: INK.hairline,
+            buttonBackground: INK.wash,
+        },
     },
     blockquote: { borderColor: INK.hairline, color: INK.muted, padding: 12, gap: 8, borderWidth: 2 },
     list: { gap: 8, indent: 22, markerColor: INK.muted },
