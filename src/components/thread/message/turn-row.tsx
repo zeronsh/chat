@@ -8,7 +8,7 @@ import {
 } from '@wingleeio/mugen';
 import { Markdown } from '@wingleeio/mugen-markdown';
 import type { ReactNode } from 'react';
-import { CopyIcon, EditIcon, RefreshCcwIcon } from 'lucide-react';
+import { CopyIcon, EditIcon, FileTextIcon, GlobeIcon, Loader2Icon, RefreshCcwIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { FileAttachment } from '@/components/thread/file-attachment';
@@ -246,10 +246,48 @@ function AssistantTurn({
                     );
                 }
 
+                if (block.kind === 'tool-search') {
+                    return (
+                        <Escape key={i} height={40}>
+                            <ToolCard
+                                icon={<GlobeIcon className="size-3.5" />}
+                                label={block.status === 'running' ? 'Searching the web' : 'Searched the web'}
+                                detail={block.query}
+                                meta={
+                                    block.sources.length > 0
+                                        ? `${block.sources.length} result${block.sources.length === 1 ? '' : 's'}`
+                                        : undefined
+                                }
+                                running={block.status === 'running'}
+                            />
+                        </Escape>
+                    );
+                }
+
+                if (block.kind === 'tool-read') {
+                    return (
+                        <Escape key={i} height={40}>
+                            <ToolCard
+                                icon={<FileTextIcon className="size-3.5" />}
+                                label={block.status === 'running' ? 'Reading' : 'Read'}
+                                detail={block.title || domainOf(block.url)}
+                                meta={domainOf(block.url)}
+                                running={block.status === 'running'}
+                            />
+                        </Escape>
+                    );
+                }
+
                 return (
                     <Markdown key={i} source={block.text} theme={CHAT_MD_THEME} fade={fading} />
                 );
             })}
+
+            {!turn.streaming && turn.sources.length > 0 ? (
+                <Escape height={SOURCES_TOP_PAD + SOURCES_HEADER_H + turn.sources.length * SOURCE_ROW_H}>
+                    <SourcesFooter sources={turn.sources} />
+                </Escape>
+            ) : null}
 
             {turn.streaming && !turn.pending ? (
                 <Text
@@ -268,6 +306,99 @@ function AssistantTurn({
                 </Escape>
             ) : null}
         </VStack>
+    );
+}
+
+// ── Web-tool cards + sources footer — normal React inside an Escape with a
+//    declared height, so the walker measures them exactly without inspecting
+//    their contents. ──
+
+const SOURCES_TOP_PAD = 12;
+const SOURCES_HEADER_H = 22;
+const SOURCE_ROW_H = 30;
+
+function domainOf(url?: string): string {
+    if (!url) return '';
+    try {
+        return new URL(url).hostname.replace(/^www\./, '');
+    } catch {
+        return url;
+    }
+}
+
+function faviconOf(url: string): string {
+    return `https://www.google.com/s2/favicons?domain=${domainOf(url)}&sz=64`;
+}
+
+function ToolCard({
+    icon,
+    label,
+    detail,
+    meta,
+    running,
+}: {
+    icon: ReactNode;
+    label: string;
+    detail?: string;
+    meta?: string;
+    running?: boolean;
+}): ReactNode {
+    return (
+        <div className="flex h-full items-center">
+            <div className="flex h-9 min-w-0 items-center gap-2 rounded-lg border border-foreground/8 bg-foreground/[0.04] px-3 text-muted-foreground">
+                {running ? <Loader2Icon className="size-3.5 animate-spin shrink-0" /> : icon}
+                <span className="shrink-0 text-xs font-medium text-foreground/80">{label}</span>
+                {detail ? (
+                    <span className="truncate text-xs text-muted-foreground">{detail}</span>
+                ) : null}
+                {meta ? (
+                    <span className="shrink-0 font-mono text-[10px] text-muted-foreground/70">
+                        {meta}
+                    </span>
+                ) : null}
+            </div>
+        </div>
+    );
+}
+
+function SourcesFooter({ sources }: { sources: { url: string; title?: string }[] }): ReactNode {
+    return (
+        <div style={{ paddingTop: SOURCES_TOP_PAD }}>
+            <div
+                style={{ height: SOURCES_HEADER_H }}
+                className="flex items-center font-mono text-[11px] uppercase tracking-wider text-muted-foreground/60"
+            >
+                Sources
+            </div>
+            {sources.map((source, i) => (
+                <a
+                    key={`${source.url}-${i}`}
+                    href={source.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ height: SOURCE_ROW_H }}
+                    className="group/source flex items-center gap-2.5 rounded-md text-sm text-muted-foreground transition-colors hover:text-foreground"
+                >
+                    <span className="flex size-5 shrink-0 items-center justify-center font-mono text-[10px] text-muted-foreground/60">
+                        {i + 1}
+                    </span>
+                    <img
+                        src={faviconOf(source.url)}
+                        alt=""
+                        className="size-4 shrink-0 rounded-sm"
+                        onError={e => {
+                            e.currentTarget.style.visibility = 'hidden';
+                        }}
+                    />
+                    <span className="min-w-0 flex-1 truncate text-foreground/80 group-hover/source:text-foreground">
+                        {source.title || domainOf(source.url)}
+                    </span>
+                    <span className="shrink-0 text-xs text-muted-foreground/60">
+                        {domainOf(source.url)}
+                    </span>
+                </a>
+            ))}
+        </div>
     );
 }
 

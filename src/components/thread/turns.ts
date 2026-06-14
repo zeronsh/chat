@@ -1,10 +1,14 @@
 import type { ThreadMessage } from '@/ai/types';
 import type { ChatStatus } from 'ai';
 
+export type Source = { url: string; title?: string };
+
 export type TurnBlock =
     | { kind: 'markdown'; text: string }
     | { kind: 'reasoning'; text: string; done: boolean; seconds: number | null }
-    | { kind: 'error'; text: string };
+    | { kind: 'error'; text: string }
+    | { kind: 'tool-search'; status: 'running' | 'done'; query?: string; sources: Source[] }
+    | { kind: 'tool-read'; status: 'running' | 'done'; url?: string; title?: string };
 
 export type TurnFile = {
     url: string;
@@ -19,6 +23,8 @@ export interface Turn {
     role: 'user' | 'assistant';
     blocks: TurnBlock[];
     files: TurnFile[];
+    /** Unique sources the turn's web tools surfaced — rendered as a footer. */
+    sources: Source[];
     /** Plain text of the turn — the copy/edit source. */
     text: string;
     modelName?: string;
@@ -46,10 +52,49 @@ export function buildTurns(messages: ThreadMessage[], status: ChatStatus): Turn[
 
         const blocks: TurnBlock[] = [];
         const files: TurnFile[] = [];
+        const sources: Source[] = [];
         const textPieces: string[] = [];
 
         for (let i = 0; i < parts.length; i++) {
             const part = parts[i];
+
+            if (part.type === 'tool-search') {
+                const tp = part as ToolPart;
+                const done = tp.state === 'output-available';
+                const query =
+                    tp.input && typeof tp.input.query === 'string' ? tp.input.query : undefined;
+                const found = (tp.output?.results ?? []).map(r => ({
+                    url: r.url,
+                    title: r.title ?? undefined,
+                }));
+                blocks.push({
+                    kind: 'tool-search',
+                    status: done ? 'done' : 'running',
+                    query,
+                    sources: found,
+                });
+                sources.push(...found);
+                continue;
+            }
+
+            if (part.type === 'tool-readSite') {
+                const tp = part as ToolPart;
+                const done = tp.state === 'output-available';
+                const url =
+                    (tp.input && typeof tp.input.url === 'string' ? tp.input.url : undefined) ??
+                    tp.output?.url;
+                const title = tp.output?.title ?? undefined;
+                if (url) {
+                    blocks.push({
+                        kind: 'tool-read',
+                        status: done ? 'done' : 'running',
+                        url,
+                        title,
+                    });
+                    sources.push({ url, title });
+                }
+                continue;
+            }
 
             if (part.type === 'text') {
                 if (part.text) {
@@ -100,6 +145,7 @@ export function buildTurns(messages: ThreadMessage[], status: ChatStatus): Turn[
             role,
             blocks,
             files,
+            sources: dedupeSources(sources),
             text: textPieces.join('\n'),
             modelName: message.metadata?.model?.name,
             modelIcon: message.metadata?.model?.icon,
@@ -117,6 +163,7 @@ export function buildTurns(messages: ThreadMessage[], status: ChatStatus): Turn[
             role: 'assistant',
             blocks: [],
             files: [],
+            sources: [],
             text: '',
             streaming: true,
             pending: true,
@@ -124,6 +171,28 @@ export function buildTurns(messages: ThreadMessage[], status: ChatStatus): Turn[
     }
 
     return turns;
+}
+
+/** Minimal view of an AI SDK tool-call UI part, across its streaming states. */
+type ToolPart = {
+    state: 'input-streaming' | 'input-available' | 'output-available' | 'output-error';
+    input?: { query?: string; url?: string };
+    output?: {
+        url?: string;
+        title?: string | null;
+        results?: { url: string; title?: string | null }[];
+    };
+};
+
+function dedupeSources(sources: Source[]): Source[] {
+    const seen = new Set<string>();
+    const out: Source[] = [];
+    for (const s of sources) {
+        if (!s.url || seen.has(s.url)) continue;
+        seen.add(s.url);
+        out.push(s);
+    }
+    return out;
 }
 
 /** Seconds spent reasoning, from the data-reasoning-time parts around index `i`. */

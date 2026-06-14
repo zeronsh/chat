@@ -50,6 +50,7 @@ export type DataParts = {
 
 export type Tools = {
     search: InferUITool<AvailableTools['search']>;
+    readSite: InferUITool<AvailableTools['readSite']>;
     research: InferUITool<AvailableTools['research']>;
     deepSearch: InferUITool<AvailableTools['deepSearch']>;
 };

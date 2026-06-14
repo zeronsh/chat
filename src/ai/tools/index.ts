@@ -1,4 +1,5 @@
 import { getSearchTool } from '@/ai/tools/search-tool';
+import { getReadSiteTool } from '@/ai/tools/read-site-tool';
 import { ThreadMessage } from '@/ai/types';
 import { Tool, UIMessageStreamWriter } from 'ai';
 import { schema } from '@/database/schema';
@@ -11,6 +12,7 @@ import { getDeepSearchTool } from '@/ai/tools/deep-search-tool';
 
 const tools = {
     search: getSearchTool,
+    readSite: getReadSiteTool,
     research: getResearchTool,
     deepSearch: getDeepSearchTool,
 } as const;

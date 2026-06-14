@@ -85,7 +85,18 @@ const threadPostApiHandler = Effect.gen(function* () {
         supportsDocuments: model.capabilities.includes('documents'),
     });
 
-    const activeTools = [body.tool].filter(tool => tool !== undefined);
+    // search + read_site are root-level tools the model can always reach; any
+    // explicitly-requested tool (research/deepSearch) is added on top. Only
+    // offer tools to models that actually support tool calling.
+    const activeTools = model.capabilities.includes('tools')
+        ? Array.from(
+              new Set([
+                  'search',
+                  'readSite',
+                  ...[body.tool].filter((t): t is string => t !== undefined),
+              ])
+          )
+        : [];
 
     const MODEL_REQUIRES_MIDDLEWARE = [
         'zai/glm-4.5-air',
@@ -177,7 +188,7 @@ const threadPostApiHandler = Effect.gen(function* () {
             // adaptive-thinking Claude models don't accept it alongside
             // thinking, and some models (Kimi K2.7 Code) only allow the default.
             temperature: omitTemperature ? undefined : 0.8,
-            stopWhen: stepCountIs(3),
+            stopWhen: stepCountIs(10),
             system: getSystemPrompt(settings, activeTools),
             experimental_transform: smoothStream({
                 chunking: 'word',
