@@ -111,29 +111,33 @@ function timeMeasureCold(source) {
     return performance.now() - t;
 }
 
-// Verbatim port of FadePainter.frame()'s text-node walk (mugen-markdown dist
-// ~2234-2270): walk every text node accumulating the char offset `base`, and
-// paint the slice covered by an active veil. `getClientRects` returns [] under
-// happy-dom (no layout), so this is a LOWER BOUND — a real browser adds the
-// per-rect layout/paint cost on top of this O(n) traversal.
+// Port of FadePainter.frame()'s text-node walk (mugen-markdown 0.4.2 dist
+// ~2239-2272): walk text nodes BACKWARD from the last one and stop once past
+// the veil region (`end > minStart`), so only the freshly-arrived tail is
+// visited — O(veil span), not O(total length). (Before 0.4.2 it walked forward
+// from index 0 every frame: O(n) per frame at 60fps → the streaming lag.)
+// `getClientRects` returns [] under happy-dom, so the per-rect layout a real
+// browser pays isn't captured; the point here is how the traversal SCALES.
 const container = document.createElement('div');
 document.body.appendChild(container);
 function timeFadeWalk(source) {
     container.innerHTML = renderToStaticMarkup(h(Markdown, { source, theme: THEME }));
-    const text = container.textContent || '';
+    const total = (container.textContent || '').length;
     // Active veils cover the freshly-arrived tail (~200 chars), as while streaming.
-    const veils = [{ start: Math.max(0, text.length - 200), end: text.length, t0: 0 }];
+    const veils = [{ start: Math.max(0, total - 200), end: total, t0: 0 }];
     const minStart = veils.reduce((m, v) => Math.min(m, v.start), Infinity);
     let nodes = 0;
     let rects = 0;
     const t = performance.now();
     const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
-    let base = 0;
-    let node = walker.nextNode();
-    while (node != null) {
+    walker.currentNode = container;
+    let node = walker.lastChild();
+    let end = total;
+    while (node != null && end > minStart) {
         nodes++;
         const len = node.data.length;
-        if (len > 0 && base + len > minStart) {
+        const base = end - len;
+        if (len > 0) {
             for (const v of veils) {
                 const s = Math.max(v.start - base, 0);
                 const e = Math.min(v.end - base, len);
@@ -145,8 +149,8 @@ function timeFadeWalk(source) {
                 rects++;
             }
         }
-        base += len;
-        node = walker.nextNode();
+        end = base;
+        node = walker.previousNode();
     }
     return { ms: performance.now() - t, nodes, rects };
 }
@@ -201,24 +205,18 @@ for (const r of rows) {
 const first = rows[1];
 const last = rows[rows.length - 1];
 const med = arr => arr.slice().sort((a, b) => a - b)[Math.floor(arr.length / 2)];
-const ratio = (a, b) => (b / Math.max(a, 0.001)).toFixed(1);
 console.log('─'.repeat(82));
+const maxNodes = Math.max(...rows.map(r => r.nodes));
 console.log(
     `\ngrowth ${first.words}→${last.words} words:` +
         `\n  measure warm (0.3.5 height cache): median ${med(rows.slice(1).map(r => r.warm)).toFixed(2)}ms, ${first.warm.toFixed(2)}ms → ${last.warm.toFixed(2)}ms  (flat — no growth with size)` +
         `\n  measure cold (no cache):           median ${med(rows.slice(1).map(r => r.cold)).toFixed(2)}ms, ${first.cold.toFixed(2)}ms → ${last.cold.toFixed(2)}ms` +
-        `\n  fade walk (per frame):             ${first.fade.toFixed(2)}ms → ${last.fade.toFixed(2)}ms  (${ratio(first.fade, last.fade)}×, linear in text nodes ${first.nodes}→${last.nodes})`,
+        `\n  fade walk (0.4.2 backward walk):   tail nodes visited ≤ ${maxNodes} at every size (was O(total nodes), now bounded to the veil tail)`,
 );
 console.log(
-    `\nFrequency matters: measurement runs once per throttled commit (~10/s); the\n` +
-        `fade frame() runs once per animation frame (~60/s) for the WHOLE stream.\n` +
-        `Effective main-thread time/sec at the largest snapshot (CPU walk only — a\n` +
-        `real browser also pays getClientRects layout, ${last.rects} forced reflows/frame):\n` +
-        `  measure: ~${(last.warm * 10).toFixed(0)}ms/s   fade walk: ~${(last.fade * 60).toFixed(0)}ms/s`,
-);
-console.log(
-    `\nConclusion: mugen 0.3.5 fixed measurement (warm stays flat). The remaining\n` +
-        `O(n)-per-frame cost is mugen-markdown's fade overlay re-walking every text\n` +
-        `node each frame to position veils by char offset — at 60fps, growing with\n` +
-        `length. That's the streaming lag.`,
+    `\nConclusion: both per-tick costs are now flat as the answer grows —` +
+        `\n  • measurement: mugen 0.3.5 height cache (warm stays ~${med(rows.slice(1).map(r => r.warm)).toFixed(1)}ms).` +
+        `\n  • fade overlay: mugen-markdown 0.4.2 walks text nodes backward from the` +
+        `\n    tail and stops past the veil region, so it visits ≤ ${maxNodes} nodes per frame` +
+        `\n    regardless of length (was a full O(n) forward walk at 60fps — the lag).`,
 );
