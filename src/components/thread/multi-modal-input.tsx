@@ -200,7 +200,7 @@ export function MultiModalInput({ aboveInput }: { aboveInput?: React.ReactNode }
                     </div>
                 ) : null}
                 <PromptInput
-                    className="p-0 w-full overflow-hidden rounded-2xl border border-border bg-background transition-colors focus-within:border-foreground/20"
+                    className="p-0 w-full overflow-hidden rounded-2xl border border-border bg-background transition-colors focus-within:border-foreground/12"
                     value={input}
                     onValueChange={setInput}
                     onSubmit={handleSubmit}

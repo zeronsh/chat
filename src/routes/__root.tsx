@@ -137,7 +137,7 @@ function RootComponent({ htmlRef }: { htmlRef: React.RefObject<HTMLHtmlElement |
     return (
         <div className="fixed inset-0 flex text-foreground">
             <Outlet />
-            <Toaster position="top-center" />
+            <Toaster position="top-right" />
             <ProDialog />
         </div>
     );
