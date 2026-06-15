@@ -6,7 +6,12 @@ import {
     useMugenState,
     VStack,
 } from '@wingleeio/mugen';
-import { Markdown } from '@wingleeio/mugen-markdown';
+import {
+    Markdown,
+    defineMarkdownComponents,
+    measureInline,
+    type Font,
+} from '@wingleeio/mugen-markdown';
 import type { ReactNode } from 'react';
 import { CopyIcon, EditIcon, FileTextIcon, GlobeIcon, Loader2Icon, RefreshCcwIcon } from 'lucide-react';
 import { toast } from 'sonner';
@@ -86,6 +91,68 @@ const REASONING_MD_THEME = {
     blockquote: { borderColor: INK.hairline, color: INK.muted, padding: 10, gap: 8, borderWidth: 2 },
     list: { gap: 6, indent: 20, markerColor: INK.muted },
 } as const;
+
+// ── Inline citation pills (mugen-markdown 0.4.1 inline-box override) ──────────
+// A numbered citation link — `[1](https://…)` — renders as a measured inline
+// pill that flows and wraps with the prose. The inline box reserves exactly its
+// painted advance (measureInline + padding), so the analytic row height stays
+// pixel-exact. The pill font is fixed so the width we reserve matches the paint.
+const PILL_FONT = '600 11px Geist' as Font;
+const PILL_PAD = 12; // 2 × 6px horizontal padding
+
+function CitationPill({ label, href }: { label: string; href: string }): ReactNode {
+    // A plain anchor: its box is exactly text + padding (no border/margin/width
+    // to drift it), so the reserved advance matches what's painted. `title` is a
+    // zero-layout native tooltip onto the source domain.
+    return (
+        <a
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            title={domainOf(href)}
+            style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                verticalAlign: 'middle',
+                height: 16,
+                padding: '0 6px',
+                borderRadius: 5,
+                textDecoration: 'none',
+                font: PILL_FONT,
+                lineHeight: '16px',
+                background: 'color-mix(in oklab, var(--color-primary) 16%, transparent)',
+                color: 'var(--color-primary)',
+            }}
+        >
+            {label}
+        </a>
+    );
+}
+
+// Links whose visible text is just a number become measured citation pills;
+// every other link stays a normal themed link. Tolerates the older bracketed
+// `[[n]](url)` form (link text "[n]") as well as the plain `[n](url)` form.
+const CHAT_COMPONENTS = defineMarkdownComponents({
+    inline: {
+        link: node => {
+            const url = node.url ?? '';
+            if (!url) return null;
+            const text = node.children
+                .map(child => (child.type === 'text' ? child.value : ''))
+                .join('')
+                .trim();
+            const match = text.match(/^\[?(\d+)\]?$/);
+            if (!match) return null;
+            return [
+                {
+                    advance: measureInline(match[1], PILL_FONT) + PILL_PAD,
+                    content: <CitationPill label={match[1]} href={url} />,
+                },
+            ];
+        },
+    },
+});
 
 /** Clickable disclosure header for the reasoning trace (a real <button>). */
 const Disclosure = definePrimitive('button', { name: 'Disclosure' });
@@ -274,7 +341,13 @@ function AssistantTurn({
                 }
 
                 return (
-                    <Markdown key={i} source={block.text} theme={CHAT_MD_THEME} fade={fading} />
+                    <Markdown
+                        key={i}
+                        source={block.text}
+                        theme={CHAT_MD_THEME}
+                        components={CHAT_COMPONENTS}
+                        fade={fading}
+                    />
                 );
             })}
 

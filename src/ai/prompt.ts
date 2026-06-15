@@ -50,9 +50,9 @@ const toolPrompts: Record<string, string> = {
 
     ## Citations
     - When you use information from a source, cite it inline as a markdown link whose text is
-      the citation number in brackets, immediately after the relevant sentence — e.g.
-      "The model has a 1M token context window [[1]](https://example.com/post)."
-    - Number citations sequentially as they first appear ([[1]], [[2]], [[3]] …) and reuse the
+      just the citation number, immediately after the relevant sentence — e.g.
+      "The model has a 1M token context window [1](https://example.com/post)."
+    - Number citations sequentially as they first appear ([1], [2], [3] …) and reuse the
       same number for the same source.
     - Place each citation right after the clause it supports; never group them at the end.
     - Don't use the word "citation" or "source" in prose — let the links speak for themselves.
