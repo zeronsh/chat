@@ -167,7 +167,7 @@ export function MultiModalInput({ aboveInput }: { aboveInput?: React.ReactNode }
                 'absolute px-4 pb-4 flex flex-col gap-8 left-0 right-0',
                 threadId
                     ? 'bottom-0 pt-12 bg-gradient-to-t from-background from-60% via-background to-transparent'
-                    : 'top-[22vh] pt-4'
+                    : 'top-[calc(50vh_-_8rem)] pt-4'
             )}
             onSubmit={async e => {
                 e.preventDefault();
