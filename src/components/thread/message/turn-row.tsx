@@ -11,6 +11,8 @@ import {
     defineMarkdownComponents,
     measureInline,
     type Font,
+    type RichTextRun,
+    type InlineRenderContext,
 } from '@wingleeio/mugen-markdown';
 import type { ReactNode } from 'react';
 import { CopyIcon, EditIcon, FileTextIcon, GlobeIcon, Loader2Icon, RefreshCcwIcon } from 'lucide-react';
@@ -138,34 +140,39 @@ function phrasingText(nodes: readonly { type: string; value?: string; children?:
     return out;
 }
 
-const CITATION_TEXT = /^\[?(\d+)\]?$/;
+// A citation marker is only separators/brackets around a single number — "1",
+// "[1]", or ", 5" (models emit grouped cites as `[1](u)[, 5](u)`, so the comma
+// lives inside the second link's text). Group 1 = leading separators, group 2 =
+// the number. Anything else (a real link whose text has words) is left alone.
+const CITATION_TEXT = /^([\s,;[\]]*)(\d+)[\s,;[\]]*$/;
 
-function citationRun(label: string, url: string) {
-    return [
-        {
-            advance: measureInline(label, PILL_FONT) + PILL_PAD,
-            content: <CitationPill label={label} href={url || undefined} />,
-        },
-    ];
+function citationRuns(
+    label: string,
+    url: string,
+    ctx: InlineRenderContext
+): RichTextRun[] | null {
+    const match = label.trim().match(CITATION_TEXT);
+    if (!match) return null;
+    const separator = match[1].replace(/[[\]]/g, ''); // keep ", " etc.; drop brackets
+    const runs: RichTextRun[] = [];
+    // Render the separator as prose so a group reads as "1, 5" with both pilled.
+    if (separator) runs.push({ text: separator, font: ctx.font() });
+    runs.push({
+        advance: measureInline(match[2], PILL_FONT) + PILL_PAD,
+        content: <CitationPill label={match[2]} href={url || undefined} />,
+    });
+    return runs;
 }
 
 // Any numeric citation marker becomes a measured pill; every other link stays a
 // normal themed link. Models emit these inconsistently, so we catch all forms:
-//   `[n](url)` / `[n]()` (empty) / `[[n]](url)` → `link` node
-//   `[n]` (reference-style)                     → `linkReference` node
-// The pill renders even without a url so grouped citations stay consistent; the
-// footer supplies the link.
+//   `[n](url)` / `[n]()` (empty) / `[, n](url)` (grouped) / `[[n]](url)` → `link`
+//   `[n]` (reference-style)                                          → `linkReference`
 const CHAT_COMPONENTS = defineMarkdownComponents({
     inline: {
-        link: node => {
-            const match = phrasingText(node.children).trim().match(CITATION_TEXT);
-            return match ? citationRun(match[1], node.url ?? '') : null;
-        },
-        linkReference: node => {
-            const id = String(node.label ?? node.identifier ?? '').trim();
-            const match = id.match(CITATION_TEXT);
-            return match ? citationRun(match[1], '') : null;
-        },
+        link: (node, ctx) => citationRuns(phrasingText(node.children), node.url ?? '', ctx),
+        linkReference: (node, ctx) =>
+            citationRuns(String(node.label ?? node.identifier ?? ''), '', ctx),
     },
 });
 

@@ -194,11 +194,17 @@ type ToolPart = {
 
 // Reference definitions `[n]: url` (one per line).
 const DEFINITION_RE = /^[ \t]*\[(\d+)\]:[ \t]*(\S+)/gm;
-// Inline links carrying a url: `[n](url)` / `[[n]](url)`.
-const INLINE_URL_RE = /\[\[?(\d+)\]\]?\(([^)]+)\)/g;
-// Any numeric citation actually used — inline, empty `[n]()`, or reference `[n]`
-// — but NOT a definition line (negative lookahead on the trailing `:`).
-const USAGE_RE = /\[\[?(\d+)\]\]?(?!:)(?:\([^)]*\))?/g;
+// Inline links `[label](url)` — label captured for citation-shape testing.
+const INLINE_LINK_RE = /\[([^\]]*?)\]\(([^)]+)\)/g;
+// Any `[label]` (optionally followed by a url), but NOT a definition line.
+const USAGE_RE = /\[([^\]]*?)\](?!:)(?:\([^)]*\))?/g;
+
+// A citation label is only separators/brackets around one number — "1", ", 5",
+// "[1]" (from `[[1]]`). Returns the number, or null for a normal link label.
+function citationNum(label: string): number | null {
+    const m = label.match(/^[\s,;[\]]*(\d+)[\s,;[\]]*$/);
+    return m ? Number(m[1]) : null;
+}
 
 /**
  * Build the footer source list from the citations actually present in the
@@ -210,13 +216,17 @@ const USAGE_RE = /\[\[?(\d+)\]\]?(?!:)(?:\([^)]*\))?/g;
 function parseCitations(text: string, titles: Map<string, string>): CitedSource[] {
     const urlByNum = new Map<number, string>();
     for (const m of text.matchAll(DEFINITION_RE)) urlByNum.set(Number(m[1]), m[2].trim());
-    for (const m of text.matchAll(INLINE_URL_RE)) {
-        const num = Number(m[1]);
-        if (!urlByNum.has(num)) urlByNum.set(num, m[2].trim());
+    for (const m of text.matchAll(INLINE_LINK_RE)) {
+        const num = citationNum(m[1]);
+        const url = m[2].trim();
+        if (num !== null && url && !urlByNum.has(num)) urlByNum.set(num, url);
     }
 
     const used = new Set<number>();
-    for (const m of text.matchAll(USAGE_RE)) used.add(Number(m[1]));
+    for (const m of text.matchAll(USAGE_RE)) {
+        const num = citationNum(m[1]);
+        if (num !== null) used.add(num);
+    }
 
     const out: CitedSource[] = [];
     for (const num of used) {
