@@ -192,33 +192,38 @@ type ToolPart = {
     };
 };
 
-// Matches inline citation links `[n](url)` and the legacy `[[n]](url)` form.
-// The url group may be empty (the model sometimes omits it on a repeated cite).
-const CITATION_RE = /\[\[?(\d+)\]\]?\(([^)]*)\)/g;
+// Reference definitions `[n]: url` (one per line).
+const DEFINITION_RE = /^[ \t]*\[(\d+)\]:[ \t]*(\S+)/gm;
+// Inline links carrying a url: `[n](url)` / `[[n]](url)`.
+const INLINE_URL_RE = /\[\[?(\d+)\]\]?\(([^)]+)\)/g;
+// Any numeric citation actually used — inline, empty `[n]()`, or reference `[n]`
+// — but NOT a definition line (negative lookahead on the trailing `:`).
+const USAGE_RE = /\[\[?(\d+)\]\]?(?!:)(?:\([^)]*\))?/g;
 
 /**
  * Build the footer source list from the citations actually present in the
  * response text — so only used sources show, each numbered with the model's own
- * citation number (matching the inline pills). A number's url/title comes from
- * the first citation that carries a non-empty url; numbers never given a url are
- * dropped (nothing to link to).
+ * citation number (matching the inline pills). A number's url comes from a
+ * reference definition (`[n]: url`) or the first inline link that carries one;
+ * cited numbers with no resolvable url are dropped (nothing to link to).
  */
 function parseCitations(text: string, titles: Map<string, string>): CitedSource[] {
-    const byNum = new Map<number, CitedSource>();
-    CITATION_RE.lastIndex = 0;
-    let match: RegExpExecArray | null;
-    while ((match = CITATION_RE.exec(text)) !== null) {
-        const num = Number(match[1]);
-        const url = match[2].trim();
-        const existing = byNum.get(num);
-        if (!existing) {
-            byNum.set(num, { num, url, title: url ? titles.get(url) : undefined });
-        } else if (!existing.url && url) {
-            existing.url = url;
-            existing.title = titles.get(url);
-        }
+    const urlByNum = new Map<number, string>();
+    for (const m of text.matchAll(DEFINITION_RE)) urlByNum.set(Number(m[1]), m[2].trim());
+    for (const m of text.matchAll(INLINE_URL_RE)) {
+        const num = Number(m[1]);
+        if (!urlByNum.has(num)) urlByNum.set(num, m[2].trim());
     }
-    return [...byNum.values()].filter(s => s.url).sort((a, b) => a.num - b.num);
+
+    const used = new Set<number>();
+    for (const m of text.matchAll(USAGE_RE)) used.add(Number(m[1]));
+
+    const out: CitedSource[] = [];
+    for (const num of used) {
+        const url = urlByNum.get(num);
+        if (url) out.push({ num, url, title: titles.get(url) });
+    }
+    return out.sort((a, b) => a.num - b.num);
 }
 
 /** Seconds spent reasoning, from the data-reasoning-time parts around index `i`. */

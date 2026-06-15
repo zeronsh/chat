@@ -138,23 +138,33 @@ function phrasingText(nodes: readonly { type: string; value?: string; children?:
     return out;
 }
 
-// Links whose visible text is just a number become measured citation pills;
-// every other link stays a normal themed link. The pill renders even when the
-// model omits the url (`[2]()`), so grouped citations stay visually consistent;
-// tolerates the legacy bracketed `[[n]](url)` form too.
+const CITATION_TEXT = /^\[?(\d+)\]?$/;
+
+function citationRun(label: string, url: string) {
+    return [
+        {
+            advance: measureInline(label, PILL_FONT) + PILL_PAD,
+            content: <CitationPill label={label} href={url || undefined} />,
+        },
+    ];
+}
+
+// Any numeric citation marker becomes a measured pill; every other link stays a
+// normal themed link. Models emit these inconsistently, so we catch all forms:
+//   `[n](url)` / `[n]()` (empty) / `[[n]](url)` → `link` node
+//   `[n]` (reference-style)                     → `linkReference` node
+// The pill renders even without a url so grouped citations stay consistent; the
+// footer supplies the link.
 const CHAT_COMPONENTS = defineMarkdownComponents({
     inline: {
         link: node => {
-            const text = phrasingText(node.children).trim();
-            const match = text.match(/^\[?(\d+)\]?$/);
-            if (!match) return null;
-            const url = node.url ?? '';
-            return [
-                {
-                    advance: measureInline(match[1], PILL_FONT) + PILL_PAD,
-                    content: <CitationPill label={match[1]} href={url || undefined} />,
-                },
-            ];
+            const match = phrasingText(node.children).trim().match(CITATION_TEXT);
+            return match ? citationRun(match[1], node.url ?? '') : null;
+        },
+        linkReference: node => {
+            const id = String(node.label ?? node.identifier ?? '').trim();
+            const match = id.match(CITATION_TEXT);
+            return match ? citationRun(match[1], '') : null;
         },
     },
 });
