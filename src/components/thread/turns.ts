@@ -3,6 +3,10 @@ import type { ChatStatus } from 'ai';
 
 export type Source = { url: string; title?: string };
 
+/** A source actually cited in the response — numbered with the model's own
+ *  citation number so the footer matches the inline `[n]` pills. */
+export type CitedSource = { num: number; url: string; title?: string };
+
 export type TurnBlock =
     | { kind: 'markdown'; text: string }
     | { kind: 'reasoning'; text: string; done: boolean; seconds: number | null }
@@ -23,8 +27,9 @@ export interface Turn {
     role: 'user' | 'assistant';
     blocks: TurnBlock[];
     files: TurnFile[];
-    /** Unique sources the turn's web tools surfaced — rendered as a footer. */
-    sources: Source[];
+    /** Sources actually cited in the response, numbered to match the inline
+     *  `[n]` citation pills — rendered as a footer. */
+    sources: CitedSource[];
     /** Plain text of the turn — the copy/edit source. */
     text: string;
     modelName?: string;
@@ -52,7 +57,9 @@ export function buildTurns(messages: ThreadMessage[], status: ChatStatus): Turn[
 
         const blocks: TurnBlock[] = [];
         const files: TurnFile[] = [];
-        const sources: Source[] = [];
+        // Titles the web tools surfaced, keyed by url — used to label the footer
+        // sources, which are derived from the citations actually in the text.
+        const toolTitles = new Map<string, string>();
         const textPieces: string[] = [];
 
         for (let i = 0; i < parts.length; i++) {
@@ -73,7 +80,7 @@ export function buildTurns(messages: ThreadMessage[], status: ChatStatus): Turn[
                     query,
                     sources: found,
                 });
-                sources.push(...found);
+                for (const r of found) if (r.title) toolTitles.set(r.url, r.title);
                 continue;
             }
 
@@ -91,7 +98,7 @@ export function buildTurns(messages: ThreadMessage[], status: ChatStatus): Turn[
                         url,
                         title,
                     });
-                    sources.push({ url, title });
+                    if (title) toolTitles.set(url, title);
                 }
                 continue;
             }
@@ -138,6 +145,7 @@ export function buildTurns(messages: ThreadMessage[], status: ChatStatus): Turn[
         }
 
         const streaming = isLast && role === 'assistant' && busy;
+        const text = textPieces.join('\n');
 
         turns.push({
             id: message.id,
@@ -145,8 +153,8 @@ export function buildTurns(messages: ThreadMessage[], status: ChatStatus): Turn[
             role,
             blocks,
             files,
-            sources: dedupeSources(sources),
-            text: textPieces.join('\n'),
+            sources: parseCitations(text, toolTitles),
+            text,
             modelName: message.metadata?.model?.name,
             modelIcon: message.metadata?.model?.icon,
             streaming,
@@ -184,15 +192,33 @@ type ToolPart = {
     };
 };
 
-function dedupeSources(sources: Source[]): Source[] {
-    const seen = new Set<string>();
-    const out: Source[] = [];
-    for (const s of sources) {
-        if (!s.url || seen.has(s.url)) continue;
-        seen.add(s.url);
-        out.push(s);
+// Matches inline citation links `[n](url)` and the legacy `[[n]](url)` form.
+// The url group may be empty (the model sometimes omits it on a repeated cite).
+const CITATION_RE = /\[\[?(\d+)\]\]?\(([^)]*)\)/g;
+
+/**
+ * Build the footer source list from the citations actually present in the
+ * response text — so only used sources show, each numbered with the model's own
+ * citation number (matching the inline pills). A number's url/title comes from
+ * the first citation that carries a non-empty url; numbers never given a url are
+ * dropped (nothing to link to).
+ */
+function parseCitations(text: string, titles: Map<string, string>): CitedSource[] {
+    const byNum = new Map<number, CitedSource>();
+    CITATION_RE.lastIndex = 0;
+    let match: RegExpExecArray | null;
+    while ((match = CITATION_RE.exec(text)) !== null) {
+        const num = Number(match[1]);
+        const url = match[2].trim();
+        const existing = byNum.get(num);
+        if (!existing) {
+            byNum.set(num, { num, url, title: url ? titles.get(url) : undefined });
+        } else if (!existing.url && url) {
+            existing.url = url;
+            existing.title = titles.get(url);
+        }
     }
-    return out;
+    return [...byNum.values()].filter(s => s.url).sort((a, b) => a.num - b.num);
 }
 
 /** Seconds spent reasoning, from the data-reasoning-time parts around index `i`. */

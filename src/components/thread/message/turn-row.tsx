@@ -100,54 +100,59 @@ const REASONING_MD_THEME = {
 const PILL_FONT = '600 11px Geist' as Font;
 const PILL_PAD = 12; // 2 × 6px horizontal padding
 
-function CitationPill({ label, href }: { label: string; href: string }): ReactNode {
-    // A plain anchor: its box is exactly text + padding (no border/margin/width
-    // to drift it), so the reserved advance matches what's painted. `title` is a
-    // zero-layout native tooltip onto the source domain.
-    return (
-        <a
-            href={href}
-            target="_blank"
-            rel="noopener noreferrer"
-            title={domainOf(href)}
-            style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                verticalAlign: 'middle',
-                height: 16,
-                padding: '0 6px',
-                borderRadius: 5,
-                textDecoration: 'none',
-                font: PILL_FONT,
-                lineHeight: '16px',
-                background: 'color-mix(in oklab, var(--color-primary) 16%, transparent)',
-                color: 'var(--color-primary)',
-            }}
-        >
+function CitationPill({ label, href }: { label: string; href?: string }): ReactNode {
+    // The box is exactly text + padding (no border/margin/width to drift it), so
+    // the reserved advance matches what's painted. Clickable when the citation
+    // carries a url; otherwise a non-interactive pill (the footer still links it).
+    const style = {
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        verticalAlign: 'middle',
+        height: 16,
+        padding: '0 6px',
+        borderRadius: 5,
+        textDecoration: 'none',
+        font: PILL_FONT,
+        lineHeight: '16px',
+        background: 'color-mix(in oklab, var(--color-primary) 16%, transparent)',
+        color: 'var(--color-primary)',
+    } as const;
+    return href ? (
+        <a href={href} target="_blank" rel="noopener noreferrer" title={domainOf(href)} style={style}>
             {label}
         </a>
+    ) : (
+        <span style={style}>{label}</span>
     );
 }
 
+/** Flatten a phrasing node's text, recursing through marks (bold/italic), so a
+ *  number wrapped in emphasis (`[**1**](url)`) is still recognised. */
+function phrasingText(nodes: readonly { type: string; value?: string; children?: unknown[] }[]): string {
+    let out = '';
+    for (const node of nodes) {
+        if (node.type === 'text' && typeof node.value === 'string') out += node.value;
+        else if (Array.isArray(node.children)) out += phrasingText(node.children as typeof nodes);
+    }
+    return out;
+}
+
 // Links whose visible text is just a number become measured citation pills;
-// every other link stays a normal themed link. Tolerates the older bracketed
-// `[[n]](url)` form (link text "[n]") as well as the plain `[n](url)` form.
+// every other link stays a normal themed link. The pill renders even when the
+// model omits the url (`[2]()`), so grouped citations stay visually consistent;
+// tolerates the legacy bracketed `[[n]](url)` form too.
 const CHAT_COMPONENTS = defineMarkdownComponents({
     inline: {
         link: node => {
-            const url = node.url ?? '';
-            if (!url) return null;
-            const text = node.children
-                .map(child => (child.type === 'text' ? child.value : ''))
-                .join('')
-                .trim();
+            const text = phrasingText(node.children).trim();
             const match = text.match(/^\[?(\d+)\]?$/);
             if (!match) return null;
+            const url = node.url ?? '';
             return [
                 {
                     advance: measureInline(match[1], PILL_FONT) + PILL_PAD,
-                    content: <CitationPill label={match[1]} href={url} />,
+                    content: <CitationPill label={match[1]} href={url || undefined} />,
                 },
             ];
         },
@@ -429,7 +434,11 @@ function ToolCard({
     );
 }
 
-function SourcesFooter({ sources }: { sources: { url: string; title?: string }[] }): ReactNode {
+function SourcesFooter({
+    sources,
+}: {
+    sources: { num: number; url: string; title?: string }[];
+}): ReactNode {
     return (
         <div style={{ paddingTop: SOURCES_TOP_PAD }}>
             <div
@@ -438,9 +447,9 @@ function SourcesFooter({ sources }: { sources: { url: string; title?: string }[]
             >
                 Sources
             </div>
-            {sources.map((source, i) => (
+            {sources.map(source => (
                 <a
-                    key={`${source.url}-${i}`}
+                    key={`${source.num}-${source.url}`}
                     href={source.url}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -448,7 +457,7 @@ function SourcesFooter({ sources }: { sources: { url: string; title?: string }[]
                     className="group/source flex items-center gap-2.5 rounded-md text-sm text-muted-foreground transition-colors hover:text-foreground"
                 >
                     <span className="flex size-5 shrink-0 items-center justify-center font-mono text-[10px] text-muted-foreground/60">
-                        {i + 1}
+                        {source.num}
                     </span>
                     <img
                         src={faviconOf(source.url)}

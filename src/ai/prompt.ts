@@ -54,6 +54,11 @@ const toolPrompts: Record<string, string> = {
       "The model has a 1M token context window [1](https://example.com/post)."
     - Number citations sequentially as they first appear ([1], [2], [3] …) and reuse the
       same number for the same source.
+    - ALWAYS include the full URL inside every citation link, even when you reuse a number —
+      never write an empty link like "[2]()" or a bare "[2]".
+    - When several sources support one statement, write them as separate links, e.g.
+      "… multiplexer [1](https://a.com) [2](https://b.com)" — never combine numbers in one
+      bracket like "[1, 2]".
     - Place each citation right after the clause it supports; never group them at the end.
     - Don't use the word "citation" or "source" in prose — let the links speak for themselves.
     `,
