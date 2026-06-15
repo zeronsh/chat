@@ -33,21 +33,57 @@ import { useThreadsByTimeRange } from '@/hooks/use-chats-by-time-range';
 import { Thread } from '@/zero/types';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
 import { Loader2Icon, PencilIcon, PlusIcon, TrashIcon } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Fragment } from 'react/jsx-runtime';
 import { useForm } from '@tanstack/react-form';
 import z from 'zod';
 import { Label } from '@/components/ui/label';
 import ZeronIcon from '../icons/zeron';
 
+// Toggle `data-overflow-top/bottom` on the scroll container so the fade-y-edges
+// mask only fades an edge that actually has content scrolled past it. Watches
+// scroll, sidebar resize, and content add/remove (threads loading in).
+function useEdgeFade() {
+    const ref = useRef<HTMLDivElement>(null);
+    useEffect(() => {
+        const el = ref.current;
+        if (!el) return;
+        let raf = 0;
+        const apply = () => {
+            raf = 0;
+            el.dataset.overflowTop = String(el.scrollTop > 1);
+            el.dataset.overflowBottom = String(
+                Math.ceil(el.scrollTop + el.clientHeight) < el.scrollHeight - 1
+            );
+        };
+        const schedule = () => {
+            if (!raf) raf = requestAnimationFrame(apply);
+        };
+        apply();
+        el.addEventListener('scroll', schedule, { passive: true });
+        const ro = new ResizeObserver(schedule);
+        ro.observe(el);
+        const mo = new MutationObserver(schedule);
+        mo.observe(el, { childList: true, subtree: true });
+        return () => {
+            if (raf) cancelAnimationFrame(raf);
+            el.removeEventListener('scroll', schedule);
+            ro.disconnect();
+            mo.disconnect();
+        };
+    }, []);
+    return ref;
+}
+
 export function AppSidebar() {
     const [threadToEdit, setThreadToEdit] = useState<Thread | null>(null);
     const [threadToDelete, setThreadToDelete] = useState<Thread | null>(null);
+    const contentRef = useEdgeFade();
 
     return (
         <Sidebar>
             <AppSidebarHeader />
-            <SidebarContent className="fade-y-edges">
+            <SidebarContent ref={contentRef} className="fade-y-edges">
                 <AppSidebarActions />
                 <AppSidebarThreads
                     setThreadToEdit={setThreadToEdit}

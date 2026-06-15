@@ -217,19 +217,30 @@ code {
 
 /* Soft top/bottom fade for scrollable lists, so overflow dissolves
    instead of being hard-cut at the container edges. */
+/* Edge fades that only appear when there's actually content scrolled past that
+   edge. `data-overflow-top/bottom` are toggled by a scroll/resize observer; each
+   fade defaults to 0px so a non-overflowing list has no fade at all. */
 .fade-y-edges {
+    --fade-top: 0px;
+    --fade-bottom: 0px;
     mask-image: linear-gradient(
         to bottom,
         transparent 0,
-        #000 16px,
-        #000 calc(100% - 16px),
+        #000 var(--fade-top),
+        #000 calc(100% - var(--fade-bottom)),
         transparent 100%
     );
     -webkit-mask-image: linear-gradient(
         to bottom,
         transparent 0,
-        #000 16px,
-        #000 calc(100% - 16px),
+        #000 var(--fade-top),
+        #000 calc(100% - var(--fade-bottom)),
         transparent 100%
     );
+}
+.fade-y-edges[data-overflow-top='true'] {
+    --fade-top: 16px;
+}
+.fade-y-edges[data-overflow-bottom='true'] {
+    --fade-bottom: 16px;
 }
