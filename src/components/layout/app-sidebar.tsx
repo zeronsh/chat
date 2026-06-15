@@ -204,7 +204,10 @@ function AppSidebarKeyboardShortcuts() {
         };
 
         if (!isFullyVisible()) {
-            activeEl.scrollIntoView({ block: 'start', inline: 'nearest', behavior: 'instant' });
+            // `nearest` scrolls the minimum to reveal the active thread instead of
+            // yanking it to the very top — which would push content above the fold
+            // and show a top edge-fade unnecessarily.
+            activeEl.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'instant' });
         }
     }, [params?.threadId, threads]);
 

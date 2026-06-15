@@ -164,7 +164,10 @@ export function MultiModalInput({ aboveInput }: { aboveInput?: React.ReactNode }
             layout="position"
             transition={{ type: 'spring', stiffness: 500, damping: 40 }}
             className={cn(
-                'absolute px-4 pb-4 flex flex-col gap-8 left-0 right-0',
+                // pointer-events-none so the tall pt-12 gradient region doesn't
+                // sit on top of the last message and swallow its hover/clicks
+                // (copy/retry). Only the actual controls re-enable pointer events.
+                'absolute px-4 pb-4 flex flex-col gap-8 left-0 right-0 pointer-events-none',
                 threadId
                     ? 'bottom-0 pt-12 bg-gradient-to-t from-background from-60% via-background to-transparent'
                     : 'top-[calc(50vh_-_8rem)] pt-4'
@@ -183,7 +186,7 @@ export function MultiModalInput({ aboveInput }: { aboveInput?: React.ReactNode }
         >
             {!threadId && (
                 <motion.div
-                    className="max-w-3xl mx-auto w-full"
+                    className="max-w-3xl mx-auto w-full pointer-events-auto"
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
@@ -193,7 +196,7 @@ export function MultiModalInput({ aboveInput }: { aboveInput?: React.ReactNode }
                     </h2>
                 </motion.div>
             )}
-            <div className="relative max-w-3xl mx-auto w-full">
+            <div className="relative max-w-3xl mx-auto w-full pointer-events-auto">
                 {aboveInput ? (
                     <div className="absolute bottom-full left-1/2 mb-3 -translate-x-1/2">
                         {aboveInput}
