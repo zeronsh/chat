@@ -344,7 +344,7 @@ const editThreadTitleSchema = z.object({
     title: z.string().min(1).max(200),
 });
 
-function EditThreadTitleDialog({
+export function EditThreadTitleDialog({
     thread,
     setThreadToEdit,
 }: {
@@ -446,7 +446,7 @@ function EditThreadTitleDialog({
     );
 }
 
-function DeleteThreadDialog({
+export function DeleteThreadDialog({
     thread,
     setThreadToDelete,
 }: {
