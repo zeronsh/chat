@@ -294,15 +294,18 @@ function ThreadItem({
                         )}
                     </Link>
                     {/* Action cluster fades in on hover (no slide); the gradient
-                        matches the hovered row bg so the title reads cleanly under it. */}
-                    <div className="absolute inset-y-0 right-0 flex items-center gap-0.5 rounded-r-lg pl-10 pr-1.5 opacity-0 transition-opacity duration-150 pointer-events-none bg-gradient-to-l from-accent from-55% to-transparent group-hover/thread-item:opacity-100 group-hover/thread-item:pointer-events-auto">
+                        matches the hovered row bg so the title reads cleanly under it.
+                        The container stays pointer-events-none so its gradient padding
+                        never covers the link — only the buttons themselves capture
+                        clicks (and only while hovered), keeping the title fully clickable. */}
+                    <div className="absolute inset-y-0 right-0 flex items-center gap-0.5 rounded-r-lg pl-10 pr-1.5 opacity-0 transition-opacity duration-150 pointer-events-none bg-gradient-to-l from-accent from-55% to-transparent group-hover/thread-item:opacity-100">
                         <Tooltip>
                             <TooltipTrigger
                                 render={
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        className="size-7 text-muted-foreground hover:text-foreground hover:bg-transparent"
+                                        className="size-7 text-muted-foreground hover:text-foreground hover:bg-transparent pointer-events-none group-hover/thread-item:pointer-events-auto"
                                         onClick={() => setThreadToEdit(thread)}
                                     >
                                         <PencilIcon className="size-4" />
@@ -319,7 +322,7 @@ function ThreadItem({
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        className="size-7 text-muted-foreground hover:text-destructive hover:bg-transparent"
+                                        className="size-7 text-muted-foreground hover:text-destructive hover:bg-transparent pointer-events-none group-hover/thread-item:pointer-events-auto"
                                         onClick={() => setThreadToDelete(thread)}
                                     >
                                         <TrashIcon className="size-4" />
