@@ -30,7 +30,8 @@ import { dialogStore } from '@/stores/dialogs';
 import { useUser } from '@/hooks/use-database';
 import { getUsername } from '@/lib/usernames';
 import { ModelSelector } from '@/components/app/model-selector';
-import { EffortSelector, useReasoningEffort } from '@/components/app/effort-selector';
+import { EffortSelector } from '@/components/app/effort-selector';
+import { useReasoningEffort } from '@/hooks/use-reasoning-effort';
 
 function greetingForHour(hour: number) {
     if (hour < 5) return 'Up late';
