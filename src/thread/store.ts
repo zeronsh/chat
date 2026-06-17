@@ -20,6 +20,9 @@ export interface ThreadStoreImpl<UI_MESSAGE extends UIMessage> {
     setEditingMessageId: (editingMessageId: string | undefined) => void;
     input: string;
     setInput: (input: string) => void;
+    /** Chosen reasoning effort for effort-capable models; null = model default. */
+    effort: string | null;
+    setEffort: (effort: string | null) => void;
     pendingFileCount: number;
     setPendingFileCount: (pendingFileCount: number | ((prev: number) => number)) => void;
     attachments: FileAttachment[];
@@ -64,6 +67,9 @@ export function createThreadStore<UI_MESSAGE extends UIMessage>(init: {
                     setEditingMessageId: (editingMessageId: string | undefined) =>
                         set({ editingMessageId }, false, 'thread/setEditingMessageId'),
                     setInput: (input: string) => set({ input }, false, 'thread/setInput'),
+                    effort: null,
+                    setEffort: (effort: string | null) =>
+                        set({ effort }, false, 'thread/setEffort'),
                     setPendingFileCount: (
                         pendingFileCount: number | ((prev: number) => number)
                     ) => {

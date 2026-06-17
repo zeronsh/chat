@@ -30,6 +30,7 @@ import { dialogStore } from '@/stores/dialogs';
 import { useUser } from '@/hooks/use-database';
 import { getUsername } from '@/lib/usernames';
 import { ModelSelector } from '@/components/app/model-selector';
+import { EffortSelector, useReasoningEffort } from '@/components/app/effort-selector';
 
 function greetingForHour(hour: number) {
     if (hour < 5) return 'Up late';
@@ -53,6 +54,7 @@ export function MultiModalInput({ aboveInput }: { aboveInput?: React.ReactNode }
     const setProDialogOpen = dialogStore(store => store.proDialog.setOpen);
     const user = useUser();
     const { sendMessage } = useThreadContext();
+    const { value: effort } = useReasoningEffort();
 
     const { startUpload } = useUploadThing('fileUploader', {
         onBeforeUploadBegin: file => {
@@ -108,17 +110,20 @@ export function MultiModalInput({ aboveInput }: { aboveInput?: React.ReactNode }
             );
         }
 
-        sendMessage({
-            id: editingMessageId,
-            role: 'user',
-            parts: [
-                ...attachments,
-                {
-                    type: 'text',
-                    text: input,
-                },
-            ],
-        });
+        sendMessage(
+            {
+                id: editingMessageId,
+                role: 'user',
+                parts: [
+                    ...attachments,
+                    {
+                        type: 'text',
+                        text: input,
+                    },
+                ],
+            },
+            effort ? { body: { effort } } : undefined
+        );
 
         // Reset form state
         setInput('');
@@ -322,8 +327,9 @@ export function MultiModalInput({ aboveInput }: { aboveInput?: React.ReactNode }
                     ))}
                 </div>
                 <PromptInputTextarea className="px-5 pt-4" placeholder="Write to the model…" />
-                <PromptInputActions className="flex items-center px-3 pb-3 pt-1">
+                <PromptInputActions className="flex items-center gap-2 px-3 pb-3 pt-1">
                     <ModelSelector />
+                    <EffortSelector />
                     <div className="flex-1" />
                     <PromptInputAction
                         tooltip={matcher

@@ -20,6 +20,7 @@ import {
 } from '@/ai/service';
 import { Stream } from '@/ai/stream';
 import { calculateTokenCost } from '@/lib/cost';
+import { resolveEffort } from '@/lib/reasoning';
 import { RedisLive } from '@/lib/redis';
 import { Database } from '@/database/effect';
 import type { OpenAIResponsesProviderOptions } from '@ai-sdk/openai';
@@ -178,6 +179,26 @@ const threadPostApiHandler = Effect.gen(function* () {
         disableParallelToolUse: true,
     };
 
+    // Reasoning effort: validate the client's choice against the model's allowed
+    // levels, then forward it as providerOptions[provider].reasoningEffort. The
+    // gateway normalises this across providers (openai/anthropic/google/xai/zai/
+    // deepseek), so no per-provider budget mapping is needed.
+    const reasoningEffort = resolveEffort(model.model, body.effort);
+    const reasoningProvider = model.model.split('/')[0];
+    if (reasoningEffort) {
+        if (reasoningProvider === 'openai') openai.reasoningEffort = reasoningEffort;
+        else if (reasoningProvider === 'google')
+            (google as Record<string, unknown>).reasoningEffort = reasoningEffort;
+        else if (reasoningProvider === 'anthropic')
+            (anthropic as Record<string, unknown>).reasoningEffort = reasoningEffort;
+    }
+    // For gateway-only providers (xai, zai, deepseek, …) there's no dedicated
+    // options object above — add one keyed by the provider.
+    const extraReasoningOptions =
+        reasoningEffort && !['openai', 'google', 'anthropic'].includes(reasoningProvider)
+            ? { [reasoningProvider]: { reasoningEffort } }
+            : {};
+
     yield* Effect.logInfo('Creating stream');
 
     const stream = yield* Stream.create.pipe(
@@ -199,6 +220,7 @@ const threadPostApiHandler = Effect.gen(function* () {
                 openai,
                 google,
                 anthropic,
+                ...extraReasoningOptions,
                 gateway: {
                     order: ['groq', 'cerebras', 'baseten'],
                 },
@@ -355,6 +377,7 @@ const ThreadPostApiSchema = z.object({
     modelId: z.string(),
     message: z.any(),
     tool: z.string().optional(),
+    effort: z.string().optional(),
 });
 
 export class ThreadPostBody extends Effect.Tag('ThreadPostBody')<
