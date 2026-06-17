@@ -204,6 +204,13 @@
       "when": 1781658014897,
       "tag": "0028_seed-glm-5.2",
       "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1781677360236,
+      "tag": "0029_fix-model-capabilities",
+      "breakpoints": true
     }
   ]
 }
