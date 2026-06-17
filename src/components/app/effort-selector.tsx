@@ -24,7 +24,8 @@ export function EffortSelector() {
                 >
                     <div className="flex items-center gap-2">
                         <GaugeIcon className="size-3.5 shrink-0 text-primary" />
-                        <span className="text-xs">{effortLabel(value)}</span>
+                        {/* Mobile: icon + chevron only, to save room in the action row. */}
+                        <span className="hidden text-xs sm:inline">{effortLabel(value)}</span>
                     </div>
                     <ChevronsUpDown className="opacity-50 size-3.5" />
                 </Button>
