@@ -201,6 +201,10 @@ const threadPostApiHandler = Effect.gen(function* () {
 
     yield* Effect.logInfo('Creating stream');
 
+    // Max agentic steps (tool-call roundtrips). The last step forces a text
+    // answer (see prepareStep) so search-heavy turns never dead-end.
+    const MAX_STEPS = 10;
+
     const stream = yield* Stream.create.pipe(
         Stream.options({
             model: actualModel,
@@ -209,7 +213,12 @@ const threadPostApiHandler = Effect.gen(function* () {
             // adaptive-thinking Claude models don't accept it alongside
             // thinking, and some models (Kimi K2.7 Code) only allow the default.
             temperature: omitTemperature ? undefined : 0.8,
-            stopWhen: stepCountIs(10),
+            stopWhen: stepCountIs(MAX_STEPS),
+            // On the final allowed step, stop tool use so the model must answer
+            // with what it gathered. Otherwise a long search/read loop exhausts
+            // the step budget on a tool call and the turn ends with no response.
+            prepareStep: ({ stepNumber }) =>
+                stepNumber >= MAX_STEPS - 1 ? { toolChoice: 'none' } : undefined,
             system: getSystemPrompt(settings, activeTools),
             experimental_transform: smoothStream({
                 chunking: 'word',
