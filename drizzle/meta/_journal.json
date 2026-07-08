@@ -218,6 +218,13 @@
       "when": 1783378613870,
       "tag": "0030_seed-models-jul-6-2026",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1783533847478,
+      "tag": "0031_add-grok-4.5",
+      "breakpoints": true
     }
   ]
 }

@@ -25,6 +25,7 @@ export const REASONING_EFFORTS: Record<string, readonly Effort[]> = {
     'google/gemini-3.1-pro-preview': ['low', 'medium', 'high'],
     'google/gemini-3.5-flash': ['minimal', 'low', 'medium', 'high'],
     'xai/grok-4.3': ['none', 'low', 'medium', 'high'],
+    'xai/grok-4.5': ['none', 'low', 'medium', 'high'],
     'deepseek/deepseek-v4-flash': ['high', 'max'],
     'deepseek/deepseek-v4-pro': ['high', 'max'],
     'zai/glm-5.2': ['high', 'max'],
