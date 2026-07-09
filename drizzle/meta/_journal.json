@@ -225,6 +225,13 @@
       "when": 1783533847478,
       "tag": "0031_add-grok-4.5",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1783618821363,
+      "tag": "0032_seed-gpt-5.6",
+      "breakpoints": true
     }
   ]
 }
