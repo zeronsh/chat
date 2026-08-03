@@ -232,6 +232,13 @@
       "when": 1783618821363,
       "tag": "0032_seed-gpt-5.6",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1785793898307,
+      "tag": "0033_seed-models-aug-3-2026",
+      "breakpoints": true
     }
   ]
 }
