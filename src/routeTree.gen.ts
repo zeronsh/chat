@@ -18,6 +18,7 @@ import { Route as AppThreadRouteImport } from './routes/_app._thread'
 import { Route as AccountMagicLinkRouteImport } from './routes/_account.magic-link'
 import { Route as AccountLoggedOutRouteImport } from './routes/_account.logged-out'
 import { Route as AccountAccountRouteImport } from './routes/_account.account'
+import { Route as AccountAboutRouteImport } from './routes/_account.about'
 import { Route as AppThreadIndexRouteImport } from './routes/_app._thread.index'
 import { Route as AccountLoginIndexRouteImport } from './routes/_account.login.index'
 import { Route as AccountAccountIndexRouteImport } from './routes/_account.account.index'
@@ -68,6 +69,11 @@ const AccountLoggedOutRoute = AccountLoggedOutRouteImport.update({
 const AccountAccountRoute = AccountAccountRouteImport.update({
   id: '/account',
   path: '/account',
+  getParentRoute: () => AccountRoute,
+} as any)
+const AccountAboutRoute = AccountAboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => AccountRoute,
 } as any)
 const AppThreadIndexRoute = AppThreadIndexRouteImport.update({
@@ -168,6 +174,7 @@ const ApiThreadThreadIdStopServerRoute =
   } as any)
 
 export interface FileRoutesByFullPath {
+  '/about': typeof AccountAboutRoute
   '/account': typeof AccountAccountRouteWithChildren
   '/logged-out': typeof AccountLoggedOutRoute
   '/magic-link': typeof AccountMagicLinkRoute
@@ -181,6 +188,7 @@ export interface FileRoutesByFullPath {
   '/': typeof AppThreadIndexRoute
 }
 export interface FileRoutesByTo {
+  '/about': typeof AccountAboutRoute
   '/logged-out': typeof AccountLoggedOutRoute
   '/magic-link': typeof AccountMagicLinkRoute
   '/account/appearance': typeof AccountAccountAppearanceRoute
@@ -197,6 +205,7 @@ export interface FileRoutesById {
   '/_account': typeof AccountRouteWithChildren
   '/_app': typeof AppRouteWithChildren
   '/_team': typeof TeamRoute
+  '/_account/about': typeof AccountAboutRoute
   '/_account/account': typeof AccountAccountRouteWithChildren
   '/_account/logged-out': typeof AccountLoggedOutRoute
   '/_account/magic-link': typeof AccountMagicLinkRoute
@@ -213,6 +222,7 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/about'
     | '/account'
     | '/logged-out'
     | '/magic-link'
@@ -226,6 +236,7 @@ export interface FileRouteTypes {
     | '/'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/about'
     | '/logged-out'
     | '/magic-link'
     | '/account/appearance'
@@ -241,6 +252,7 @@ export interface FileRouteTypes {
     | '/_account'
     | '/_app'
     | '/_team'
+    | '/_account/about'
     | '/_account/account'
     | '/_account/logged-out'
     | '/_account/magic-link'
@@ -397,6 +409,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountAccountRouteImport
       parentRoute: typeof AccountRoute
     }
+    '/_account/about': {
+      id: '/_account/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AccountAboutRouteImport
+      parentRoute: typeof AccountRoute
+    }
     '/_app/_thread/': {
       id: '/_app/_thread/'
       path: '/'
@@ -551,6 +570,7 @@ const AccountAccountRouteWithChildren = AccountAccountRoute._addFileChildren(
 )
 
 interface AccountRouteChildren {
+  AccountAboutRoute: typeof AccountAboutRoute
   AccountAccountRoute: typeof AccountAccountRouteWithChildren
   AccountLoggedOutRoute: typeof AccountLoggedOutRoute
   AccountMagicLinkRoute: typeof AccountMagicLinkRoute
@@ -558,6 +578,7 @@ interface AccountRouteChildren {
 }
 
 const AccountRouteChildren: AccountRouteChildren = {
+  AccountAboutRoute: AccountAboutRoute,
   AccountAccountRoute: AccountAccountRouteWithChildren,
   AccountLoggedOutRoute: AccountLoggedOutRoute,
   AccountMagicLinkRoute: AccountMagicLinkRoute,
