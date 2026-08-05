@@ -1,5 +1,11 @@
 import '@/global.css';
-import { HeadContent, Outlet, Scripts, createRootRoute } from '@tanstack/react-router';
+import {
+    HeadContent,
+    Outlet,
+    Scripts,
+    createRootRoute,
+    useRouterState,
+} from '@tanstack/react-router';
 import { DatabaseProvider } from '@/context/database';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/sonner';
@@ -143,9 +149,15 @@ function RootComponent({ htmlRef }: { htmlRef: React.RefObject<HTMLHtmlElement |
     );
 }
 
+// Routes that render without a session or database connection, so they stay
+// accessible (and server-rendered) for logged-out visitors and crawlers.
+const PUBLIC_ROUTES = ['/about'];
+
 function RootDocument() {
     const ref = useRef<HTMLHtmlElement>(null);
     const loaderData = Route.useLoaderData();
+    const pathname = useRouterState({ select: state => state.location.pathname });
+    const isPublicRoute = PUBLIC_ROUTES.includes(pathname.replace(/\/+$/, '') || '/');
 
     return (
         <html
@@ -160,9 +172,15 @@ function RootDocument() {
                 <HeadContent />
             </head>
             <body className="fixed inset-0">
-                <DatabaseProvider>
-                    <RootComponent htmlRef={ref} />
-                </DatabaseProvider>
+                {isPublicRoute ? (
+                    <div className="fixed inset-0 flex text-foreground">
+                        <Outlet />
+                    </div>
+                ) : (
+                    <DatabaseProvider>
+                        <RootComponent htmlRef={ref} />
+                    </DatabaseProvider>
+                )}
                 <Scripts />
             </body>
         </html>
